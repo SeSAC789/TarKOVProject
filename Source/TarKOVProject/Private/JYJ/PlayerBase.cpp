@@ -87,10 +87,12 @@ void APlayerBase::BeginPlay()
 void APlayerBase::SetupPlayerInputComponent( UInputComponent* PlayerInputComponent )
 {
 	// Set up action bindings
+	Super::SetupPlayerInputComponent( PlayerInputComponent );
 
 	UEnhancedInputComponent* input = CastChecked<UEnhancedInputComponent>( PlayerInputComponent);
 
-	SetupInputDelegate.Broadcast(input);
+	//SetupInputDelegate.Broadcast(input);
+	moveComp->SetupInput(input);
 
 
 	/*

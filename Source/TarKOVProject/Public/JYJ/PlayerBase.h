@@ -20,6 +20,8 @@ class APlayerBase : public ACharacter
 {
 	GENERATED_BODY()
 
+public:
+
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY( VisibleAnywhere , BlueprintReadOnly , Category = Camera , meta = (AllowPrivateAccess = "true") )
 	USpringArmComponent* CameraBoom;
@@ -33,19 +35,15 @@ class APlayerBase : public ACharacter
 	UInputMappingContext* DefaultMappingContext;
 
 	
-public:
 	APlayerBase();
 
 
-
-
-
-protected:
+public:
 	// APawn interface
 	virtual void SetupPlayerInputComponent( class UInputComponent* PlayerInputComponent ) override;
 
 	// To add mapping context
-	virtual void BeginPlay();
+	virtual void BeginPlay() override;
 
 public:
 	FSetupInputDelegate SetupInputDelegate;
