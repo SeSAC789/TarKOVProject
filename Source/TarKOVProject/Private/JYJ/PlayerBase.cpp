@@ -33,34 +33,45 @@ APlayerBase::APlayerBase()
 
 	// Note: For faster iteration times these variables, and many more, can be tweaked in the Character Blueprint
 	// instead of recompiling to adjust them
-	GetCharacterMovement()->JumpZVelocity = 700.f;
+	GetCharacterMovement()->JumpZVelocity = 450.f;
 	GetCharacterMovement()->AirControl = 0.35f;
-	GetCharacterMovement()->MaxWalkSpeed = 500.f;
+	GetCharacterMovement()->MaxWalkSpeed = 300.f;
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
-	CameraBoom = CreateDefaultSubobject<USpringArmComponent>( TEXT( "CameraBoom" ) );
-	CameraBoom->SetupAttachment( RootComponent );
-	CameraBoom->TargetArmLength = 400.0f; // The camera follows at this distance behind the character	
-	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
+	//CameraBoom = CreateDefaultSubobject<USpringArmComponent>( TEXT( "CameraBoom" ) );
+	//CameraBoom->SetupAttachment( RootComponent );
+	//CameraBoom->SetupAttachment( RootComponent );
+	//CameraBoom->TargetArmLength = 400.0f; // The camera follows at this distance behind the character	
+	//CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 
 	// Create a follow camera
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>( TEXT( "FollowCamera" ) );
-	FollowCamera->SetupAttachment( CameraBoom , USpringArmComponent::SocketName ); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
+	//FollowCamera->SetupAttachment( CameraBoom , USpringArmComponent::SocketName ); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
-
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> tmpMesh( TEXT( "/Script/Engine.SkeletalMesh'/Game/TarKOV/JYJ/Models/Ch49_nonPBR.Ch49_nonPBR'" ) );
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> tmpMesh( TEXT( "/Script/Engine.SkeletalMesh'/Game/TarKOV/JYJ/Models/Ch08/Ch08_nonPBR.Ch08_nonPBR'" ) );
 	if (tmpMesh.Succeeded())
 	{
 		GetMesh()->SetSkeletalMesh( tmpMesh.Object );
-		GetMesh()->SetRelativeLocationAndRotation( FVector( 0 , 0 , -90 ) , FRotator( 0 , -90 , 0 ) );
+		GetMesh()->SetRelativeLocationAndRotation( FVector( 0 , 0 , -98 ) , FRotator( 0 , -90 , 0 ) );
+		GetMesh()->SetupAttachment( RootComponent );
+		GetMesh()->SetOwnerNoSee( false );
+		FollowCamera->SetupAttachment( GetMesh(), TEXT("CamSocket") );
+		//(Pitch=0.000000,Yaw=0.000000,Roll=-90.000000)
+		FollowCamera->SetRelativeRotation(FRotator(0, 0, -90));
+		
 
 	}
+
+	FollowCamera->bUsePawnControlRotation = true;
+	this->bUseControllerRotationPitch = false;
+	this->bUseControllerRotationYaw = true;
+	this->bUseControllerRotationRoll = false;
 
 	moveComp = CreateDefaultSubobject<UPlayerdMoveComp>( TEXT( "moveComp" ) );
 
