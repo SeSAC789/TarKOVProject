@@ -64,8 +64,6 @@ APlayerBase::APlayerBase()
 		FollowCamera->SetupAttachment( GetMesh(), TEXT("CamSocket") );
 		//(Pitch=0.000000,Yaw=0.000000,Roll=-90.000000)
 		FollowCamera->SetRelativeRotation(FRotator(0, 0, -90));
-		
-
 	}
 
 	FollowCamera->bUsePawnControlRotation = true;

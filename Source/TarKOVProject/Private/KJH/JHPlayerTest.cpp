@@ -3,10 +3,12 @@
 
 #include "KJH/JHPlayerTest.h"
 
+#include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 
 AJHPlayerTest::AJHPlayerTest()
 {
+
     HeadHitbox = CreateDefaultSubobject<UCapsuleComponent>( TEXT( "HeadHitbox" ) );
     HeadHitbox->SetupAttachment( GetMesh() , FName( "HeadSocket" ) );
     HeadHitbox->SetCapsuleSize( 15.f , 25.f ); // 캡슐의 크기 설정 (반지름, 높이)
