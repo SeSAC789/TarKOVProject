@@ -3,3 +3,13 @@
 
 #include "KJH/JHPlayerTest.h"
 
+AJHPlayerTest::AJHPlayerTest()
+{
+
+}
+
+void AJHPlayerTest::BeginPlay()
+{
+	Super::BeginPlay();
+
+}

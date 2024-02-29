@@ -14,5 +14,8 @@ class TARKOVPROJECT_API AJHPlayerTest : public APlayerBase
 {
 	GENERATED_BODY()
 
-	
+	AJHPlayerTest();
+
+	// To add mapping context
+	virtual void BeginPlay() override;
 };
