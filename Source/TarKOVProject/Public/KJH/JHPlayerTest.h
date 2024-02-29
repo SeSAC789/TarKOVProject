@@ -14,5 +14,5 @@ class TARKOVPROJECT_API AJHPlayerTest : public APlayerBase
 {
 	GENERATED_BODY()
 
-	AJHPlayerTest();
+	
 };
