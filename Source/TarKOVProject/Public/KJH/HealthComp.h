@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -24,5 +24,15 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-		
+
+	void TakeDamage( const FName& BodyPart , float DamageAmount );
+
+protected:
+	// 각 신체 부위별 현재 HP
+	UPROPERTY( VisibleAnywhere , Category = "Health" )
+	TMap<FName , float> BodyPartCurrentHealth;
+
+	// 각 신체 부위별 Max HP
+	UPROPERTY( EditDefaultsOnly , Category = "Health" )
+	TMap<FName , float> BodyPartMaxHealth;
 };
