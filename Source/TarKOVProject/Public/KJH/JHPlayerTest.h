@@ -31,15 +31,23 @@ public:
 	class UCapsuleComponent* StomachHitbox;
 	// 오른팔
 	UPROPERTY( VisibleAnywhere , BlueprintReadOnly , Category = "Hitbox" )
-	class UCapsuleComponent* RightArmHitbox;
+	class UCapsuleComponent* RightArmUpperHitbox;
+	UPROPERTY( VisibleAnywhere , BlueprintReadOnly , Category = "Hitbox" )
+	class UCapsuleComponent* RightForeArmHitbox;
 	// 왼팔
 	UPROPERTY( VisibleAnywhere , BlueprintReadOnly , Category = "Hitbox" )
-	class UCapsuleComponent* LeftArmHitbox;
+	class UCapsuleComponent* LeftArmUpperHitbox;
+	UPROPERTY( VisibleAnywhere , BlueprintReadOnly , Category = "Hitbox" )
+	class UCapsuleComponent* LeftForeArmHitbox;
 	// 오른다리
 	UPROPERTY( VisibleAnywhere , BlueprintReadOnly , Category = "Hitbox" )
-	class UCapsuleComponent* RightLegHitbox;
+	class UCapsuleComponent* RightLegUpperHitbox;
+	UPROPERTY( VisibleAnywhere , BlueprintReadOnly , Category = "Hitbox" )
+	class UCapsuleComponent* RightLegLowerHitbox;
 	// 왼다리
 	UPROPERTY( VisibleAnywhere , BlueprintReadOnly , Category = "Hitbox" )
-	class UCapsuleComponent* LeftLegHitbox;
+	class UCapsuleComponent* LeftLegUpperHitbox;
+	UPROPERTY( VisibleAnywhere , BlueprintReadOnly , Category = "Hitbox" )
+	class UCapsuleComponent* LeftLegLowerHitbox;
 
 };
