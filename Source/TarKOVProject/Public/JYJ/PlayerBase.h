@@ -21,11 +21,6 @@ class APlayerBase : public ACharacter
 	GENERATED_BODY()
 
 public:
-
-	/** Camera boom positioning the camera behind the character */
-	UPROPERTY( VisibleAnywhere , BlueprintReadOnly , Category = Camera , meta = (AllowPrivateAccess = "true") )
-	USpringArmComponent* CameraBoom;
-
 	/** Follow camera */
 	UPROPERTY( VisibleAnywhere , BlueprintReadOnly , Category = Camera , meta = (AllowPrivateAccess = "true") )
 	UCameraComponent* FollowCamera;
@@ -34,7 +29,6 @@ public:
 	UPROPERTY( EditAnywhere , BlueprintReadOnly , Category = Input , meta = (AllowPrivateAccess = "true") )
 	UInputMappingContext* DefaultMappingContext;
 
-	
 	APlayerBase();
 
 
@@ -45,11 +39,11 @@ public:
 	// To add mapping context
 	virtual void BeginPlay() override;
 
+	UFUNCTION()
+	virtual void OnHitboxOverlap( UPrimitiveComponent* OverlappedComponent , AActor* OtherActor , UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep , const FHitResult& SweepResult );
+
 public:
 	FSetupInputDelegate SetupInputDelegate;
-
-	UPROPERTY( EditDefaultsOnly )
-	class UPlayerdMoveComp* moveComp;
 
 	UPROPERTY( EditDefaultsOnly )
 	class USceneComponent* aimingCamPos;
@@ -62,9 +56,55 @@ public:
 
 
 public:
-	/** Returns CameraBoom subobject **/
-	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+public:
+	// 24.03.06 정현 플레이어 기능 추가
+	// 정현이 테스트 플레이어에서 재정의 가능하도록 수정 -> 정현이한테 말하기
+	//UFUNCTION()
+	//void OnHitboxOverlap( UPrimitiveComponent* OverlappedComponent , AActor* OtherActor , UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep , const FHitResult& SweepResult );
+
+	// 머리
+	UPROPERTY( VisibleAnywhere , BlueprintReadOnly , Category = "Hitbox" )
+	class UCapsuleComponent* HeadHitbox;
+	// 흉부
+	UPROPERTY( VisibleAnywhere , BlueprintReadOnly , Category = "Hitbox" )
+	class UCapsuleComponent* ThoraxHitbox;
+	// 복부
+	UPROPERTY( VisibleAnywhere , BlueprintReadOnly , Category = "Hitbox" )
+	class UCapsuleComponent* StomachHitbox;
+	// 오른팔
+	UPROPERTY( VisibleAnywhere , BlueprintReadOnly , Category = "Hitbox" )
+	class UCapsuleComponent* RightArmUpperHitbox;
+	UPROPERTY( VisibleAnywhere , BlueprintReadOnly , Category = "Hitbox" )
+	class UCapsuleComponent* RightForeArmHitbox;
+	// 왼팔
+	UPROPERTY( VisibleAnywhere , BlueprintReadOnly , Category = "Hitbox" )
+	class UCapsuleComponent* LeftArmUpperHitbox;
+	UPROPERTY( VisibleAnywhere , BlueprintReadOnly , Category = "Hitbox" )
+	class UCapsuleComponent* LeftForeArmHitbox;
+	// 오른다리
+	UPROPERTY( VisibleAnywhere , BlueprintReadOnly , Category = "Hitbox" )
+	class UCapsuleComponent* RightLegUpperHitbox;
+	UPROPERTY( VisibleAnywhere , BlueprintReadOnly , Category = "Hitbox" )
+	class UCapsuleComponent* RightLegLowerHitbox;
+	// 왼다리
+	UPROPERTY( VisibleAnywhere , BlueprintReadOnly , Category = "Hitbox" )
+	class UCapsuleComponent* LeftLegUpperHitbox;
+	UPROPERTY( VisibleAnywhere , BlueprintReadOnly , Category = "Hitbox" )
+	class UCapsuleComponent* LeftLegLowerHitbox;
+
+	// Components
+	UPROPERTY( VisibleAnywhere , BlueprintReadOnly , Category = "Components" )
+	class UHealthComp* HealthComp;
+
+	UPROPERTY( EditDefaultsOnly , BlueprintReadOnly , Category = "Components" )
+	class UPlayerFireComp* fireComp;
+
+	UPROPERTY( EditDefaultsOnly , BlueprintReadOnly , Category = "Components" )
+	class UPlayerMoveComp* moveComp;
+
+	void SetPartitionDamageCollision();
 };
 

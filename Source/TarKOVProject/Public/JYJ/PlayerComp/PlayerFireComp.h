@@ -44,10 +44,6 @@ public:
 	UPROPERTY()
 	class ARifleActor* weapon;
 
-	//base 에 springarm 추가하면 삭제
-	UPROPERTY()
-	class AYJTestPlayer* testplayer;
-
 	UPROPERTY( EditAnywhere )
 	class UPlayerAnimInstance* PlayerAnim;
 

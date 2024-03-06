@@ -13,10 +13,11 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	Super::NativeUpdateAnimation(DeltaSeconds);
 
 	//1. owner pawn 을 가져와서 atpsplayer 로 cast 하고 싶다.
-	AYJTestPlayer* player = Cast<AYJTestPlayer>( TryGetPawnOwner() );
+	APlayerBase* player = Cast<APlayerBase>( TryGetPawnOwner() );
 	if (nullptr == player)
 		return;
 
+	
 	//2. 오너의 velocity, forwward vector, right vector를 가져오고 싶다.
 	FVector v = player->GetVelocity();
 	FVector forward = player->GetActorForwardVector();
@@ -28,16 +29,19 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	//4. isInAir, isCrouch를 채우고 싶다.
 	isInAir = player->GetCharacterMovement()->IsFalling();
-	isCrouched = player->moveComp1->isCrouched;
-	isProned = player->moveComp1->isProned;
-
-	pitch = player->GetBaseAimRotation().GetNormalized().Pitch;
-	pitch = FMath::Clamp(pitch, -90, 90);
-	//yaw = player->GetBaseAimRotation().Yaw;
-	//roll = player->GetBaseAimRotation().Roll;
+	isCrouched = player->moveComp->isCrouched;
+	isProned = player->moveComp->isProned;
 
 	bAimRifle = player->fireComp->bAimRifle;
 	bValidRifle = player->fireComp->bValidRifle;
+
+	pitch = player->GetBaseAimRotation().GetNormalized().Pitch;
+	pitch = FMath::Clamp(pitch, -90, 90);
+	yaw = player->GetBaseAimRotation().Yaw;
+	roll = player->GetBaseAimRotation().Roll;
+
+	
+	
 
 }
 

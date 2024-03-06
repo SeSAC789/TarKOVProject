@@ -3,6 +3,8 @@
 
 #include "JYJ/Weapon/RifleActor.h"
 
+#include "Camera/CameraComponent.h"
+
 // Sets default values
 ARifleActor::ARifleActor()
 {
@@ -12,14 +14,18 @@ ARifleActor::ARifleActor()
 	meshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("meshComp"));
 	SetRootComponent(meshComp);
 
+	//Rifle Cam Settings
+	rifleCamComp = CreateDefaultSubobject<UCameraComponent>(TEXT("rifleCamComp"));
+	rifleCamComp->SetupAttachment(meshComp);
+	rifleCamComp->SetRelativeLocation(FVector( 0.170610, -2.909110 , 17.945868 ));
+	rifleCamComp->SetRelativeRotation(FRotator( 0, 90, 0));
+
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> tmpMesh( TEXT( "/Script/Engine.SkeletalMesh'/Game/TarKOV/JYJ/Models/Weapons/Meshes/Ka47/SK_KA47.SK_KA47'" ) );
 	if (tmpMesh.Succeeded())
 	{
 		meshComp->SetSkeletalMesh( tmpMesh.Object );
-		meshComp->SetRelativeLocation( FVector( 3 , -1 , 2 ) );
-		//(Pitch=40.000000,Yaw=-100.000000,Roll=80.000000)
+		meshComp->SetWorldScale3D( FVector( 1.1f ) );
 		meshComp->SetRelativeRotation( FRotator( 40 , -100 , 80 ) );
-		meshComp->SetWorldScale3D( FVector( 1.5f ) );
 	}
 
 
@@ -37,5 +43,18 @@ void ARifleActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void ARifleActor::ActiveRifleCamp(bool isRifle, APlayerController* controller )
+{
+	if(false == isRifle) return;
+
+	rifleCamComp->Activate(true);
+	controller->SetViewTargetWithBlend(this);
+}
+
+void ARifleActor::DeactiveRifleCamp()
+{
+	rifleCamComp->Deactivate();
 }
 

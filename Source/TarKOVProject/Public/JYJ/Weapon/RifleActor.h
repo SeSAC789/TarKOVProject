@@ -25,6 +25,11 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	class USkeletalMeshComponent* meshComp;
-	
+
+	UPROPERTY(EditDefaultsOnly)
+	class UCameraComponent* rifleCamComp;
+
+	void ActiveRifleCamp(bool isRifle, APlayerController* controller);
+	void DeactiveRifleCamp();
 
 };
