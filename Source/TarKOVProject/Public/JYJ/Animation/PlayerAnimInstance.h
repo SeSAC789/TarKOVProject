@@ -32,7 +32,24 @@ public:
 	UPROPERTY( EditAnywhere , BlueprintReadWrite )
 	bool isProned;
 
-	//UPROPERTY( EditAnywhere , BlueprintReadWrite )
-	//float pitch1;
+	UPROPERTY( EditAnywhere , BlueprintReadWrite )
+	bool bValidRifle;
+
+	UPROPERTY( EditAnywhere , BlueprintReadWrite )
+	bool bAimRifle;
+
+	UPROPERTY( EditAnywhere , BlueprintReadWrite )
+	float pitch;
+
+	UPROPERTY( EditAnywhere , BlueprintReadWrite )
+	float yaw;
+
+	UPROPERTY( EditAnywhere , BlueprintReadWrite )
+	float roll;
+
+	UPROPERTY( EditDefaultsOnly )
+	class UAnimMontage* fireRifleMontage;
+
+	void playFireAnimation();
 	
 };

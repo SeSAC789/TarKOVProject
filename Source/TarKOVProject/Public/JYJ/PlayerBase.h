@@ -51,6 +51,16 @@ public:
 	UPROPERTY( EditDefaultsOnly )
 	class UPlayerdMoveComp* moveComp;
 
+	UPROPERTY( EditDefaultsOnly )
+	class USceneComponent* aimingCamPos;
+
+	UPROPERTY(EditDefaultsOnly)
+	class USceneComponent* DefaultCamPos;
+
+	UPROPERTY( EditDefaultsOnly )
+	class USceneComponent* rifleComp;
+
+
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }

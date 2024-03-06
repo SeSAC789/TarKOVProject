@@ -15,8 +15,15 @@ class TARKOVPROJECT_API AYJTestPlayer : public APlayerBase
 	GENERATED_BODY()
 
 public:
+	//UPROPERTY(EditDefaultsOnly)
+	//class USpringArmComponent* springComp;
+
 	UPROPERTY( EditDefaultsOnly )
 	class UPlayerMoveComp* moveComp1;
+
+	UPROPERTY( EditDefaultsOnly )
+	class UPlayerFireComp* fireComp;
+
 
 	AYJTestPlayer();
 

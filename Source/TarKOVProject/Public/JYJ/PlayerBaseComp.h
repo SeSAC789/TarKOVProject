@@ -30,5 +30,4 @@ public:
 
 	UPROPERTY()
 	class APlayerBase* me;
-
 };

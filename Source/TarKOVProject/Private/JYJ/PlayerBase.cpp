@@ -51,17 +51,32 @@ APlayerBase::APlayerBase()
 	{
 		GetMesh()->SetSkeletalMesh( tmpMesh.Object );
 		GetMesh()->SetRelativeLocationAndRotation( FVector( 0 , 0 , -98 ) , FRotator( 0 , -90 , 0 ) );
-		GetMesh()->SetupAttachment( RootComponent );
+		GetMesh()->SetupAttachment(RootComponent );
 		GetMesh()->SetOwnerNoSee( false );
 
 		FollowCamera->SetupAttachment( GetMesh(), TEXT("CamSocket") );
-		FollowCamera->SetRelativeLocation(FVector(10,0,0));
-		FollowCamera->SetRelativeRotation(FRotator(0, 0, -90));
+		//(X=29.088001,Y=-14.927225,Z=-27.355890)
+		FollowCamera->SetRelativeLocation(FVector( 29.088001 , -14.927225 , -27.355890 ));
+		//(Pitch=-9.333045,Yaw=0.415788,Roll=-92.469920)
+		FollowCamera->SetRelativeRotation(FRotator( -9.333045 , 0.415788 , -92.469920 ));
+
+		aimingCamPos = CreateDefaultSubobject<USceneComponent>( TEXT( "aimingCamPos" ) );
+		DefaultCamPos = CreateDefaultSubobject<USceneComponent>( TEXT( "DefaultCamPos" ) );
+
+		aimingCamPos->SetupAttachment(GetMesh());
+		DefaultCamPos->SetupAttachment(GetMesh());
+
+		DefaultCamPos->SetWorldLocation(FollowCamera->GetRelativeLocation());
+		aimingCamPos->SetWorldLocation( FollowCamera->GetRelativeLocation() + FVector(10, 0, 30));
 	}
 
+
+	rifleComp = CreateDefaultSubobject<USceneComponent>( TEXT( "rifleComp" ) );
+	rifleComp->SetupAttachment(GetMesh(), TEXT("RifleSocket"));
 	
 
 	moveComp = CreateDefaultSubobject<UPlayerdMoveComp>( TEXT( "moveComp" ) );
+	
 
 }
 
