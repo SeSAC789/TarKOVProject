@@ -5,11 +5,13 @@
 
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Components/Border.h"
+#include "Components/CanvasPanelSlot.h"
 
 void UInventoryGrid_Widget::Initializee(UInventoryComponent* inventoryComponent1, float tileSize1)
 {
 	inventoryComponent = inventoryComponent1;
-	UWidgetLayoutLibrary::SlotAsCanvasSlot( GridBorder );
+	auto slot = UWidgetLayoutLibrary::SlotAsCanvasSlot( GridBorder );
+	//slot->SetSize()
 
 	
 }

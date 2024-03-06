@@ -30,4 +30,10 @@ public:
 
 	UPROPERTY( EditDefaultsOnly , BlueprintReadOnly , Category = Private )
 	float tileSize;
+
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
+	class UBorder* GridBorder;
+
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
+	class UGridCanvasPanel* GridCanvasPanel;
 };
