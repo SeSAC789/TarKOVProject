@@ -18,8 +18,14 @@ class TARKOVPROJECT_API AJHPlayerTest : public APlayerBase
 
 	// To add mapping context
 	virtual void BeginPlay() override;
+	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
 public:
+	// 충돌 처리 함수
+	UFUNCTION()
+	void OnHitboxOverlap( UPrimitiveComponent* OverlappedComponent , AActor* OtherActor , UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep , const FHitResult& SweepResult );
+
+
 	// 머리
 	UPROPERTY( VisibleAnywhere , BlueprintReadOnly , Category = "Hitbox" )
 	class UCapsuleComponent* HeadHitbox;
@@ -49,5 +55,9 @@ public:
 	class UCapsuleComponent* LeftLegUpperHitbox;
 	UPROPERTY( VisibleAnywhere , BlueprintReadOnly , Category = "Hitbox" )
 	class UCapsuleComponent* LeftLegLowerHitbox;
+
+	UPROPERTY( VisibleAnywhere , BlueprintReadOnly , Category = "Components" )
+	class UHealthComp* HealthComp;
+
 
 };

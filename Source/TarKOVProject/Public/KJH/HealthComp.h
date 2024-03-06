@@ -25,14 +25,19 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 
-	void TakeDamage( const FName& BodyPart , float DamageAmount );
+	void TakeDamage( const FName& BodyPart , int32 DamageAmount, const FString& HitObjectName );
 
 protected:
 	// 각 신체 부위별 현재 HP
 	UPROPERTY( VisibleAnywhere , Category = "Health" )
-	TMap<FName , float> BodyPartCurrentHealth;
+	TMap<FName , int32> BodyPartHP;
 
 	// 각 신체 부위별 Max HP
 	UPROPERTY( EditDefaultsOnly , Category = "Health" )
-	TMap<FName , float> BodyPartMaxHealth;
+	TMap<FName , int32> BodyPartMaxHP;
+
+	// 캐릭터의 사망 상태
+	UPROPERTY( EditDefaultsOnly , Category = "Health" )
+	bool bIsDead;
+
 };

@@ -12,20 +12,20 @@ UHealthComp::UHealthComp()
 
 	// ...
 
-     // 각 신체 부위별 기본 HP 값 초기화
-    BodyPartMaxHealth.Add( "Head" , 35.f );
-    BodyPartMaxHealth.Add( "Thorax" , 85.f );
-    BodyPartMaxHealth.Add( "Stomach" , 70.f );
-    BodyPartMaxHealth.Add( "RightArm" , 60.f );
-    BodyPartMaxHealth.Add( "LeftArm" , 60.f );
-    BodyPartMaxHealth.Add( "RightLeg" , 65.f );
-    BodyPartMaxHealth.Add( "LeftLeg" , 65.f );
+	 // 각 신체 부위별 기본 HP 값 초기화
+	BodyPartMaxHP.Add( "Head" , 35 );
+	BodyPartMaxHP.Add( "Thorax" , 85 );
+	BodyPartMaxHP.Add( "Stomach" , 70 );
+	BodyPartMaxHP.Add( "RightArm" , 60 );
+	BodyPartMaxHP.Add( "LeftArm" , 60 );
+	BodyPartMaxHP.Add( "RightLeg" , 65 );
+	BodyPartMaxHP.Add( "LeftLeg" , 65 );
 
-    // MaxHP 값을 사용하여 각 부위의 현재 건강 상태 초기화
-    for (const auto& Elem : BodyPartMaxHealth)
-    {
-        BodyPartCurrentHealth.Add( Elem.Key , Elem.Value );
-    }
+	// MaxHP 값을 사용하여 각 부위의 현재 건강 상태 초기화
+	for (const auto& Elem : BodyPartMaxHP)
+	{
+		BodyPartHP.Add( Elem.Key , Elem.Value );
+	}
 }
 
 
@@ -35,31 +35,53 @@ void UHealthComp::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	
+
 }
 
 
 // Called every frame
-void UHealthComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UHealthComp::TickComponent( float DeltaTime , ELevelTick TickType , FActorComponentTickFunction* ThisTickFunction )
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	Super::TickComponent( DeltaTime , TickType , ThisTickFunction );
 
 	// ...
 }
 
-void UHealthComp::TakeDamage(const FName& BodyPart, float DamageAmount)
+void UHealthComp::TakeDamage( const FName& BodyPart , int32 DamageAmount, const FString& HitObjectName )
 {
-    if (BodyPartCurrentHealth.Contains( BodyPart ))
-    {
-        // 해당 신체 부위의 건강 상태 감소
-        BodyPartCurrentHealth[BodyPart] -= DamageAmount;
+	
+	if (BodyPartHP.Contains( BodyPart ))
+	{
+		BodyPartHP[BodyPart] = FMath::Clamp<int32>( BodyPartHP[BodyPart] - DamageAmount , 0 , BodyPartMaxHP[BodyPart] );
+		//UE_LOG( LogTemp , Warning , TEXT( "%s received %d damage. Remaining HP: %d" ) , *BodyPart.ToString() , DamageAmount , BodyPartHP[BodyPart] );
+		UE_LOG( LogTemp , Warning , TEXT( "%s received %d damage from %s. Remaining HP: %d" ) , *BodyPart.ToString() , DamageAmount , *HitObjectName , BodyPartHP[BodyPart] );
 
-        // 머리 또는 흉부 부위의 체력이 0 이하인 경우 즉시 사망 처리
-        if ((BodyPart == FName( "Head" ) || BodyPart == FName( "Thorax" )) && BodyPartCurrentHealth[BodyPart] <= 0.f)
-        {
-            // 즉시 사망 이후 관련 함수 구현하자, 죽음 애니메이션 제생, 게임오버 ui등 구현
-        }
-      
-    }
+		// 만약 머리 또는 흉부 부위의 체력이 0 이하라면 즉시 사망
+		if ((BodyPart == FName( "Head" ) || BodyPart == FName( "Thorax" )) && BodyPartHP[BodyPart] <= 0)
+		{
+			bIsDead = true;
+			// 즉시 사망 이후 관련 함수 구현하자, 죽음 애니메이션 제생, 게임오버 ui등 구현하면 될 듯
+			return;
+		}
+
+		// 모든 신체 부위의 체력이 0 이하인지 확인
+		bIsDead = true; // 처음에는 캐릭터를 사망한 것으로 가정
+		for (const auto& Elem : BodyPartHP)
+		{
+			if (Elem.Value > 0)
+			{
+				bIsDead = false; // 하나라도 체력이 0보다 큰 부위가 있다면, 캐릭터는 아직 살아있음
+				break;
+			}
+		}
+
+		// 만약 모든 신체 부위의 체력이 0 이하이면 사망 처리
+		if (bIsDead)
+		{
+			// 즉시 사망 이후 관련 함수 구현하자, 죽음 애니메이션 제생, 게임오버 ui등 구현하면 될 듯
+
+		}
+	}
+	
 }
 
