@@ -5,6 +5,7 @@
 #include "JYJ/PlayerComp/PlayerMoveComp.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "JYJ/PlayerBase.h"
+#include "JYJ/PlayerComp/PlayerFireComp.h"
 #include "JYJ/TestPlayer/YJTestPlayer.h"
 
 void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -29,4 +30,18 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	isInAir = player->GetCharacterMovement()->IsFalling();
 	isCrouched = player->moveComp1->isCrouched;
 	isProned = player->moveComp1->isProned;
+
+	pitch = player->GetBaseAimRotation().GetNormalized().Pitch;
+	pitch = FMath::Clamp(pitch, -90, 90);
+	//yaw = player->GetBaseAimRotation().Yaw;
+	//roll = player->GetBaseAimRotation().Roll;
+
+	bAimRifle = player->fireComp->bAimRifle;
+	bValidRifle = player->fireComp->bValidRifle;
+
+}
+
+void UPlayerAnimInstance::playFireAnimation()
+{
+	//Montage_Play( fireRifleMontage );
 }
