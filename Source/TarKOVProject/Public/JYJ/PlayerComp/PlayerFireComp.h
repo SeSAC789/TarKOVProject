@@ -59,6 +59,9 @@ public:
 	UPROPERTY( EditDefaultsOnly )
 	class UStaticMeshComponent* TraceGun;
 
+	UPROPERTY( EditAnywhere )
+	TSubclassOf<class ADamageTestActor> DamageActorFactory;
+
 
 	float targetFOV = 90 ;
 

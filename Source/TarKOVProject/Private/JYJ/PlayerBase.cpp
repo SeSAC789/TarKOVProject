@@ -130,7 +130,7 @@ void APlayerBase::OnHitboxOverlap( UPrimitiveComponent* OverlappedComponent , AA
 {
 	if (this == OtherActor)
 	{
-		UE_LOG( LogTemp , Warning , TEXT( "AJHPlayerTest::OnHitboxOverlap" ) );
+		//UE_LOG( LogTemp , Warning , TEXT( "AJHPlayerTest::OnHitboxOverlap" ) );
 		return;
 	}
 

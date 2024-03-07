@@ -4,6 +4,7 @@
 #include "JYJ/PlayerComp/PlayerFireComp.h"
 #include "EnhancedInputComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "JYJ/Weapon/RifleActor.h"
@@ -11,6 +12,7 @@
 #include "JYJ/Animation/PlayerAnimInstance.h"
 #include "JYJ/TestPlayer/YJTestPlayer.h"
 #include "Kismet/GameplayStatics.h"
+#include "KJH/DamageTestActor.h"
 #include "KJH/HealthComp.h"
 
 void UPlayerFireComp::BeginPlay()
@@ -147,16 +149,46 @@ void UPlayerFireComp::Fire()
 		if (bHits)
 		{
 			UGameplayStatics::SpawnEmitterAtLocation( GetWorld() , ExplosionVFXFactory , OutHit.ImpactPoint );
+
+			//태호가 제시해준 방향
+			/*
+			UCapsuleComponent* HitComp = Cast<UCapsuleComponent>( OutHit.GetComponent() );
+
+			if (HitComp->ComponentHasTag( "Head" ) || HitComp->ComponentHasTag( "Thorax" ) || HitComp->ComponentHasTag( "Stomach" ) || HitComp->ComponentHasTag( "RightArm" ) || HitComp->ComponentHasTag( "LeftArm" ) || HitComp->ComponentHasTag( "RightLeg" ) || HitComp->ComponentHasTag( "LeftLeg" ))
+			{
+				FTransform t = weapon->meshComp->GetSocketTransform( TEXT( "Muzzle" ) );
+				//FTransform aimSight = weapon->meshComp->GetSocketTransform( TEXT( "AimSight" ) );
+
+				DrawDebugLine( GetWorld() , t.GetLocation() , End , FColor::Silver , false , 0.2f );
+
+				//만약 부딪힌 상대방이 플레이어라면 데미지 함수를 호출
+				auto otherplayer = Cast<APlayerBase>( OutHit.GetActor() );
+				if (otherplayer)
+				{
+
+					FName BodyPart = HitComp->ComponentTags[0];
+					FString HitObjectName = OutHit.GetComponent()->GetName();
+					//HitComp->ComponentTags[0]
+					me->HealthComp->TakeDamage( BodyPart, 5, HitObjectName );
+					//GetWorld()->SpawnActor<ADamageTestActor>(DamageActor, OutHit.GetActor()->GetActorLocation(), FRotator::ZeroRotator);
+
+
+				}
+			}
+			*/
+			
 			FTransform t = weapon->meshComp->GetSocketTransform( TEXT( "Muzzle" ) );
 			//FTransform aimSight = weapon->meshComp->GetSocketTransform( TEXT( "AimSight" ) );
-			
+
 			DrawDebugLine( GetWorld() , t.GetLocation() , End , FColor::Silver , false , 0.2f );
 
-			//만약 부딪힌 상대방이 플레이어라면 데미지 함수를 호출
-			auto otherplayer = Cast<APlayerBase>( OutHit.GetActor() );
+			//만약 부딪힌 상대방이 플레이어라면 해당 위치에 스폰
+			auto otherplayer = Cast<APlayerBase>( OutHit.GetActor());
 			if (otherplayer)
 			{
-				//me->HealthComp->TakeDamage();
+				FActorSpawnParameters SpawnParameters;
+				GetWorld()->SpawnActor<ADamageTestActor>( DamageActorFactory , OutHit.GetComponent()->GetComponentLocation() , FRotator::ZeroRotator , SpawnParameters );
+
 			}
 
 
