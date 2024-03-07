@@ -138,7 +138,8 @@ void UPlayerFireComp::Fire()
 	{
 		FHitResult OutHit;
 		FVector Start = weapon->meshComp->GetSocketLocation( TEXT( "Muzzle" ) );
-		FVector End = weapon->rifleCamComp->GetForwardVector() * 100000;
+		//FVector End = weapon->rifleCamComp->GetForwardVector() * 100000;
+		FVector End = me->FollowCamera->GetForwardVector() * 100000;
 
 		FCollisionQueryParams Params;
 		Params.AddIgnoredActor( me );
@@ -150,13 +151,18 @@ void UPlayerFireComp::Fire()
 		{
 			UGameplayStatics::SpawnEmitterAtLocation( GetWorld() , ExplosionVFXFactory , OutHit.ImpactPoint );
 
+			FTransform t = weapon->meshComp->GetSocketTransform( TEXT( "Muzzle" ) );
+			DrawDebugLine( GetWorld() , t.GetLocation() , End , FColor::Silver , false , 0.2f );
+			UE_LOG( LogTemp , Warning,TEXT( "%s" ) , *OutHit.Component->GetName() );
+
 			//태호가 제시해준 방향
-			/*
+			
 			UCapsuleComponent* HitComp = Cast<UCapsuleComponent>( OutHit.GetComponent() );
+			if(HitComp==nullptr)return;
 
 			if (HitComp->ComponentHasTag( "Head" ) || HitComp->ComponentHasTag( "Thorax" ) || HitComp->ComponentHasTag( "Stomach" ) || HitComp->ComponentHasTag( "RightArm" ) || HitComp->ComponentHasTag( "LeftArm" ) || HitComp->ComponentHasTag( "RightLeg" ) || HitComp->ComponentHasTag( "LeftLeg" ))
 			{
-				FTransform t = weapon->meshComp->GetSocketTransform( TEXT( "Muzzle" ) );
+				//FTransform t = weapon->meshComp->GetSocketTransform( TEXT( "Muzzle" ) );
 				//FTransform aimSight = weapon->meshComp->GetSocketTransform( TEXT( "AimSight" ) );
 
 				DrawDebugLine( GetWorld() , t.GetLocation() , End , FColor::Silver , false , 0.2f );
@@ -175,21 +181,21 @@ void UPlayerFireComp::Fire()
 
 				}
 			}
-			*/
 			
-			FTransform t = weapon->meshComp->GetSocketTransform( TEXT( "Muzzle" ) );
-			//FTransform aimSight = weapon->meshComp->GetSocketTransform( TEXT( "AimSight" ) );
+			
+			//FTransform t = weapon->meshComp->GetSocketTransform( TEXT( "Muzzle" ) );
+			////FTransform aimSight = weapon->meshComp->GetSocketTransform( TEXT( "AimSight" ) );
 
-			DrawDebugLine( GetWorld() , t.GetLocation() , End , FColor::Silver , false , 0.2f );
+			//DrawDebugLine( GetWorld() , t.GetLocation() , End , FColor::Silver , false , 0.2f );
 
-			//만약 부딪힌 상대방이 플레이어라면 해당 위치에 스폰
-			auto otherplayer = Cast<APlayerBase>( OutHit.GetActor());
-			if (otherplayer)
-			{
-				FActorSpawnParameters SpawnParameters;
-				GetWorld()->SpawnActor<ADamageTestActor>( DamageActorFactory , OutHit.GetComponent()->GetComponentLocation() , FRotator::ZeroRotator , SpawnParameters );
+			////만약 부딪힌 상대방이 플레이어라면 해당 위치에 스폰
+			//auto otherplayer = Cast<APlayerBase>( OutHit.GetActor());
+			//if (otherplayer)
+			//{
+			//	FActorSpawnParameters SpawnParameters;
+			//	GetWorld()->SpawnActor<ADamageTestActor>( DamageActorFactory , OutHit.GetComponent()->GetComponentLocation() , FRotator::ZeroRotator , SpawnParameters );
 
-			}
+			//}
 
 
 		}
