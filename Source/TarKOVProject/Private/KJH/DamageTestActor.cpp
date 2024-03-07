@@ -14,7 +14,7 @@ ADamageTestActor::ADamageTestActor()
    
     BoxComp = CreateDefaultSubobject<UBoxComponent>( TEXT( "BoxComp" ) );
     this->SetRootComponent( BoxComp );
-    BoxComp->InitBoxExtent( FVector( 50.0f , 50.0f , 50.0f ) );
+    BoxComp->InitBoxExtent( FVector( 5.0f , 5.0f , 5.0f ) );
 
 
     MeshComp = CreateDefaultSubobject<UStaticMeshComponent>( TEXT( "MeshComp" ) );

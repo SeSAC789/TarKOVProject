@@ -52,6 +52,13 @@ void UHealthComp::TakeDamage( const FName& BodyPart , int32 DamageAmount, const 
 	
 	if (BodyPartHP.Contains( BodyPart ))
 	{
+		// 체력이 이미 0이라면 데미지를 적용하지 않는다
+		if (BodyPartHP[BodyPart] <= 0)
+		{
+			UE_LOG( LogTemp , Warning , TEXT( "%s part is already at 0 HP due to %s. No further damage applied." ) , *BodyPart.ToString() , *HitObjectName );
+			return; // 더 이상 코드를 실행하지 않고 빠져나갑니다.
+		}
+
 		BodyPartHP[BodyPart] = FMath::Clamp<int32>( BodyPartHP[BodyPart] - DamageAmount , 0 , BodyPartMaxHP[BodyPart] );
 		//UE_LOG( LogTemp , Warning , TEXT( "%s received %d damage. Remaining HP: %d" ) , *BodyPart.ToString() , DamageAmount , BodyPartHP[BodyPart] );
 		UE_LOG( LogTemp , Warning , TEXT( "%s received %d damage from %s. Remaining HP: %d" ) , *BodyPart.ToString() , DamageAmount , *HitObjectName , BodyPartHP[BodyPart] );
@@ -60,6 +67,7 @@ void UHealthComp::TakeDamage( const FName& BodyPart , int32 DamageAmount, const 
 		if ((BodyPart == FName( "Head" ) || BodyPart == FName( "Thorax" )) && BodyPartHP[BodyPart] <= 0)
 		{
 			bIsDead = true;
+			UE_LOG( LogTemp , Warning , TEXT( "Character has died due to critical damage to %s from %s." ) , *BodyPart.ToString() , *HitObjectName );
 			// 즉시 사망 이후 관련 함수 구현하자, 죽음 애니메이션 제생, 게임오버 ui등 구현하면 될 듯
 			return;
 		}
@@ -78,6 +86,7 @@ void UHealthComp::TakeDamage( const FName& BodyPart , int32 DamageAmount, const 
 		// 만약 모든 신체 부위의 체력이 0 이하이면 사망 처리
 		if (bIsDead)
 		{
+			UE_LOG( LogTemp , Warning , TEXT( "Character has died due to total HP depletion." ) );
 			// 즉시 사망 이후 관련 함수 구현하자, 죽음 애니메이션 제생, 게임오버 ui등 구현하면 될 듯
 
 		}
