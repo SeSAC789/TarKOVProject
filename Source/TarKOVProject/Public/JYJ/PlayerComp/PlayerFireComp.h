@@ -56,12 +56,11 @@ public:
 	UPROPERTY( EditDefaultsOnly )
 	class UParticleSystem* ExplosionVFXFactory;
 
-	UPROPERTY( EditDefaultsOnly )
-	class UStaticMeshComponent* TraceGun;
-
 	UPROPERTY( EditAnywhere )
 	TSubclassOf<class ADamageTestActor> DamageActorFactory;
 
+	//PROPERTY( EditAnywhere )
+	//TSubclassOf<class ATra> TraceFactory;
 
 	float targetFOV = 90 ;
 
