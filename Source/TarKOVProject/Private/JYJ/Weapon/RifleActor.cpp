@@ -17,8 +17,8 @@ ARifleActor::ARifleActor()
 	//Rifle Cam Settings
 	rifleCamComp = CreateDefaultSubobject<UCameraComponent>(TEXT("rifleCamComp"));
 	rifleCamComp->SetupAttachment(meshComp);
-	rifleCamComp->SetRelativeLocation(FVector( 0.170610, -2.909110 , 17.945868 ));
-	rifleCamComp->SetRelativeRotation(FRotator( 0, 90, 0));
+	rifleCamComp->SetRelativeLocation(FVector( 0, -12.691425 , 14.088460 ));
+	rifleCamComp->SetRelativeRotation(FRotator( 2.248205 , 90, 0));
 
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> tmpMesh( TEXT( "/Script/Engine.SkeletalMesh'/Game/TarKOV/JYJ/Models/Weapons/Meshes/Ka47/SK_KA47.SK_KA47'" ) );
 	if (tmpMesh.Succeeded())
