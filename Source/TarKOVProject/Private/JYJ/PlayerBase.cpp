@@ -65,15 +65,16 @@ APlayerBase::APlayerBase()
 		DefaultCamPos = CreateDefaultSubobject<USceneComponent>( TEXT( "DefaultCamPos" ) );
 
 		aimingCamPos->SetupAttachment(GetMesh());
-		DefaultCamPos->SetupAttachment(GetMesh());
+		DefaultCamPos->SetupAttachment(GetMesh() , TEXT( "CamSocket" ) );
 
-		DefaultCamPos->SetWorldLocation(FollowCamera->GetRelativeLocation());
+		DefaultCamPos->SetRelativeLocationAndRotation(FollowCamera->GetRelativeLocation(), FollowCamera->GetRelativeRotation());
 		aimingCamPos->SetWorldLocation( FollowCamera->GetRelativeLocation() + FVector(10, 0, 30));
 	}
 
 	// Rifle Hand Socket Settings
 	rifleComp = CreateDefaultSubobject<USceneComponent>( TEXT( "rifleComp" ) );
 	rifleComp->SetupAttachment(GetMesh(), TEXT("RifleSocket"));
+	rifleComp->SetRelativeRotation(FRotator(0, 0, -10));
 
 	//부위 별 데미지 Setting Function
 	SetPartitionDamageCollision();
@@ -143,15 +144,6 @@ void APlayerBase::OnHitboxOverlap( UPrimitiveComponent* OverlappedComponent , AA
 			HealthComp->TakeDamage( BodyPart , 5 , HitObjectName ); // 모든 충돌에 대해 5의 데미지를 적용, 충돌한 객체 이름을 전달
 			//HealthComp->TakeDamage( BodyPart , 5 ); // 모든 충돌에 대해 5의 데미지를 적용
 		}
-
-		//if (OverlappedComponent->ComponentHasTag( "Head" ))
-		//{
-		//	FName BodyPart = TEXT( "Head" ); // 머리와 충돌
-		//	if (HealthComp)
-		//	{
-		//		HealthComp->TakeDamage( BodyPart , 5 ); // 머리에 5의 데미지 적용
-		//	}
-		//}
 	}
 }
 

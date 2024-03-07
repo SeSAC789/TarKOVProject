@@ -110,11 +110,19 @@ void UPlayerFireComp::ZoomIn()
 	bAimRifle = true;
 
 	//카메라 시점 변경 (PlayerCam -> RifleCam)
+	/*
 	me->FollowCamera->Deactivate();
 	auto pc = Cast<APlayerController>( me->GetController() );
 	if (nullptr == pc) return;
 
 	weapon->ActiveRifleCamp(bAimRifle, pc);
+	*/
+
+	if(!me->fireComp->bValidRifle || !weapon->rifleCamSocket || !me->FollowCamera) return;
+
+	me->FollowCamera->AttachToComponent(weapon->rifleCamSocket, FAttachmentTransformRules::SnapToTargetIncludingScale);
+
+
 }
 
 void UPlayerFireComp::ZoomOut()
@@ -123,85 +131,84 @@ void UPlayerFireComp::ZoomOut()
 	bAimRifle = false;
 
 	//카메라 시점 변경 (RifleCam -> PlayerCam)
+	/*
 	auto pc = Cast<APlayerController>( me->GetController() );
 	if (nullptr == pc) return;
 
 	pc->SetViewTargetWithBlend( me );
 	me->FollowCamera->Activate(true);
+	*/
+
+	if (!me->fireComp->bValidRifle || !me->DefaultCamPos || !me->FollowCamera) return;
+
+	me->FollowCamera->AttachToComponent( me->DefaultCamPos , FAttachmentTransformRules::SnapToTargetIncludingScale );
+
 
 }
 
 void UPlayerFireComp::Fire()
 {
 
-	if (bValidRifle)
+	
+
+	if (me->fireComp->bValidRifle)
 	{
 		FHitResult OutHit;
 		FVector Start = weapon->meshComp->GetSocketLocation( TEXT( "Muzzle" ) );
-		//FVector End = weapon->rifleCamComp->GetForwardVector() * 100000;
-		FVector End = me->FollowCamera->GetForwardVector() * 100000;
 
-		FCollisionQueryParams Params;
-		Params.AddIgnoredActor( me );
-
-		bool bHits = GetWorld()->LineTraceSingleByChannel( OutHit , Start , End , ECollisionChannel::ECC_Visibility , Params );
-
-		//만약 부딪힌 곳이 있다면, 그 곳에 폭발 vfx를 배치하고 싶다.
-		if (bHits)
+		if(!me->fireComp->bAimRifle)
 		{
-			UGameplayStatics::SpawnEmitterAtLocation( GetWorld() , ExplosionVFXFactory , OutHit.ImpactPoint );
-
-			FTransform t = weapon->meshComp->GetSocketTransform( TEXT( "Muzzle" ) );
-			DrawDebugLine( GetWorld() , t.GetLocation() , End , FColor::Silver , false , 0.2f );
-			UE_LOG( LogTemp , Warning,TEXT( "%s" ) , *OutHit.Component->GetName() );
-
-			//태호가 제시해준 방향
-			
-			UCapsuleComponent* HitComp = Cast<UCapsuleComponent>( OutHit.GetComponent() );
-			if(HitComp==nullptr)return;
-
-			if (HitComp->ComponentHasTag( "Head" ) || HitComp->ComponentHasTag( "Thorax" ) || HitComp->ComponentHasTag( "Stomach" ) || HitComp->ComponentHasTag( "RightArm" ) || HitComp->ComponentHasTag( "LeftArm" ) || HitComp->ComponentHasTag( "RightLeg" ) || HitComp->ComponentHasTag( "LeftLeg" ))
-			{
-				//FTransform t = weapon->meshComp->GetSocketTransform( TEXT( "Muzzle" ) );
-				//FTransform aimSight = weapon->meshComp->GetSocketTransform( TEXT( "AimSight" ) );
-
-				DrawDebugLine( GetWorld() , t.GetLocation() , End , FColor::Silver , false , 0.2f );
-
-				//만약 부딪힌 상대방이 플레이어라면 데미지 함수를 호출
-				auto otherplayer = Cast<APlayerBase>( OutHit.GetActor() );
-				if (otherplayer)
-				{
-
-					FName BodyPart = HitComp->ComponentTags[0];
-					FString HitObjectName = OutHit.GetComponent()->GetName();
-					//HitComp->ComponentTags[0]
-					me->HealthComp->TakeDamage( BodyPart, 5, HitObjectName );
-					//GetWorld()->SpawnActor<ADamageTestActor>(DamageActor, OutHit.GetActor()->GetActorLocation(), FRotator::ZeroRotator);
-
-
-				}
-			}
-			
-			
-			//FTransform t = weapon->meshComp->GetSocketTransform( TEXT( "Muzzle" ) );
-			////FTransform aimSight = weapon->meshComp->GetSocketTransform( TEXT( "AimSight" ) );
-
-			//DrawDebugLine( GetWorld() , t.GetLocation() , End , FColor::Silver , false , 0.2f );
-
-			////만약 부딪힌 상대방이 플레이어라면 해당 위치에 스폰
-			//auto otherplayer = Cast<APlayerBase>( OutHit.GetActor());
-			//if (otherplayer)
-			//{
-			//	FActorSpawnParameters SpawnParameters;
-			//	GetWorld()->SpawnActor<ADamageTestActor>( DamageActorFactory , OutHit.GetComponent()->GetComponentLocation() , FRotator::ZeroRotator , SpawnParameters );
-
-			//}
-
-
+			FVector End = me->FollowCamera->GetForwardVector() * 100000;
+			SetRifleAiming(OutHit, Start, End);
+		}
+		else 
+		{
+			FVector End = weapon->rifleCamComp->GetForwardVector() * 100000;
+			SetRifleAiming(OutHit, Start, End);
 		}
 	}
+}
 
+void UPlayerFireComp::SetRifleAiming(FHitResult OutHit, FVector Start, FVector EndPoint)
+{
+	FVector End = EndPoint;
 
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor( me );
+
+	bool bHits = GetWorld()->LineTraceSingleByChannel( OutHit , Start , End , ECollisionChannel::ECC_Visibility , Params );
+
+	if (bHits)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation( GetWorld() , ExplosionVFXFactory , OutHit.ImpactPoint );
+
+		FTransform t = weapon->meshComp->GetSocketTransform( TEXT( "Muzzle" ) );
+		DrawDebugLine( GetWorld() , t.GetLocation() , End , FColor::Silver , false , 0.2f );
+		UE_LOG( LogTemp , Warning , TEXT( "%s" ) , *OutHit.Component->GetName() );
+
+		//태호가 제시해준 방향
+
+		UCapsuleComponent* HitComp = Cast<UCapsuleComponent>( OutHit.GetComponent() );
+		if (HitComp == nullptr)return;
+
+		if (HitComp->ComponentHasTag( "Head" ) || HitComp->ComponentHasTag( "Thorax" ) || HitComp->ComponentHasTag( "Stomach" ) || HitComp->ComponentHasTag( "RightArm" ) || HitComp->ComponentHasTag( "LeftArm" ) || HitComp->ComponentHasTag( "RightLeg" ) || HitComp->ComponentHasTag( "LeftLeg" ))
+		{
+			DrawDebugLine( GetWorld() , t.GetLocation() , End , FColor::Silver , false , 0.2f );
+
+			//만약 부딪힌 상대방이 플레이어라면 데미지 함수를 호출
+			auto otherplayer = Cast<APlayerBase>( OutHit.GetActor() );
+			if (otherplayer)
+			{
+
+				FName BodyPart = HitComp->ComponentTags[0];
+				FString HitObjectName = OutHit.GetComponent()->GetName();
+				//HitComp->ComponentTags[0]
+				me->HealthComp->TakeDamage( BodyPart , 5 , HitObjectName );
+
+			}
+		}
+
+	}
 }
 
 

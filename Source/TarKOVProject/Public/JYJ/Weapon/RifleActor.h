@@ -29,6 +29,12 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	class UCameraComponent* rifleCamComp;
 
+	UPROPERTY( EditDefaultsOnly )
+	class USceneComponent* rifleCamSocket;
+
+	UPROPERTY( EditDefaultsOnly )
+	class USceneComponent* defaultSocket;
+
 	void ActiveRifleCamp(bool isRifle, APlayerController* controller);
 	void DeactiveRifleCamp();
 

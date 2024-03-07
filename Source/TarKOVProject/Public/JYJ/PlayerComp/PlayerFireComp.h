@@ -76,5 +76,6 @@ public:
 	void ZoomOut();
 
 	void Fire();
+	void SetRifleAiming(FHitResult OutHit, FVector Start, FVector EndPoint);
 
 };
