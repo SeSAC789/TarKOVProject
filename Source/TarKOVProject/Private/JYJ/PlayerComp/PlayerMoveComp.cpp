@@ -83,12 +83,20 @@ void UPlayerMoveComp::Jump(const FInputActionValue& Value)
 
 void UPlayerMoveComp::Running(const FInputActionValue& Value)
 {
-	me->GetCharacterMovement()->MaxWalkSpeed *= runningSpeed;
+	if (!bIsRunning)
+	{
+		bIsRunning = true;
+		me->GetCharacterMovement()->MaxWalkSpeed *= runningSpeed;
+	}
 }
 
 void UPlayerMoveComp::StopRunning(const FInputActionValue& Value)
 {
-	me->GetCharacterMovement()->MaxWalkSpeed /= runningSpeed;
+	if (bIsRunning)
+	{
+		bIsRunning = false;
+		me->GetCharacterMovement()->MaxWalkSpeed /= runningSpeed;
+	}
 }
 
 void UPlayerMoveComp::Crouch(const FInputActionValue& Value)
@@ -113,4 +121,16 @@ void UPlayerMoveComp::Crouch(const FInputActionValue& Value)
 void UPlayerMoveComp::Prone(const FInputActionValue& Value)
 {
 	isProned = !isProned;
+}
+
+void UPlayerMoveComp::SetRunning(bool IsRunning)
+{
+	bIsRunning = IsRunning;
+	// 여기에서 캐릭터의 이동 속도를 조정할 수도 있습니다.
+	me->GetCharacterMovement()->MaxWalkSpeed = bIsRunning ? (me->GetCharacterMovement()->MaxWalkSpeed * runningSpeed) : (me->GetCharacterMovement()->MaxWalkSpeed / runningSpeed);
+}
+
+bool UPlayerMoveComp::IsRunning() const
+{
+	return bIsRunning;
 }
