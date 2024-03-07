@@ -34,6 +34,6 @@ public:
 	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
 	class UBorder* GridBorder;
 
-	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
-	class UGridCanvasPanel* GridCanvasPanel;
+	//UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
+	//class UGridCanvasPanel* GridCanvasPanel;
 };
