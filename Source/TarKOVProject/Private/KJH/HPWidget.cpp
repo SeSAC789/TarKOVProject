@@ -8,10 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "KJH/HealthComp.h"
 
-UHPWidget::UHPWidget(const FObjectInitializer& ObjectInitializer)
-{
 
-}
 
 void UHPWidget::NativeTick( const FGeometry& MyGeometry , float InDeltaTime )
 {

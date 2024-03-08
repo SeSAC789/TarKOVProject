@@ -16,7 +16,7 @@ class TARKOVPROJECT_API UHPWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	UHPWidget( const FObjectInitializer& ObjectInitializer );
+	
 
 	virtual void NativeTick( const FGeometry& MyGeometry , float InDeltaTime ) override;
 
