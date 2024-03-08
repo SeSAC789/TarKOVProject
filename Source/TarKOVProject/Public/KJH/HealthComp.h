@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "StatusEffectComp.h"
 #include "Components/ActorComponent.h"
 #include "HealthComp.generated.h"
 
@@ -20,24 +21,34 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+protected:
+	// 각 신체 부위별 현재 HP
+	UPROPERTY( VisibleAnywhere , Category = "Health" )
+	TMap<FName , float> BodyPartHP;
+
+	// 각 신체 부위별 Max HP
+	UPROPERTY( EditDefaultsOnly , Category = "Health" )
+	TMap<FName , float> BodyPartMaxHP;
+
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-
-	void TakeDamage( const FName& BodyPart , int32 DamageAmount, const FString& HitObjectName );
-
-protected:
-	// 각 신체 부위별 현재 HP
-	UPROPERTY( VisibleAnywhere , Category = "Health" )
-	TMap<FName , int32> BodyPartHP;
-
-	// 각 신체 부위별 Max HP
-	UPROPERTY( EditDefaultsOnly , Category = "Health" )
-	TMap<FName , int32> BodyPartMaxHP;
-
 	// 캐릭터의 사망 상태
 	UPROPERTY( EditDefaultsOnly , Category = "Health" )
 	bool bIsDead;
+
+	void TakeDamage( const FName& BodyPart , float DamageAmount, const FString& HitObjectName );
+	void HealBodyPart( FName BodyPart , float HealAmount );
+	// 상태이상에서 hp값 확인하기 위해
+	float GetBodyPartHealth(FName BodyPart);
+	float GetBodyPartMaxHealth(FName BodyPart );
+	// 출혈 확인 및 적용을 위해
+	void CheckAndApplyBleeding( const FName& BodyPart );
+	// 골절 확인 및 적용 위해
+	void CheckAndApplyFracture( const FName& BodyPart );
+
+	UPROPERTY()
+	class UStatusEffectComp* statusComp;
 
 };

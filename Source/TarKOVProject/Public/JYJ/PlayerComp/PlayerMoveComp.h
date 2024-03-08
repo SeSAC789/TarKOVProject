@@ -64,4 +64,12 @@ public:
 	UPROPERTY( EditAnywhere , BlueprintReadWrite )
 	bool isProned;
 
+private:
+	bool bIsRunning;
+
+public:
+	// 달리기 상태를 설정하고 가져오는 함수
+	void SetRunning( bool IsRunning );
+	bool IsRunning() const;
+
 };

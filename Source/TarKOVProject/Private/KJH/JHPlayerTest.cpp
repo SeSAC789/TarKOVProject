@@ -10,13 +10,17 @@
 
 AJHPlayerTest::AJHPlayerTest()
 {
-	
+	statusComp = CreateDefaultSubobject<UStatusEffectComp>( TEXT( "statusComp" ) );
 }
 
 void AJHPlayerTest::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// MainUI를 생성해서 기억하고싶다.
+	hpUI = CreateWidget<UHPWidget>( GetWorld() , hpUIFactory );
+	// AddtoViewport하고싶다.
+	hpUI->AddToViewport();
 }
 
 void AJHPlayerTest::SetupPlayerInputComponent( UInputComponent* PlayerInputComponent )
