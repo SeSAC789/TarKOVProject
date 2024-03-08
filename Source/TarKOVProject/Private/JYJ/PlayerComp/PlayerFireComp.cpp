@@ -109,8 +109,6 @@ void UPlayerFireComp::ZoomIn()
 {
 	bAimRifle = true;
 
-	if (!me->fireComp->bValidRifle) return;
-
 	//카메라 시점 변경 (PlayerCam -> RifleCam)
 	/*
 	me->FollowCamera->Deactivate();
@@ -131,8 +129,6 @@ void UPlayerFireComp::ZoomOut()
 {
 
 	bAimRifle = false;
-
-	if (!me->fireComp->bValidRifle) return;
 
 	//카메라 시점 변경 (RifleCam -> PlayerCam)
 	/*
