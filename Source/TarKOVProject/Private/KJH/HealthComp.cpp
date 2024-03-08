@@ -145,8 +145,9 @@ void UHealthComp::CheckAndApplyBleeding(const FName& BodyPart)
 		// StatusEffectComp에 출혈 상태이상 적용 요청
 		if (statusComp)
 		{
-			statusComp->ApplyStatusEffect( EStatusEffectType::Bleeding );
+			statusComp->ApplyStatusEffect( EStatusEffectType::Bleeding, BodyPart );
 			UE_LOG( LogTemp , Warning , TEXT( "UHealthComp::CheckAndApplyBleeding" ) );
+			UE_LOG( LogTemp , Warning , TEXT( "출혈상태 생긴 부위 :  %s" ) , *BodyPart.ToString() );
 		}
 	}
 }
@@ -158,8 +159,9 @@ void UHealthComp::CheckAndApplyFracture(const FName& BodyPart)
 		// StatusEffectComp에 골절 상태이상 적용 요청
 		if (statusComp)
 		{
-			statusComp->ApplyStatusEffect( EStatusEffectType::Fracture);
+			statusComp->ApplyStatusEffect( EStatusEffectType::Fracture, BodyPart );
 			UE_LOG( LogTemp , Warning , TEXT( "UHealthComp::CheckAndApplyFracture" ) );
+			UE_LOG( LogTemp , Warning , TEXT( "골절상태 생긴 부위 :  %s" ) , *BodyPart.ToString() );
 
 		}
 	}

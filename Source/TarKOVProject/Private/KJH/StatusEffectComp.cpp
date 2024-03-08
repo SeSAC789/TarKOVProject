@@ -43,7 +43,7 @@ void UStatusEffectComp::TickComponent(float DeltaTime, ELevelTick TickType, FAct
     UpdateStatusEffects(DeltaTime);
 }
 
-void UStatusEffectComp::ApplyStatusEffect(EStatusEffectType NewEffectType)
+void UStatusEffectComp::ApplyStatusEffect(EStatusEffectType NewEffectType, FName BodyPart )
 {
     // 상태이상 데이터가 이미 존재하는지 확인
     FStatusEffectData* ExistingEffect = StatusEffects.FindByPredicate( [&]( const FStatusEffectData& Data ) {
@@ -53,10 +53,10 @@ void UStatusEffectComp::ApplyStatusEffect(EStatusEffectType NewEffectType)
     // 상태이상이 존재하지 않는 경우, 새로 추가
     if (ExistingEffect == nullptr)
     {
-        FStatusEffectData NewEffectData = { NewEffectType, true };
+        FStatusEffectData NewEffectData = { NewEffectType, true, BodyPart };
         StatusEffects.Add( NewEffectData );
 
-        UE_LOG( LogTemp , Warning , TEXT( " UStatusEffectComp::ApplyStatusEffect, Status Effect Applied: %s" ) , *GETENUMSTRING( "EStatusEffectType" , NewEffectType ) );
+        UE_LOG( LogTemp , Warning , TEXT( " UStatusEffectComp::ApplyStatusEffect, 상태효과 적용 : %s to %s" ) , *GETENUMSTRING( "EStatusEffectType" , NewEffectType ) , *BodyPart.ToString() );
     }
 }
 
@@ -90,7 +90,9 @@ void UStatusEffectComp::UpdateStatusEffects(float DeltaTime)
 
 void UStatusEffectComp::ApplyBleedingEffect(FStatusEffectData& EffectData, float DeltaTime)
 {
-    // 출혈 상태이상의 타이머 업데이트
+    if (!healthComp) return;
+    UE_LOG( LogTemp , Warning , TEXT( " UStatusEffectComp::ApplyBleedingEffect" ) );
+	// 출혈 상태이상의 타이머 업데이트
     EffectData.Timer += DeltaTime;
 
     // 5초마다 출혈 데미지 적용
@@ -104,6 +106,8 @@ void UStatusEffectComp::ApplyBleedingEffect(FStatusEffectData& EffectData, float
         {
             // 해당 부위에 데미지 3씩 적용
             healthComp->TakeDamage( EffectData.BodyPart , 3.0f , TEXT( "Bleeding Effect" ) );
+            
+            UE_LOG( LogTemp , Warning , TEXT( "UStatusEffectComp::ApplyBleedingEffect, 출혈상태 : %s 부위 %d damage." ) , *EffectData.BodyPart.ToString() , 3 );
         }
     }
 }
@@ -135,6 +139,7 @@ void UStatusEffectComp::ApplyFractureEffect( FStatusEffectData& EffectData, floa
                     {
                         EffectData.RunningTimer = 0.0f; // 타이머 리셋
                         healthComp->TakeDamage( EffectData.FracturedBodyPart , 3.0f , "Fracture" );
+                        UE_LOG( LogTemp , Warning , TEXT( "UStatusEffectComp::ApplyFractureEffect" ) );
                     }
                 }
                 else
@@ -149,5 +154,17 @@ void UStatusEffectComp::ApplyFractureEffect( FStatusEffectData& EffectData, floa
 void UStatusEffectComp::ApplyPainEffect(FStatusEffectData& EffectData, float DeltaTime)
 {
 
+}
+
+bool UStatusEffectComp::IsBleeding() const
+{
+    for (const FStatusEffectData& Effect : StatusEffects)
+    {
+        if (Effect.bIsActive && Effect.EffectType == EStatusEffectType::Bleeding)
+        {
+            return true;
+        }
+    }
+    return false;
 }
 

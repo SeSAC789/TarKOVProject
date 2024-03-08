@@ -3,11 +3,26 @@
 
 #include "KJH/HPWidget.h"
 
+#include "Components/Image.h"
 #include "JYJ/PlayerBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "KJH/HealthComp.h"
 
-float UHPWidget::HeadHPPercent() const
+UHPWidget::UHPWidget(const FObjectInitializer& ObjectInitializer)
+{
+
+}
+
+void UHPWidget::NativeTick( const FGeometry& MyGeometry , float InDeltaTime )
+{
+	Super::NativeTick( MyGeometry , InDeltaTime );
+	
+	if (Bleeding_Img)
+	{
+		Bleeding_Img->SetVisibility( GetBleedingVisibility() );
+	}
+}
+float UHPWidget::HeadHP() const
 {
 	APlayerBase* me = Cast<APlayerBase>( UGameplayStatics::GetPlayerCharacter( this , 0 ) );
 	if (me)
@@ -22,7 +37,7 @@ float UHPWidget::HeadHPPercent() const
 	return 0.0f;
 }
 
-float UHPWidget::LeftLegHPPercent() const
+float UHPWidget::LeftLegHP() const
 {
 	APlayerBase* me = Cast<APlayerBase>( UGameplayStatics::GetPlayerCharacter( this , 0 ) );
 	if (me)
@@ -36,7 +51,7 @@ float UHPWidget::LeftLegHPPercent() const
 	return 0.0f;
 }
 
-float UHPWidget::RightLegHPPercent() const
+float UHPWidget::RightLegHP() const
 {
 	APlayerBase* me = Cast<APlayerBase>( UGameplayStatics::GetPlayerCharacter( this , 0 ) );
 	if (me)
@@ -50,7 +65,7 @@ float UHPWidget::RightLegHPPercent() const
 	return 0.0f;
 }
 
-float UHPWidget::StomachHPPercent() const
+float UHPWidget::StomachHP() const
 {
 	APlayerBase* me = Cast<APlayerBase>( UGameplayStatics::GetPlayerCharacter( this , 0 ) );
 	if (me)
@@ -64,7 +79,7 @@ float UHPWidget::StomachHPPercent() const
 	return 0.0f;
 }
 
-float UHPWidget::ThoraxHPPercent() const
+float UHPWidget::ThoraxHP() const
 {
 	APlayerBase* me = Cast<APlayerBase>( UGameplayStatics::GetPlayerCharacter( this , 0 ) );
 	if (me)
@@ -78,7 +93,7 @@ float UHPWidget::ThoraxHPPercent() const
 	return 0.0f;
 }
 
-float UHPWidget::LeftArmHPPercent() const
+float UHPWidget::LeftArmHP() const
 {
 	APlayerBase* me = Cast<APlayerBase>( UGameplayStatics::GetPlayerCharacter( this , 0 ) );
 	if (me)
@@ -92,7 +107,7 @@ float UHPWidget::LeftArmHPPercent() const
 	return 0.0f;
 }
 
-float UHPWidget::RightArmHPPercent() const
+float UHPWidget::RightArmHP() const
 {
 	APlayerBase* me = Cast<APlayerBase>( UGameplayStatics::GetPlayerCharacter( this , 0 ) );
 	if (me)
@@ -104,4 +119,18 @@ float UHPWidget::RightArmHPPercent() const
 		}
 	}
 	return 0.0f;
+}
+
+ESlateVisibility UHPWidget::GetBleedingVisibility() const
+{
+	APlayerBase* me = Cast<APlayerBase>( GetOwningPlayerPawn() );
+	if (me)
+	{
+		UStatusEffectComp* StatusEffectComp = me->FindComponentByClass<UStatusEffectComp>();
+		if (StatusEffectComp && StatusEffectComp->IsBleeding())
+		{
+			return ESlateVisibility::Visible;
+		}
+	}
+	return ESlateVisibility::Hidden;
 }

@@ -30,13 +30,13 @@ protected:
 	UPROPERTY( EditDefaultsOnly , Category = "Health" )
 	TMap<FName , float> BodyPartMaxHP;
 
-	// 캐릭터의 사망 상태
-	UPROPERTY( EditDefaultsOnly , Category = "Health" )
-	bool bIsDead;
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	// 캐릭터의 사망 상태
+	UPROPERTY( EditDefaultsOnly , Category = "Health" )
+	bool bIsDead;
 
 	void TakeDamage( const FName& BodyPart , float DamageAmount, const FString& HitObjectName );
 	void HealBodyPart( FName BodyPart , float HealAmount );

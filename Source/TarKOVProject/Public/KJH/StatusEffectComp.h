@@ -36,6 +36,10 @@ struct FStatusEffectData
     UPROPERTY( EditAnywhere , BlueprintReadWrite )
     FName FracturedBodyPart; // 골절된 부위
 
+    // 상태이상 부위가 어디인지 알기 위한 변수
+    UPROPERTY( EditAnywhere , BlueprintReadWrite )
+    FName AffectedBodyPart;
+
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -62,7 +66,7 @@ protected:
 
 public:
     // 새로운 상태이상을 캐릭터에 적용하는 함수
-    void ApplyStatusEffect( EStatusEffectType NewEffectType );
+    void ApplyStatusEffect( EStatusEffectType NewEffectType, FName BodyPart );
     // 특정 상태이상을 캐릭터에서 제거하거나 비활성화하는 함수
     void ClearStatusEffect( EStatusEffectType EffectType );
     // 모든 활성 상태이상을 업데이트
@@ -73,6 +77,8 @@ public:
     void ApplyFractureEffect( FStatusEffectData& EffectData , float DeltaTime );
     void ApplyPainEffect( FStatusEffectData& EffectData , float DeltaTime );
 
+    UFUNCTION( BlueprintCallable , Category = "Status Effects" )
+    bool IsBleeding() const;
 
     UPROPERTY()
     class UHealthComp* healthComp;
