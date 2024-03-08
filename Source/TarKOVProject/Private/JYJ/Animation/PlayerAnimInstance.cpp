@@ -7,6 +7,7 @@
 #include "JYJ/PlayerBase.h"
 #include "JYJ/PlayerComp/PlayerFireComp.h"
 #include "JYJ/TestPlayer/YJTestPlayer.h"
+#include "KJH/HealthComp.h"
 
 void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
@@ -40,7 +41,7 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	yaw = player->GetBaseAimRotation().Yaw;
 	roll = player->GetBaseAimRotation().Roll;
 
-	
+	isDie = player->HealthComp->bIsDead;
 	
 
 }

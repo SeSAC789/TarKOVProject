@@ -33,6 +33,9 @@ public:
 	bool isProned;
 
 	UPROPERTY( EditAnywhere , BlueprintReadWrite )
+	bool isDie;
+
+	UPROPERTY( EditAnywhere , BlueprintReadWrite )
 	bool bValidRifle;
 
 	UPROPERTY( EditAnywhere , BlueprintReadWrite )
