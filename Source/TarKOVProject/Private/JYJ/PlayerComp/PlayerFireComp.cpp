@@ -175,6 +175,7 @@ void UPlayerFireComp::SetRifleAiming(FHitResult OutHit, FVector Start, FVector E
 
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor( me );
+	Params.AddIgnoredActor( weapon );
 
 	bool bHits = GetWorld()->LineTraceSingleByChannel( OutHit , Start , End , ECollisionChannel::ECC_Visibility , Params );
 
@@ -203,8 +204,9 @@ void UPlayerFireComp::SetRifleAiming(FHitResult OutHit, FVector Start, FVector E
 				FName BodyPart = HitComp->ComponentTags[0];
 				FString HitObjectName = OutHit.GetComponent()->GetName();
 				//HitComp->ComponentTags[0]
-				me->HealthComp->TakeDamage( BodyPart , 5 , HitObjectName );
-
+				otherplayer->HealthComp->TakeDamage( BodyPart , 5 , HitObjectName );
+				
+				
 			}
 		}
 
