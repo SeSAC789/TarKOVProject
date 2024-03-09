@@ -14,11 +14,12 @@ ARifleActor::ARifleActor()
 	meshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("meshComp"));
 	SetRootComponent(meshComp);
 
-	//Rifle Cam Settings
+	/*Rifle Cam Settings
 	rifleCamComp = CreateDefaultSubobject<UCameraComponent>(TEXT("rifleCamComp"));
 	rifleCamComp->SetupAttachment(meshComp);
 	rifleCamComp->SetRelativeLocation(FVector( 0.170610, -2.909110 , 17.945868 ));
 	rifleCamComp->SetRelativeRotation(FRotator( 0, 90, 0));
+	*/
 
 	rifleCamSocket = CreateDefaultSubobject<USceneComponent>(TEXT("rifleCamSocket"));
 	rifleCamSocket->SetupAttachment( meshComp );
@@ -30,7 +31,7 @@ ARifleActor::ARifleActor()
 	{
 		meshComp->SetSkeletalMesh( tmpMesh.Object );
 		meshComp->SetWorldScale3D( FVector( 1.1f ) );
-		meshComp->SetRelativeRotation( FRotator( 40 , -100 , 80 ) );
+		//meshComp->SetRelativeRotation( FRotator( 40 , -100 , 80 ) );
 	}
 
 
@@ -49,17 +50,3 @@ void ARifleActor::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
-
-void ARifleActor::ActiveRifleCamp(bool isRifle, APlayerController* controller )
-{
-	if(false == isRifle) return;
-
-	rifleCamComp->Activate(true);
-	controller->SetViewTargetWithBlend(this);
-}
-
-void ARifleActor::DeactiveRifleCamp()
-{
-	rifleCamComp->Deactivate();
-}
-

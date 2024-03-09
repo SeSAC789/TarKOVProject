@@ -6,13 +6,10 @@
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Engine/SkeletalMeshSocket.h"
-#include "GameFramework/SpringArmComponent.h"
-#include "JYJ/Weapon/RifleActor.h"
 #include "JYJ/PlayerBase.h"
 #include "JYJ/Animation/PlayerAnimInstance.h"
-#include "JYJ/TestPlayer/YJTestPlayer.h"
+#include "JYJ/Weapon/RifleGun.h"
 #include "Kismet/GameplayStatics.h"
-#include "KJH/DamageTestActor.h"
 #include "KJH/HealthComp.h"
 
 void UPlayerFireComp::BeginPlay()
@@ -59,19 +56,18 @@ void UPlayerFireComp::ChoosePistol()
 
 void UPlayerFireComp::ChooseRifle()
 {
-	AttachRifle( rifle );
+	SpawnRifle(RifleGun);
 }
 
-void UPlayerFireComp::AttachRifle( TSubclassOf<ARifleActor> rifleFactory )
+void UPlayerFireComp::SpawnRifle(TSubclassOf<ARifleGun> rifleFactory)
 {
-	UE_LOG( LogTemp , Warning , TEXT( "TEST1" ) );
 	if (rifleFactory)
 	{
-		weapon = GetWorld()->SpawnActor<ARifleActor>( rifleFactory, FVector( 0 , 0 , 10000 ) , FRotator::ZeroRotator );
-		weapon->AttachToComponent( me->rifleComp , FAttachmentTransformRules::SnapToTargetNotIncludingScale );
+		gun = GetWorld()->SpawnActor<ARifleGun>( rifleFactory , FVector( 0 , 0 , 10000 ) , FRotator::ZeroRotator );
+		gun->AttachToComponent( me->rifleComp , FAttachmentTransformRules::SnapToTargetNotIncludingScale );
 
 		bValidRifle = true;
-		
+
 	}
 }
 
@@ -79,28 +75,28 @@ void UPlayerFireComp::Zoom()
 {
 
 	//줌 자연스럽게 lerp 하는 코드 -> 개선 필요
-	/*
-	me->FollowCamera->FieldOfView = FMath::Lerp<float>( me->FollowCamera->FieldOfView , targetFOV , me->GetWorld()->GetDeltaSeconds() * 10 );
+	
+	//me->FollowCamera->FieldOfView = FMath::Lerp<float>( me->FollowCamera->FieldOfView , targetFOV , me->GetWorld()->GetDeltaSeconds() * 10 );
 
 	if (bAimRifle)
 	{
-		FVector Pos = FMath::Lerp<FVector>( me->FollowCamera->GetRelativeLocation() , weapon->rifleCamComp->GetRelativeLocation()
+		FVector Pos = FMath::Lerp<FVector>( me->FollowCamera->GetRelativeLocation() , gun->AimCamSocket->GetRelativeLocation()
 		, me->GetWorld()->GetDeltaSeconds() * 10 );
 
-		me->FollowCamera->SetRelativeLocation(Pos);
+		//me->FollowCamera->SetRelativeLocation(Pos);
 		
 	}
 	else
 	{
 		if(bValidRifle)
 		{
-			FVector Pos = FMath::Lerp<FVector>( weapon->rifleCamComp->GetRelativeLocation() , me->FollowCamera->GetRelativeLocation(), me->GetWorld()->GetDeltaSeconds() * 10 );
+			FVector Pos = FMath::Lerp<FVector>( gun->AimCamSocket->GetRelativeLocation() , me->FollowCamera->GetRelativeLocation(), me->GetWorld()->GetDeltaSeconds() * 10 );
 
-			weapon->rifleCamComp->SetRelativeLocation( Pos );
+			//weapon->rifleCamComp->SetRelativeLocation( Pos );
 		}
 
 	}
-	*/
+	
 
 
 }
@@ -109,19 +105,9 @@ void UPlayerFireComp::ZoomIn()
 {
 	bAimRifle = true;
 
-	//카메라 시점 변경 (PlayerCam -> RifleCam)
-	/*
-	me->FollowCamera->Deactivate();
-	auto pc = Cast<APlayerController>( me->GetController() );
-	if (nullptr == pc) return;
+	if (!me->fireComp->bValidRifle || !me->FollowCamera) return;
 
-	weapon->ActiveRifleCamp(bAimRifle, pc);
-	*/
-
-	if(!me->fireComp->bValidRifle || !weapon->rifleCamSocket || !me->FollowCamera) return;
-
-	me->FollowCamera->AttachToComponent(weapon->rifleCamSocket, FAttachmentTransformRules::SnapToTargetIncludingScale);
-
+	me->FollowCamera->AttachToComponent(gun->AimCamSocket , FAttachmentTransformRules::SnapToTargetIncludingScale );
 
 }
 
@@ -129,15 +115,6 @@ void UPlayerFireComp::ZoomOut()
 {
 
 	bAimRifle = false;
-
-	//카메라 시점 변경 (RifleCam -> PlayerCam)
-	/*
-	auto pc = Cast<APlayerController>( me->GetController() );
-	if (nullptr == pc) return;
-
-	pc->SetViewTargetWithBlend( me );
-	me->FollowCamera->Activate(true);
-	*/
 
 	if (!me->fireComp->bValidRifle || !me->DefaultCamPos || !me->FollowCamera) return;
 
@@ -148,13 +125,12 @@ void UPlayerFireComp::ZoomOut()
 
 void UPlayerFireComp::Fire()
 {
-
-	
-
 	if (me->fireComp->bValidRifle)
 	{
 		FHitResult OutHit;
-		FVector Start = weapon->meshComp->GetSocketLocation( TEXT( "Muzzle" ) );
+		FVector Start = gun->GunMeshComp->GetSocketLocation( TEXT( "Muzzle" ) );
+
+		PlayerAnim->playFireAnimation();
 
 		if(!me->fireComp->bAimRifle)
 		{
@@ -163,7 +139,7 @@ void UPlayerFireComp::Fire()
 		}
 		else 
 		{
-			FVector End = weapon->rifleCamComp->GetForwardVector() * 100000;
+			FVector End = gun->AimCamSocket->GetForwardVector() * 100000;
 			SetRifleAiming(OutHit, Start, End);
 		}
 	}
@@ -171,42 +147,32 @@ void UPlayerFireComp::Fire()
 
 void UPlayerFireComp::SetRifleAiming(FHitResult OutHit, FVector Start, FVector EndPoint)
 {
-	FVector End = EndPoint;
-
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor( me );
-	Params.AddIgnoredActor( weapon );
+	Params.AddIgnoredActor( gun );
 
-	bool bHits = GetWorld()->LineTraceSingleByChannel( OutHit , Start , End , ECollisionChannel::ECC_Visibility , Params );
+	bool bHits = GetWorld()->LineTraceSingleByChannel( OutHit , Start , EndPoint , ECollisionChannel::ECC_Visibility , Params );
 
 	if (bHits)
 	{
 		UGameplayStatics::SpawnEmitterAtLocation( GetWorld() , ExplosionVFXFactory , OutHit.ImpactPoint );
 
-		FTransform t = weapon->meshComp->GetSocketTransform( TEXT( "Muzzle" ) );
-		DrawDebugLine( GetWorld() , t.GetLocation() , End , FColor::Silver , false , 0.2f );
+		FTransform t = gun->GunMeshComp->GetSocketTransform( TEXT( "Muzzle" ) );
+		DrawDebugLine( GetWorld() , t.GetLocation() , EndPoint , FColor::Silver , false , 0.2f );
 		UE_LOG( LogTemp , Warning , TEXT( "%s" ) , *OutHit.Component->GetName() );
-
-		//태호가 제시해준 방향
 
 		UCapsuleComponent* HitComp = Cast<UCapsuleComponent>( OutHit.GetComponent() );
 		if (HitComp == nullptr)return;
 
 		if (HitComp->ComponentHasTag( "Head" ) || HitComp->ComponentHasTag( "Thorax" ) || HitComp->ComponentHasTag( "Stomach" ) || HitComp->ComponentHasTag( "RightArm" ) || HitComp->ComponentHasTag( "LeftArm" ) || HitComp->ComponentHasTag( "RightLeg" ) || HitComp->ComponentHasTag( "LeftLeg" ))
 		{
-			DrawDebugLine( GetWorld() , t.GetLocation() , End , FColor::Silver , false , 0.2f );
-
 			//만약 부딪힌 상대방이 플레이어라면 데미지 함수를 호출
 			auto otherplayer = Cast<APlayerBase>( OutHit.GetActor() );
 			if (otherplayer)
 			{
-
 				FName BodyPart = HitComp->ComponentTags[0];
 				FString HitObjectName = OutHit.GetComponent()->GetName();
-				//HitComp->ComponentTags[0]
-				otherplayer->HealthComp->TakeDamage( BodyPart , 5 , HitObjectName );
-				
-				
+				otherplayer->HealthComp->TakeDamage( BodyPart , gun->gunCP , HitObjectName );
 			}
 		}
 

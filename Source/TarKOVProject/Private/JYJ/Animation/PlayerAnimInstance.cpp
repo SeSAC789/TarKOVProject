@@ -15,7 +15,8 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	//1. owner pawn 을 가져와서 atpsplayer 로 cast 하고 싶다.
 	APlayerBase* player = Cast<APlayerBase>( TryGetPawnOwner() );
-	if (nullptr == player)
+
+	if (nullptr == player )
 		return;
 
 	
@@ -48,5 +49,6 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 void UPlayerAnimInstance::playFireAnimation()
 {
-	//Montage_Play( fireRifleMontage );
+	Montage_Play( fireRifleMontage );
+	UE_LOG(LogTemp, Warning, TEXT("Anim TEST"));
 }

@@ -26,6 +26,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	virtual void SetupInput( UEnhancedInputComponent* input ) override;
 
+	//Fire Input
 	UPROPERTY( EditAnywhere , BlueprintReadOnly , Category = Input , meta = (AllowPrivateAccess = "true") )
 	class UInputAction* PistolAction;
 
@@ -38,14 +39,12 @@ public:
 	UPROPERTY( EditAnywhere , BlueprintReadOnly , Category = Input , meta = (AllowPrivateAccess = "true") )
 	class UInputAction* FireAction;
 
+	//Rifle setting
 	UPROPERTY( EditAnywhere )
-	TSubclassOf<class ARifleActor> rifle;
+	TSubclassOf<class ARifleGun> RifleGun;
 
 	UPROPERTY()
-	class ARifleActor* weapon;
-
-	UPROPERTY( EditAnywhere )
-	class UPlayerAnimInstance* PlayerAnim;
+	class ARifleGun* gun;
 
 	UPROPERTY( EditAnywhere , BlueprintReadWrite )
 	bool bValidRifle;
@@ -53,22 +52,21 @@ public:
 	UPROPERTY( EditAnywhere , BlueprintReadWrite )
 	bool bAimRifle;
 
+	UPROPERTY( EditAnywhere )
+	class UPlayerAnimInstance* PlayerAnim;
+
 	UPROPERTY( EditDefaultsOnly )
 	class UParticleSystem* ExplosionVFXFactory;
 
-	UPROPERTY( EditAnywhere )
-	TSubclassOf<class ADamageTestActor> DamageActorFactory;
-
 	//PROPERTY( EditAnywhere )
 	//TSubclassOf<class ATra> TraceFactory;
-
-	float targetFOV = 90 ;
 
 	void ChoosePistol();
 	void ChooseRifle();
 
 	void AttachPistol();
-	void AttachRifle( TSubclassOf<ARifleActor> rifleFactory );
+	void SpawnRifle( TSubclassOf<ARifleGun> rifleFactory );
+
 
 	void Zoom();
 	void ZoomIn();
