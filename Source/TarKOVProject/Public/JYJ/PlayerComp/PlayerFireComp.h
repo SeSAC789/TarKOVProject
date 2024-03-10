@@ -6,11 +6,12 @@
 #include "JYJ/PlayerBaseComp.h"
 #include "PlayerFireComp.generated.h"
 
-enum  class EGunType  : uint8
+UENUM( BlueprintType )
+enum class EWeaponAim : uint8
 {
-	RIFLE,
-	PISTOL,
-	MACHINEGUN,
+	RIFLE ,
+	PISTOL ,
+	MACHINEGUN ,
 };
 
 /**
@@ -39,12 +40,27 @@ public:
 	UPROPERTY( EditAnywhere , BlueprintReadOnly , Category = Input , meta = (AllowPrivateAccess = "true") )
 	class UInputAction* FireAction;
 
-	//Rifle setting
+	UPROPERTY( EditAnywhere , BlueprintReadOnly , Category = Input , meta = (AllowPrivateAccess = "true") )
+	class UInputAction* ReloadAction;
+
+
+	//Rifle Setting
 	UPROPERTY( EditAnywhere )
 	TSubclassOf<class ARifleGun> RifleGun;
 
 	UPROPERTY()
-	class ARifleGun* gun;
+	class ARifleGun* rifle;
+
+	//Pistol Setting
+	UPROPERTY( EditAnywhere )
+	TSubclassOf<class APistolGun> PistolGun;
+
+	UPROPERTY()
+	class APistolGun* pistol;
+
+
+	UPROPERTY( EditAnywhere , BlueprintReadWrite )
+	bool bValidPistol;
 
 	UPROPERTY( EditAnywhere , BlueprintReadWrite )
 	bool bValidRifle;
@@ -58,21 +74,28 @@ public:
 	UPROPERTY( EditDefaultsOnly )
 	class UParticleSystem* ExplosionVFXFactory;
 
-	//PROPERTY( EditAnywhere )
-	//TSubclassOf<class ATra> TraceFactory;
-
 	void ChoosePistol();
 	void ChooseRifle();
 
-	void AttachPistol();
+	void SpawnPistol( TSubclassOf<APistolGun> GunFactory );
 	void SpawnRifle( TSubclassOf<ARifleGun> rifleFactory );
-
 
 	void Zoom();
 	void ZoomIn();
 	void ZoomOut();
 
 	void Fire();
-	void SetRifleAiming(FHitResult OutHit, FVector Start, FVector EndPoint);
+	void SetAiming(FHitResult OutHit, FVector Start, FVector EndPoint);
+
+	UPROPERTY( EditAnywhere , BlueprintReadOnly )
+	EWeaponAim aim;
+
+private:
+	void SelectedRifle();
+	void SelectedPistol();
+	void SelectedMachineGun();
+
+	void FireRifle();
+	void FirePistol();
 
 };

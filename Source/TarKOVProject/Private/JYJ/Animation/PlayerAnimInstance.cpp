@@ -36,6 +36,7 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	bAimRifle = player->fireComp->bAimRifle;
 	bValidRifle = player->fireComp->bValidRifle;
+	bValidPistol = player->fireComp->bValidPistol;
 
 	pitch = player->GetBaseAimRotation().GetNormalized().Pitch;
 	pitch = FMath::Clamp(pitch, -90, 90);
@@ -43,7 +44,6 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	roll = player->GetBaseAimRotation().Roll;
 
 	isDie = player->HealthComp->bIsDead;
-	
 
 }
 

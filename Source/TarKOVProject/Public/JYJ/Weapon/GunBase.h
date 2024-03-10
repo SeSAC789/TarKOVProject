@@ -27,6 +27,7 @@ public:
 	UPROPERTY( EditDefaultsOnly )
 	class USkeletalMeshComponent* GunMeshComp;
 
+
 public:
 	UPROPERTY( EditDefaultsOnly )
 	class USceneComponent* AimCamSocket;

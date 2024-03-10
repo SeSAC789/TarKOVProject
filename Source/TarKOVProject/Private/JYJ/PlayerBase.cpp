@@ -57,7 +57,7 @@ APlayerBase::APlayerBase()
 		GetMesh()->SetOwnerNoSee( false );
 
 		FollowCamera->SetupAttachment( GetMesh(), TEXT("CamSocket") );
-		FollowCamera->SetRelativeLocation(FVector( 29.088001 , -14.927225 , -27.355890 ));
+		FollowCamera->SetRelativeLocation(FVector( 0 , -14.927225 , -27.355890 ));
 		FollowCamera->SetRelativeRotation(FRotator( -9.333045 , 0.415788 , -92.469920 ));
 
 		//사용하는지 확인 필요
@@ -75,6 +75,11 @@ APlayerBase::APlayerBase()
 	rifleComp = CreateDefaultSubobject<USceneComponent>( TEXT( "rifleComp" ) );
 	rifleComp->SetupAttachment(GetMesh(), TEXT("RifleSocket"));
 	rifleComp->SetRelativeRotation(FRotator(0, 0, -10));
+
+	// Pistol Hand Socket Settings
+	pistolComp = CreateDefaultSubobject<USceneComponent>( TEXT( "pistolComp" ) );
+	pistolComp->SetupAttachment( GetMesh() , TEXT( "PistolSocket" ) );
+	//pistolComp->SetRelativeRotation( FRotator( 0 , 0 , -10 ) );
 
 	//부위 별 데미지 Setting Function
 	SetPartitionDamageCollision();

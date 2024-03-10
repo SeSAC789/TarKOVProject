@@ -54,6 +54,8 @@ public:
 	UPROPERTY( EditDefaultsOnly )
 	class USceneComponent* rifleComp;
 
+	UPROPERTY( EditDefaultsOnly )
+	class USceneComponent* pistolComp;
 
 public:
 	/** Returns FollowCamera subobject **/

@@ -8,6 +8,7 @@
 #include "Engine/SkeletalMeshSocket.h"
 #include "JYJ/PlayerBase.h"
 #include "JYJ/Animation/PlayerAnimInstance.h"
+#include "JYJ/Weapon/PistolGun.h"
 #include "JYJ/Weapon/RifleGun.h"
 #include "Kismet/GameplayStatics.h"
 #include "KJH/HealthComp.h"
@@ -19,12 +20,17 @@ void UPlayerFireComp::BeginPlay()
 	PlayerAnim = Cast<UPlayerAnimInstance>( me->GetMesh()->GetAnimInstance() );
 	check( PlayerAnim );
 
+	//Spawn weapon
+	SpawnRifle(RifleGun);
+	SpawnPistol(PistolGun);
+
 }
 
 void UPlayerFireComp::TickComponent( float DeltaTime , ELevelTick TickType , FActorComponentTickFunction* ThisTickFunction )
 {
 	Super::TickComponent( DeltaTime , TickType , ThisTickFunction );
 	Zoom();
+
 }
 
 void UPlayerFireComp::SetupInput( UEnhancedInputComponent* input )
@@ -51,36 +57,43 @@ void UPlayerFireComp::SetupInput( UEnhancedInputComponent* input )
 
 void UPlayerFireComp::ChoosePistol()
 {
-	bValidRifle = false;
+	SelectedPistol();
 }
 
 void UPlayerFireComp::ChooseRifle()
 {
-	SpawnRifle(RifleGun);
+	SelectedRifle();
+}
+
+void UPlayerFireComp::SpawnPistol(TSubclassOf<APistolGun> GunFactory)
+{
+	if (GunFactory)
+	{
+		pistol = GetWorld()->SpawnActor<APistolGun>( GunFactory , FVector( 0 , 0 , 10000 ) , FRotator::ZeroRotator );
+		pistol->AttachToComponent( me->pistolComp , FAttachmentTransformRules::SnapToTargetNotIncludingScale ); 
+	}
+
+	me->fireComp->pistol->pistolMesh->SetVisibility(false);
 }
 
 void UPlayerFireComp::SpawnRifle(TSubclassOf<ARifleGun> rifleFactory)
 {
 	if (rifleFactory)
 	{
-		gun = GetWorld()->SpawnActor<ARifleGun>( rifleFactory , FVector( 0 , 0 , 10000 ) , FRotator::ZeroRotator );
-		gun->AttachToComponent( me->rifleComp , FAttachmentTransformRules::SnapToTargetNotIncludingScale );
-
-		bValidRifle = true;
-
+		rifle = GetWorld()->SpawnActor<ARifleGun>( rifleFactory , FVector( 0 , 0 , 10000 ) , FRotator::ZeroRotator );
+		rifle->AttachToComponent( me->rifleComp , FAttachmentTransformRules::SnapToTargetNotIncludingScale );
 	}
+
+	me->fireComp->rifle->GunMeshComp->SetVisibility(false);
 }
 
 void UPlayerFireComp::Zoom()
 {
-
-	//줌 자연스럽게 lerp 하는 코드 -> 개선 필요
-	
 	//me->FollowCamera->FieldOfView = FMath::Lerp<float>( me->FollowCamera->FieldOfView , targetFOV , me->GetWorld()->GetDeltaSeconds() * 10 );
 
 	if (bAimRifle)
 	{
-		FVector Pos = FMath::Lerp<FVector>( me->FollowCamera->GetRelativeLocation() , gun->AimCamSocket->GetRelativeLocation()
+		FVector Pos = FMath::Lerp<FVector>( me->FollowCamera->GetRelativeLocation() , rifle->AimCamSocket->GetRelativeLocation()
 		, me->GetWorld()->GetDeltaSeconds() * 10 );
 
 		//me->FollowCamera->SetRelativeLocation(Pos);
@@ -90,74 +103,86 @@ void UPlayerFireComp::Zoom()
 	{
 		if(bValidRifle)
 		{
-			FVector Pos = FMath::Lerp<FVector>( gun->AimCamSocket->GetRelativeLocation() , me->FollowCamera->GetRelativeLocation(), me->GetWorld()->GetDeltaSeconds() * 10 );
+			FVector Pos = FMath::Lerp<FVector>( rifle->AimCamSocket->GetRelativeLocation() , me->FollowCamera->GetRelativeLocation(), me->GetWorld()->GetDeltaSeconds() * 10 );
 
 			//weapon->rifleCamComp->SetRelativeLocation( Pos );
 		}
-
 	}
-	
-
 
 }
 
 void UPlayerFireComp::ZoomIn()
 {
 	bAimRifle = true;
+	if (!me->FollowCamera) return;
+	
+	switch (aim)
+	{
+		case EWeaponAim::RIFLE:
+			me->FollowCamera->AttachToComponent( rifle->AimCamSocket , FAttachmentTransformRules::SnapToTargetIncludingScale );
 
-	if (!me->fireComp->bValidRifle || !me->FollowCamera) return;
+		break;
 
-	me->FollowCamera->AttachToComponent(gun->AimCamSocket , FAttachmentTransformRules::SnapToTargetIncludingScale );
+		case EWeaponAim::PISTOL:
+			me->FollowCamera->AttachToComponent( pistol->AimCamSocket , FAttachmentTransformRules::SnapToTargetIncludingScale );
+		break;
 
+		case EWeaponAim::MACHINEGUN:
+		break;
+	}
 }
 
 void UPlayerFireComp::ZoomOut()
 {
-
 	bAimRifle = false;
-
-	if (!me->fireComp->bValidRifle || !me->DefaultCamPos || !me->FollowCamera) return;
+	if (!me->DefaultCamPos || !me->FollowCamera) return;
 
 	me->FollowCamera->AttachToComponent( me->DefaultCamPos , FAttachmentTransformRules::SnapToTargetIncludingScale );
-
-
 }
 
 void UPlayerFireComp::Fire()
 {
-	if (me->fireComp->bValidRifle)
+	if (false == bValidPistol && false == bValidRifle) return;
+
+	switch (aim)
 	{
-		FHitResult OutHit;
-		FVector Start = gun->GunMeshComp->GetSocketLocation( TEXT( "Muzzle" ) );
-
-		PlayerAnim->playFireAnimation();
-
-		if(!me->fireComp->bAimRifle)
-		{
-			FVector End = me->FollowCamera->GetForwardVector() * 100000;
-			SetRifleAiming(OutHit, Start, End);
-		}
-		else 
-		{
-			FVector End = gun->AimCamSocket->GetForwardVector() * 100000;
-			SetRifleAiming(OutHit, Start, End);
-		}
+	case EWeaponAim::RIFLE:		FireRifle();	break;
+	case EWeaponAim::PISTOL:	FirePistol();	break;
+	case EWeaponAim::MACHINEGUN:
+		break;
 	}
 }
 
-void UPlayerFireComp::SetRifleAiming(FHitResult OutHit, FVector Start, FVector EndPoint)
+void UPlayerFireComp::SetAiming(FHitResult OutHit, FVector Start, FVector EndPoint)
 {
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor( me );
-	Params.AddIgnoredActor( gun );
+	Params.AddIgnoredActor( rifle );
+	Params.AddIgnoredActor( pistol );
 
 	bool bHits = GetWorld()->LineTraceSingleByChannel( OutHit , Start , EndPoint , ECollisionChannel::ECC_Visibility , Params );
 
 	if (bHits)
 	{
 		UGameplayStatics::SpawnEmitterAtLocation( GetWorld() , ExplosionVFXFactory , OutHit.ImpactPoint );
+		FTransform t;
+		float attackDamage = 0.0f;
 
-		FTransform t = gun->GunMeshComp->GetSocketTransform( TEXT( "Muzzle" ) );
+		switch (aim)
+		{
+		case EWeaponAim::RIFLE:		
+			t = rifle->GunMeshComp->GetSocketTransform( TEXT( "Muzzle" ) );
+			attackDamage = rifle->gunCP;
+			break;
+		case EWeaponAim::PISTOL:	
+			t = pistol->pistolMesh->GetSocketTransform( TEXT( "Muzzle" ) );
+			attackDamage = pistol->gunCP;
+			break;
+		case EWeaponAim::MACHINEGUN:
+			break;
+		}
+
+		//FTransform t = rifle->GunMeshComp->GetSocketTransform( TEXT( "Muzzle" ) );
 		DrawDebugLine( GetWorld() , t.GetLocation() , EndPoint , FColor::Silver , false , 0.2f );
 		UE_LOG( LogTemp , Warning , TEXT( "%s" ) , *OutHit.Component->GetName() );
 
@@ -172,10 +197,76 @@ void UPlayerFireComp::SetRifleAiming(FHitResult OutHit, FVector Start, FVector E
 			{
 				FName BodyPart = HitComp->ComponentTags[0];
 				FString HitObjectName = OutHit.GetComponent()->GetName();
-				otherplayer->HealthComp->TakeDamage( BodyPart , gun->gunCP , HitObjectName );
+				otherplayer->HealthComp->TakeDamage( BodyPart , attackDamage , HitObjectName );
 			}
 		}
 
+	}
+}
+
+void UPlayerFireComp::SelectedRifle()
+{
+	bValidRifle = true;
+	bValidPistol = false;
+
+	aim = EWeaponAim::RIFLE;
+
+	rifle->GunMeshComp->SetVisibility(true);
+	pistol->pistolMesh->SetVisibility( false );
+}
+
+void UPlayerFireComp::SelectedPistol()
+{
+	bValidPistol = true;
+	bValidRifle = false;
+
+	aim = EWeaponAim::PISTOL;
+
+	pistol->pistolMesh->SetVisibility(true);
+	rifle->GunMeshComp->SetVisibility( false );
+
+	
+}
+
+void UPlayerFireComp::SelectedMachineGun()
+{
+}
+
+void UPlayerFireComp::FireRifle()
+{
+	FHitResult OutHit;
+	FVector Start = rifle->GunMeshComp->GetSocketLocation( TEXT( "Muzzle" ) );
+
+	PlayerAnim->playFireAnimation();
+
+	if (!me->fireComp->bAimRifle)
+	{
+		FVector End = me->FollowCamera->GetForwardVector() * 100000;
+		SetAiming( OutHit , Start , End );
+	}
+	else
+	{
+		FVector End = rifle->AimCamSocket->GetForwardVector() * 100000;
+		SetAiming( OutHit , Start , End );
+	}
+}
+
+void UPlayerFireComp::FirePistol()
+{
+	FHitResult OutHit;
+	FVector Start = pistol->pistolMesh->GetSocketLocation( TEXT( "Muzzle" ) );
+
+	PlayerAnim->playFireAnimation();
+
+	if (!me->fireComp->bAimRifle)
+	{
+		FVector End = me->FollowCamera->GetForwardVector() * 100000;
+		SetAiming( OutHit , Start , End );
+	}
+	else
+	{
+		FVector End = pistol->AimCamSocket->GetForwardVector() * 100000;
+		SetAiming( OutHit , Start , End );
 	}
 }
 

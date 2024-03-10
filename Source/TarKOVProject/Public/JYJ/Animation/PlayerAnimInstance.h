@@ -39,6 +39,9 @@ public:
 	bool bValidRifle;
 
 	UPROPERTY( EditAnywhere , BlueprintReadWrite )
+	bool bValidPistol;
+
+	UPROPERTY( EditAnywhere , BlueprintReadWrite )
 	bool bAimRifle;
 
 	UPROPERTY( EditAnywhere , BlueprintReadWrite )
