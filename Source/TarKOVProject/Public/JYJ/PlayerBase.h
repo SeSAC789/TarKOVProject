@@ -107,6 +107,19 @@ public:
 	UPROPERTY( EditDefaultsOnly , BlueprintReadOnly , Category = "Components" )
 	class UPlayerMoveComp* moveComp;
 
+	UPROPERTY( EditDefaultsOnly , BlueprintReadOnly , Category = "Components" )
+	class UStatusEffectComp* statusComp;
+
+	UPROPERTY( EditDefaultsOnly , BlueprintReadOnly , Category = "Components" )
+	class UStaminaComp* staminaComp;
+
+	
 	void SetPartitionDamageCollision();
+
+	UPROPERTY( BlueprintReadOnly )
+	class UHPWidget* hpUI;
+
+	UPROPERTY( EditDefaultsOnly )
+	TSubclassOf<class UUserWidget> hpUIFactory;
 };
 

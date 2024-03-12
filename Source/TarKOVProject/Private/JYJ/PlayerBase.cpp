@@ -13,6 +13,8 @@
 #include "JYJ/PlayerComp/PlayerFireComp.h"
 #include "JYJ/PlayerComp/PlayerMoveComp.h"
 #include "KJH/HealthComp.h"
+#include "KJH/HPWidget.h"
+#include "Blueprint/UserWidget.h"
 
 //DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -89,6 +91,8 @@ APlayerBase::APlayerBase()
 	moveComp = CreateDefaultSubobject<UPlayerMoveComp>( TEXT( "moveComp" ) );
 	HealthComp = CreateDefaultSubobject<UHealthComp>( TEXT( "HealthComp" ) );
 	fireComp = CreateDefaultSubobject<UPlayerFireComp>( TEXT( "fireComp" ) );
+	statusComp = CreateDefaultSubobject<UStatusEffectComp>( TEXT( "statusComp" ) );
+	staminaComp = CreateDefaultSubobject<UStaminaComp>( TEXT( "staminaComp" ) );
 	
 
 }
@@ -109,6 +113,15 @@ void APlayerBase::BeginPlay()
 	LeftLegUpperHitbox->OnComponentBeginOverlap.AddDynamic( this , &APlayerBase::OnHitboxOverlap );
 	LeftLegLowerHitbox->OnComponentBeginOverlap.AddDynamic( this , &APlayerBase::OnHitboxOverlap );
 
+	/*
+	if (!hpUI)
+	{
+		// MainUI를 생성해서 기억하고싶다.
+		hpUI = CreateWidget<UHPWidget>( GetWorld() , hpUIFactory );
+		// AddtoViewport하고싶다.
+		hpUI->AddToViewport();
+	}
+	*/
 
 	// Player Controller Input Settings
 	if (APlayerController* PlayerController = Cast<APlayerController>( Controller ))
