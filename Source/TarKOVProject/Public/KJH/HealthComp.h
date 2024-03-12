@@ -22,13 +22,17 @@ protected:
 	virtual void BeginPlay() override;
 
 protected:
+
 	// 각 신체 부위별 현재 HP
-	UPROPERTY( VisibleAnywhere , Category = "Health" )
+	UPROPERTY( EditDefaultsOnly , Category = "Health" )
 	TMap<FName , float> BodyPartHP;
 
 	// 각 신체 부위별 Max HP
 	UPROPERTY( EditDefaultsOnly , Category = "Health" )
 	TMap<FName , float> BodyPartMaxHP;
+
+	
+
 
 public:	
 	// Called every frame
