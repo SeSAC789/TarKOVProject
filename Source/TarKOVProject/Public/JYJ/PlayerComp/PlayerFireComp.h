@@ -107,4 +107,60 @@ private:
 	bool bEnableRepeating;
 	bool bRepeated;
 
+	//-----------------NetWork-----------------//
+public:
+	// client to server. 손에 붙여 주세요. (총 액터의 포인터)
+	UFUNCTION( Server , Reliable )
+	void ServerRPCSpawnPistol( TSubclassOf<APistolGun> GunFactory );				//요청
+
+	// server to multi. 손에 붙이세요. (총 액터의 포인터)
+	UFUNCTION( NetMulticast , Reliable )
+	void MultiRPCSpawnPistol( APistolGun* OwnPistol );				//요청
+
+	//SelectedPistol
+	// client to server.
+	UFUNCTION( Server , Reliable )
+	void ServerRPCSelectedPistol( APistolGun* selectedPistol );				//요청
+
+	// server to multi.
+	UFUNCTION( NetMulticast , Reliable )
+	void MultiRPCSelectedPistol( APistolGun* selectedPistol );				//요청
+
+	// client to server. 손에 붙여 주세요. (총 액터의 포인터)
+	UFUNCTION( Server , Reliable )
+	void ServerRPCSpawnRifle( TSubclassOf<ARifleGun> GunFactory );				//요청
+
+	// server to multi. 손에 붙이세요. (총 액터의 포인터)
+	UFUNCTION( NetMulticast , Reliable )
+	void MultiRPCSpawnRifle( ARifleGun* OwnRifle );				//요청
+
+	//SelectedPistol
+	// client to server.
+	UFUNCTION( Server , Reliable )
+	void ServerRPCSelectedRifle( ARifleGun* selectedPistol );				//요청
+
+	// server to multi.
+	UFUNCTION( NetMulticast , Reliable )
+	void MultiRPCSelectedRifle( ARifleGun* selectedPistol );				//요청
+
+	//Fire
+	// client to server.
+	UFUNCTION( Server , Reliable )
+	void ServerRPCFirePistol( );											//요청
+
+	// server to multi.
+	UFUNCTION( NetMulticast , Reliable )
+	void MultiRPCFirePistol( bool bHit, const FHitResult& hitInfo );		//요청
+
+	//Reload
+	// client to server.
+	UFUNCTION( Server , Reliable )
+	void ServerRPCReload();											//요청
+
+	// server to multi.
+	UFUNCTION( NetMulticast , Reliable )
+	void MultiRPCReload( );		//요청
+
+
+
 };

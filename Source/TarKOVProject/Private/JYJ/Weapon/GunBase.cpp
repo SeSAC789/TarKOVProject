@@ -15,6 +15,9 @@ AGunBase::AGunBase()
 	AimCamSocket = CreateDefaultSubobject<USceneComponent>(TEXT("AimCamSocket"));
 	AimCamSocket->SetupAttachment(GunMeshComp);
 
+	bReplicates = true;
+	SetReplicateMovement( true );
+
 }
 
 // Called when the game starts or when spawned

@@ -12,6 +12,9 @@
 #include "JYJ/Weapon/RifleGun.h"
 #include "Kismet/GameplayStatics.h"
 #include "KJH/HealthComp.h"
+#include "Net/UnrealNetwork.h"
+
+
 
 void UPlayerFireComp::BeginPlay()
 {
@@ -21,8 +24,9 @@ void UPlayerFireComp::BeginPlay()
 	check( PlayerAnim );
 
 	//Spawn weapon
-	SpawnRifle(RifleGun);
 	SpawnPistol(PistolGun);
+	//ServerRPCSpawnPistol(PistolGun);
+	//SpawnRifle( RifleGun );
 
 	bRepeated = false;
 
@@ -32,6 +36,30 @@ void UPlayerFireComp::TickComponent( float DeltaTime , ELevelTick TickType , FAc
 {
 	Super::TickComponent( DeltaTime , TickType , ThisTickFunction );
 	Zoom();
+
+	//UE_LOG(LogTemp, Warning, TEXT("1"));
+	//오너가 있는가
+	FString owner = me->GetOwner() ? me->GetOwner()->GetName() : TEXT( "No Exist Owner" );
+	//NetConnection 있는가?
+	FString conn = me->GetNetConnection() ? TEXT( "Valid" ) : TEXT( "InValid" );
+
+	//Local Role
+	FString localRole = UEnum::GetValueAsString<ENetRole>( me->GetLocalRole() );
+
+	//Remote Roll
+	FString remoteRole = UEnum::GetValueAsString<ENetRole>( me->GetRemoteRole() );
+
+	FString str = FString::Printf( TEXT( "Owner : %s \nConnection : %s\nLocalRole : %s\nRemoteRole : %s" ) , *owner , *conn , *localRole , *remoteRole );
+
+	FVector loc = me->GetActorLocation() + FVector( 0 , 0 , 50 );
+	DrawDebugString( GetWorld() , loc , *str , nullptr , FColor::Yellow , 0 , true , 1.2f );
+
+	/*
+	if(me->HasAuthority())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("test"));
+	}
+	*/
 
 }
 
@@ -64,12 +92,14 @@ void UPlayerFireComp::SetupInput( UEnhancedInputComponent* input )
 
 void UPlayerFireComp::ChoosePistol()
 {
-	SelectedPistol();
+	ServerRPCSelectedPistol(pistol);
+	//SelectedPistol();
 }
 
 void UPlayerFireComp::ChooseRifle()
 {
-	SelectedRifle();
+	ServerRPCSelectedRifle(rifle);
+	//SelectedRifle();
 }
 
 void UPlayerFireComp::SpawnPistol(TSubclassOf<APistolGun> GunFactory)
@@ -80,8 +110,13 @@ void UPlayerFireComp::SpawnPistol(TSubclassOf<APistolGun> GunFactory)
 	{
 		pistol = GetWorld()->SpawnActor<APistolGun>( GunFactory , FVector( 0 , 0 , 10000 ) , FRotator::ZeroRotator );
 		pistol->AttachToComponent( me->pistolComp , FAttachmentTransformRules::SnapToTargetNotIncludingScale );
+		pistol->SetOwner( me );
 		pistol->pistolMesh->SetVisibility( false );
+
+		//ServerRPCSpawnPistol(GunFactory);
+
 	}
+	
 
 }
 
@@ -185,7 +220,7 @@ void UPlayerFireComp::SelectedRifle()
 
 void UPlayerFireComp::SelectedPistol()
 {
-	
+	/*
 	bValidPistol = true;
 	bValidRifle = false;
 	bEnableRepeating = pistol->bEnableRepeating;
@@ -200,6 +235,7 @@ void UPlayerFireComp::SelectedPistol()
 	{
 		rifle->GunMeshComp->SetVisibility( false );
 	}
+	*/
 }
 
 void UPlayerFireComp::SelectedMachineGun()
@@ -233,6 +269,8 @@ void UPlayerFireComp::FireRifle()
 
 void UPlayerFireComp::FirePistol()
 {
+
+	/*
 	if (pistol->currentAmmo <= 0) return;
 	pistol->currentAmmo--;
 	UE_LOG( LogTemp , Warning , TEXT( "%d" ) , pistol->currentAmmo );
@@ -252,6 +290,9 @@ void UPlayerFireComp::FirePistol()
 		FVector End = pistol->AimCamSocket->GetForwardVector() * 100000;
 		SetAiming( OutHit , Start , End );
 	}
+	*/
+
+	ServerRPCFirePistol();
 
 }
 
@@ -276,7 +317,7 @@ void UPlayerFireComp::SetAiming( FHitResult OutHit , FVector Start , FVector End
 
 	if (bHits)
 	{
-		UGameplayStatics::SpawnEmitterAtLocation( GetWorld() , ExplosionVFXFactory , OutHit.ImpactPoint );
+		//UGameplayStatics::SpawnEmitterAtLocation( GetWorld() , ExplosionVFXFactory , OutHit.ImpactPoint );
 
 		FTransform t;
 		float attackDamage = 0.0f;
@@ -315,24 +356,175 @@ void UPlayerFireComp::SetAiming( FHitResult OutHit , FVector Start , FVector End
 		}
 
 	}
+
+	MultiRPCFirePistol(bHits, OutHit);
 }
-
-
 
 void UPlayerFireComp::Reload()
 {
 	switch (aim)
 	{
 		case EWeaponAim::RIFLE:
-			PlayerAnim->playReloadRifleAnimation();
+			//PlayerAnim->playReloadRifleAnimation();
 			rifle->currentAmmo = rifle->gunMaxAmmo;
 			break;
 		case EWeaponAim::PISTOL:
-			PlayerAnim->playReloadPistolAnimation();
-			pistol->currentAmmo = rifle->gunMaxAmmo;
+			//PlayerAnim->playReloadPistolAnimation();
+			pistol->currentAmmo = pistol->gunMaxAmmo;
 			break;
 		case EWeaponAim::MACHINEGUN:
 			break;
 
 	}
+
+	ServerRPCReload();
+}
+
+
+
+void UPlayerFireComp::ServerRPCSpawnPistol_Implementation( TSubclassOf<APistolGun> GunFactory )
+{
+	if (GunFactory)
+	{
+		pistol = GetWorld()->SpawnActor<APistolGun>( GunFactory , FVector( 0 , 0 , 10000 ) , FRotator::ZeroRotator );
+		//pistol->AttachToComponent( me->pistolComp , FAttachmentTransformRules::SnapToTargetNotIncludingScale );
+		//pistol->SetOwner( me );
+		pistol->pistolMesh->SetVisibility( false );
+
+	}
+
+	//MultiRPCSpawnPistol( pistol );
+}
+
+void UPlayerFireComp::MultiRPCSpawnPistol_Implementation( APistolGun* OwnPistol )
+{
+	//pistolmesh->SetVisibility( false );
+	OwnPistol->AttachToComponent( me->pistolComp , FAttachmentTransformRules::SnapToTargetNotIncludingScale );
+	//OwnPistol->SetOwner( me );
+	//OwnPistol->pistolMesh->SetVisibility( false );
+
+	UE_LOG(LogTemp, Warning, TEXT("UPlayerFireComp::MultiRPCSpawnPistol_Implementation"));
+}
+
+
+void UPlayerFireComp::ServerRPCSelectedPistol_Implementation( APistolGun* selectedPistol )
+{
+	MultiRPCSelectedPistol( selectedPistol );
+}
+
+void UPlayerFireComp::MultiRPCSelectedPistol_Implementation( APistolGun* selectedPistol )
+{
+	bValidPistol = true;
+	bValidRifle = false;
+	bEnableRepeating = selectedPistol->bEnableRepeating;
+
+	aim = EWeaponAim::PISTOL;
+
+	if (selectedPistol)
+	{
+		selectedPistol->pistolMesh->SetVisibility( true );
+	}
+
+	if (rifle)
+	{
+		rifle->GunMeshComp->SetVisibility( false );
+	}
+}
+
+void UPlayerFireComp::ServerRPCFirePistol_Implementation()
+{
+	if (pistol->currentAmmo <= 0) return;
+	pistol->currentAmmo--;
+	UE_LOG( LogTemp , Warning , TEXT( "%d" ) , pistol->currentAmmo );
+
+	FHitResult OutHit;
+	FVector Start = pistol->pistolMesh->GetSocketLocation( TEXT( "Muzzle" ) );
+
+	if (!me->fireComp->bAimRifle)
+	{
+		FVector End = me->FollowCamera->GetForwardVector() * 100000;
+		SetAiming( OutHit , Start , End );
+
+
+		FCollisionQueryParams Params;
+
+		Params.AddIgnoredActor( me );
+		Params.AddIgnoredActor( rifle );
+		Params.AddIgnoredActor( pistol );
+
+		bool bHits = GetWorld()->LineTraceSingleByChannel( OutHit , Start , End , ECollisionChannel::ECC_Visibility , Params );
+
+		MultiRPCFirePistol( bHits , OutHit );
+	}
+	else
+	{
+		FVector End = pistol->AimCamSocket->GetForwardVector() * 100000;
+		SetAiming( OutHit , Start , End );
+	}
+
+	//MultiRPCFirePistol( bHits , OutHit);
+
+}
+
+void UPlayerFireComp::MultiRPCFirePistol_Implementation(bool bHit, const FHitResult& hitInfo)
+{
+
+	PlayerAnim->playFirePistolAnimation();
+
+	if (bHit)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation( GetWorld() , ExplosionVFXFactory , hitInfo.ImpactPoint );
+	}
+}
+
+void UPlayerFireComp::ServerRPCReload_Implementation()
+{
+	//Reload();
+	MultiRPCReload();
+}
+
+void UPlayerFireComp::MultiRPCReload_Implementation()
+{
+	switch (aim)
+	{
+	case EWeaponAim::RIFLE:
+		PlayerAnim->playReloadRifleAnimation();
+		//rifle->currentAmmo = rifle->gunMaxAmmo;
+		break;
+	case EWeaponAim::PISTOL:
+		PlayerAnim->playReloadPistolAnimation();
+		//pistol->currentAmmo = pistol->gunMaxAmmo;
+		break;
+	case EWeaponAim::MACHINEGUN:
+		break;
+
+	}
+}
+
+
+void UPlayerFireComp::ServerRPCSelectedRifle_Implementation( ARifleGun* selectedPistol )
+{
+	MultiRPCSelectedRifle(selectedPistol);
+}
+
+void UPlayerFireComp::MultiRPCSelectedRifle_Implementation( ARifleGun* selectedPistol )
+{
+	bValidRifle = true;
+	bValidPistol = false;
+	bEnableRepeating = selectedPistol->bEnableRepeating;
+
+	aim = EWeaponAim::RIFLE;
+
+	selectedPistol->GunMeshComp->SetVisibility( true );
+	pistol->pistolMesh->SetVisibility( false );
+
+}
+
+
+void UPlayerFireComp::MultiRPCSpawnRifle_Implementation( ARifleGun* OwnRifle )
+{
+}
+
+void UPlayerFireComp::ServerRPCSpawnRifle_Implementation( TSubclassOf<ARifleGun> GunFactory )
+{
 }
