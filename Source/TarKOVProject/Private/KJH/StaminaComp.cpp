@@ -30,35 +30,7 @@ void UStaminaComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
-	RecoverStamina( DeltaTime );
+	//RecoverStamina( DeltaTime );
 }
 
-void UStaminaComp::UpdateLegStamina(float DeltaTime)
-{
-}
-
-void UStaminaComp::UpdateArmStamina(float DeltaTime)
-{
-}
-
-void UStaminaComp::ConsumeStaminaForJump()
-{
-}
-
-void UStaminaComp::ConsumeStaminaForRun(float DeltaTime)
-{
-}
-
-void UStaminaComp::RecoverStamina(float DeltaTime)
-{
-
-}
-
-bool UStaminaComp::CanPerformLegAction()
-{
-}
-
-bool UStaminaComp::CanPerformArmAction()
-{
-}
 

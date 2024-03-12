@@ -6,6 +6,8 @@
 #include "EnhancedInputComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "KJH/HPWidget.h"
+#include "Blueprint/UserWidget.h"
 #include "KJH/HealthComp.h"
 
 AJHPlayerTest::AJHPlayerTest()
@@ -17,10 +19,13 @@ void AJHPlayerTest::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// MainUI를 생성해서 기억하고싶다.
-	hpUI = CreateWidget<UHPWidget>( GetWorld() , hpUIFactory );
-	// AddtoViewport하고싶다.
-	hpUI->AddToViewport();
+	if (!hpUI)
+	{
+		// MainUI를 생성해서 기억하고싶다.
+		hpUI = CreateWidget<UHPWidget>( GetWorld() , hpUIFactory );
+		// AddtoViewport하고싶다.
+		hpUI->AddToViewport();
+	}
 }
 
 void AJHPlayerTest::SetupPlayerInputComponent( UInputComponent* PlayerInputComponent )

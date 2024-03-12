@@ -53,6 +53,8 @@ public:
 	void DistributeDamage( float DamageAmount , FName IgnoredBodyPart );
 
 
+
+
 	UPROPERTY()
 	class UStatusEffectComp* statusComp;
 

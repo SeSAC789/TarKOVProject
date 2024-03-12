@@ -36,6 +36,7 @@ void UHPWidget::NativeTick( const FGeometry& MyGeometry , float InDeltaTime )
 	UpdateBodyPartImageColor( LeftLeg_Img , LeftLegHP() );
 	UpdateBodyPartImageColor( RightLeg_Img , RightLegHP() );
 }
+
 float UHPWidget::HeadHP() const
 {
 	APlayerBase* me = Cast<APlayerBase>( UGameplayStatics::GetPlayerCharacter( this , 0 ) );

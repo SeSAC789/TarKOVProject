@@ -26,10 +26,10 @@ public:
 	UPROPERTY( EditDefaultsOnly , BlueprintReadOnly , Category = "Components" )
 	class UStatusEffectComp* statusComp;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY( BlueprintReadOnly )
 	class UHPWidget* hpUI;
 
 	UPROPERTY( EditDefaultsOnly )
-	TSubclassOf<class UHPWidget> hpUIFactory;
+	TSubclassOf<class UUserWidget> hpUIFactory;
 
 };

@@ -2,6 +2,9 @@
 
 
 #include "KJH/HealthComp.h"
+#include "KJH/HPWidget.h"
+#include "Blueprint/UserWidget.h"
+#include <Subsystems/PanelExtensionSubsystem.h>
 
 // Sets default values for this component's properties
 UHealthComp::UHealthComp()
@@ -36,6 +39,8 @@ void UHealthComp::BeginPlay()
 
 	// ...
 	statusComp = Cast<UStatusEffectComp>( GetOwner()->GetComponentByClass( UStatusEffectComp::StaticClass() ) );
+
+
 	
 }
 
