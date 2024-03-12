@@ -122,7 +122,7 @@ void APlayerBase::SetupPlayerInputComponent( UInputComponent* PlayerInputCompone
 	UEnhancedInputComponent* input = CastChecked<UEnhancedInputComponent>( PlayerInputComponent);
 
 	//자식 class 에서 호출 
-	//SetupInputDelegate.Broadcast(input);
+	SetupInputDelegate.Broadcast(input);
 	
 }
 
