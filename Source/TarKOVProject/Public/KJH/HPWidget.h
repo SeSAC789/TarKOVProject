@@ -16,7 +16,8 @@ class TARKOVPROJECT_API UHPWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	
+
+	UHPWidget( const FObjectInitializer& ObjectInitializer );
 
 	virtual void NativeTick( const FGeometry& MyGeometry , float InDeltaTime ) override;
 
@@ -71,6 +72,39 @@ public:
 	UFUNCTION( BlueprintCallable , Category = "Health" )
 	ESlateVisibility GetBleedingVisibility() const;
 
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
+	class UImage* Fracture_Img;
+
+	UFUNCTION( BlueprintCallable , Category = "Health" )
+	ESlateVisibility GetFractureVisibility() const;
+
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
+	class UImage* Head_Img;
+
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
+	class UImage* Thorax_Img;
+
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
+	class UImage* Stomach_Img;
+
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
+	class UImage* LeftArm_Img;
+
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
+	class UImage* RightArm_Img;
+
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
+	class UImage* LeftLeg_Img;
+
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
+	class UImage* RightLeg_Img;
+
+	UFUNCTION( BlueprintCallable , Category = "Health" )
+	void UpdateBodyPartImageColor( UImage* BodyPartImage , float HPPercentage ) const;
+
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
+	class UProgressBar* StaminaDown_Bar;
+	
 	/*UPROPERTY()
 	class UHealthComp* healthComp;*/
 };

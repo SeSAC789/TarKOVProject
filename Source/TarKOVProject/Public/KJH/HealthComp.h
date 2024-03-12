@@ -38,7 +38,9 @@ public:
 	UPROPERTY( EditDefaultsOnly , Category = "Health" )
 	bool bIsDead;
 
+
 	void TakeDamage( const FName& BodyPart , float DamageAmount, const FString& HitObjectName );
+	void CheckAndHandleTotalDepletion();
 	void HealBodyPart( FName BodyPart , float HealAmount );
 	// 상태이상에서 hp값 확인하기 위해
 	float GetBodyPartHealth(FName BodyPart);
@@ -47,6 +49,9 @@ public:
 	void CheckAndApplyBleeding( const FName& BodyPart );
 	// 골절 확인 및 적용 위해
 	void CheckAndApplyFracture( const FName& BodyPart );
+	// 피해 분산 함수
+	void DistributeDamage( float DamageAmount , FName IgnoredBodyPart );
+
 
 	UPROPERTY()
 	class UStatusEffectComp* statusComp;
