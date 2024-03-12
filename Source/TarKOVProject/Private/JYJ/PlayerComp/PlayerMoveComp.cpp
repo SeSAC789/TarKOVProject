@@ -126,7 +126,7 @@ void UPlayerMoveComp::Prone(const FInputActionValue& Value)
 void UPlayerMoveComp::SetRunning(bool IsRunning)
 {
 	bIsRunning = IsRunning;
-	// 여기에서 캐릭터의 이동 속도를 조정할 수도 있습니다.
+	
 	me->GetCharacterMovement()->MaxWalkSpeed = bIsRunning ? (me->GetCharacterMovement()->MaxWalkSpeed * runningSpeed) : (me->GetCharacterMovement()->MaxWalkSpeed / runningSpeed);
 }
 

@@ -2,6 +2,9 @@
 
 
 #include "KJH/HealthComp.h"
+#include "KJH/HPWidget.h"
+#include "Blueprint/UserWidget.h"
+#include <Subsystems/PanelExtensionSubsystem.h>
 
 // Sets default values for this component's properties
 UHealthComp::UHealthComp()
@@ -36,6 +39,8 @@ void UHealthComp::BeginPlay()
 
 	// ...
 	statusComp = Cast<UStatusEffectComp>( GetOwner()->GetComponentByClass( UStatusEffectComp::StaticClass() ) );
+
+
 	
 }
 
@@ -55,61 +60,88 @@ void UHealthComp::TakeDamage( const FName& BodyPart , float DamageAmount, const 
 	
 	if (BodyPartHP.Contains( BodyPart ))
 	{
-		// 체력이 이미 0이라면 데미지를 적용하지 않는다
-		if (BodyPartHP[BodyPart] <= 0.0f)
+		bool isBleedingDamage = HitObjectName.Equals( TEXT( "Bleeding Effect" ) , ESearchCase::IgnoreCase );
+
+		// 체력 감소 로직
+		if (!isBleedingDamage || BodyPartHP[BodyPart] > 0.0f)
 		{
-			UE_LOG( LogTemp , Warning , TEXT( "%s part is already at 0 HP due to %s. No further damage applied." ) , *BodyPart.ToString() , *HitObjectName );
-			return; // 더 이상 코드를 실행하지 않고 빠져나갑니다.
+			BodyPartHP[BodyPart] = FMath::Clamp<float>( BodyPartHP[BodyPart] - DamageAmount , 0.0f , BodyPartMaxHP[BodyPart] );
+			UE_LOG( LogTemp , Warning , TEXT( "%s 부위가 %f 만큼 데미지를 받았습니다 %s로 인해서 현재 남은 HP: %f" ) , *BodyPart.ToString() , DamageAmount , *HitObjectName , BodyPartHP[BodyPart] );
 		}
 
-		BodyPartHP[BodyPart] = FMath::Clamp<float>( BodyPartHP[BodyPart] - DamageAmount , 0.0f , BodyPartMaxHP[BodyPart] );
-		UE_LOG( LogTemp , Warning , TEXT( "%s received %f damage from %s. Remaining HP: %f" ) , *BodyPart.ToString() , DamageAmount , *HitObjectName , BodyPartHP[BodyPart] );
-
-		// 만약 머리 또는 흉부 부위의 체력이 0 이하라면 즉시 사망
-		if ((BodyPart == FName( "Head" ) || BodyPart == FName( "Thorax" )) && BodyPartHP[BodyPart] <= 0)
+		// 머리나 흉부가 출혈로 0이 됐을 경우를 제외하고, 출혈이 아닌 다른 원인으로 0이 되면 즉시 사망 처리
+		if ((BodyPart == FName( "Head" ) || BodyPart == FName( "Thorax" )) && BodyPartHP[BodyPart] <= 0.0f && !isBleedingDamage)
 		{
 			bIsDead = true;
 			UE_LOG( LogTemp , Warning , TEXT( "Character has died due to critical damage to %s from %s." ) , *BodyPart.ToString() , *HitObjectName );
-			// 즉시 사망 이후 관련 함수 구현하자, 죽음 애니메이션 제생, 게임오버 ui등 구현하면 될 듯
+			// 즉시 사망 이후 관련 함수 구현
 			return;
 		}
 
-		// 모든 신체 부위의 체력이 0 이하인지 확인
-		bIsDead = true; // 처음에는 캐릭터를 사망한 것으로 가정
-		for (const auto& Elem : BodyPartHP)
+		if (BodyPartHP[BodyPart] <= 0.0f)
 		{
-			if (Elem.Value > 0)
-			{
-				bIsDead = false; // 하나라도 체력이 0보다 큰 부위가 있다면, 캐릭터는 아직 살아있음
-				break;
-			}
+			// 체력이 0인 부위에 추가적인 피해 발생 시 분산 로직 호출
+			DistributeDamage( DamageAmount , BodyPart );
 		}
 
-		// 만약 모든 신체 부위의 체력이 0 이하이면 사망 처리
-		if (bIsDead)
-		{
-			UE_LOG( LogTemp , Warning , TEXT( "Character has died due to total HP depletion." ) );
-			// 즉시 사망 이후 관련 함수 구현하자, 죽음 애니메이션 제생, 게임오버 ui등 구현하면 될 듯
-
-		}
+		// 모든 신체 부위 체력이 0 이하 확인
+		CheckAndHandleTotalDepletion();
+	
 	}
 	CheckAndApplyBleeding( BodyPart );
 	CheckAndApplyFracture( BodyPart );
 }
 
+void UHealthComp::CheckAndHandleTotalDepletion()
+{
+	bIsDead = true; // 일단 사망한 것으로 가정
+	for (const auto& Elem : BodyPartHP)
+	{
+		if (Elem.Value > 0)
+		{
+			bIsDead = false; // 하나라도 체력이 0보다 큰 부위가 있다면 캐릭터는 아직 살아있음
+			break;
+		}
+	}
+
+	if (bIsDead)
+	{
+		UE_LOG( LogTemp , Warning , TEXT( "Character has died due to total HP depletion." ) );
+		// 모든 신체 부위의 체력이 0 이하이면 사망 처리 구현 하면 될 듯
+	}
+}
+
 void UHealthComp::HealBodyPart(FName BodyPart, float HealAmount)
 {
-	// 체력 회복이건 추후에 블프에서 구현 할 듯?
+	// 체력을 회복시킵니다.
+	if (BodyPartHP.Contains( BodyPart ))
+	{
+		BodyPartHP[BodyPart] = FMath::Clamp<float>( BodyPartHP[BodyPart] + HealAmount , 0.0f , BodyPartMaxHP[BodyPart] );
+		UE_LOG( LogTemp , Warning , TEXT( "%s 부위가 %f 만큼 회복되었습니다. 현재 HP: %f" ) , *BodyPart.ToString() , HealAmount , BodyPartHP[BodyPart] );
+	}
 
 	// 체력이 특정 수준 이상 회복되었으면 출혈 상태이상 비활성화
 	if (GetBodyPartHealth( BodyPart ) > GetBodyPartMaxHealth( BodyPart ) * 0.5f)
 	{
-		
 		if (statusComp)
 		{
-			statusComp->ClearStatusEffect( EStatusEffectType::Bleeding );
+			// 출혈 상태이상 해제
+			statusComp->ClearStatusEffect( EStatusEffectType::Bleeding, BodyPart );
 		}
 	}
+
+	// 골절은 추후에 힐 아이템 구현 시 부목을 통해서만 해제가능 하게
+
+	//// 체력이 30% 초과로 회복되었으면 골절 상태이상 비활성화
+	//if (GetBodyPartHealth( BodyPart ) > GetBodyPartMaxHealth( BodyPart ) * 0.3f)
+	//{
+	//	if (statusComp)
+	//	{
+	//		// 골절 상태이상 해제
+	//		statusComp->ClearStatusEffect( EStatusEffectType::Fracture );
+	//		UE_LOG( LogTemp , Warning , TEXT( "%s 부위의 골절 상태이상이 해제되었습니다." ) , *BodyPart.ToString() );
+	//	}
+	//}
 }
 
 float UHealthComp::GetBodyPartHealth( FName BodyPart )
@@ -154,15 +186,42 @@ void UHealthComp::CheckAndApplyBleeding(const FName& BodyPart)
 
 void UHealthComp::CheckAndApplyFracture(const FName& BodyPart)
 {
-	if (BodyPartHP[BodyPart] <= (BodyPartMaxHP[BodyPart] * 0.3f))
-	{
-		// StatusEffectComp에 골절 상태이상 적용 요청
-		if (statusComp)
-		{
-			statusComp->ApplyStatusEffect( EStatusEffectType::Fracture, BodyPart );
-			UE_LOG( LogTemp , Warning , TEXT( "UHealthComp::CheckAndApplyFracture" ) );
-			UE_LOG( LogTemp , Warning , TEXT( "골절상태 생긴 부위 :  %s" ) , *BodyPart.ToString() );
+	 // 골절이 다리 부위에만 적용되도록 조건 추가
+    if ((BodyPart == FName("LeftLeg") || BodyPart == FName("RightLeg")) && BodyPartHP[BodyPart] <= (BodyPartMaxHP[BodyPart] * 0.3f))
+    {
+        if (statusComp)
+        {
+            statusComp->ApplyStatusEffect(EStatusEffectType::Fracture, BodyPart);
+            UE_LOG(LogTemp, Warning, TEXT("UHealthComp::CheckAndApplyFracture, 골절 상태 생긴 부위: %s"), *BodyPart.ToString());
+        }
+    }
+}
 
+void UHealthComp::DistributeDamage(float DamageAmount, FName IgnoredBodyPart)
+{
+	float DamageMultiplier = 1.0f; // 기본 피해량 배수
+
+	// 피해 분산 배수 조정
+	if (IgnoredBodyPart == "RightArm" || IgnoredBodyPart == "LeftArm")
+	{
+		DamageMultiplier = 0.7f;
+	}
+	else if (IgnoredBodyPart == "Stomach")
+	{
+		DamageMultiplier = 1.5f;
+	}
+	
+	// 조정된 분산 피해량 계산
+	float DistributedDamage = (DamageAmount * DamageMultiplier) / (BodyPartHP.Num() - 1);
+
+	// 다른 모든 신체 부위로 피해 분산
+	for (auto& Elem : BodyPartHP)
+	{
+		if (Elem.Key != IgnoredBodyPart)
+		{
+			float NewHP = FMath::Clamp( Elem.Value - DistributedDamage , 0.0f , BodyPartMaxHP[Elem.Key] );
+			UE_LOG( LogTemp , Warning , TEXT( "%s 부위에 %f 만큼의 피해가 분산되었습니다. 변경 전 HP: %f, 변경 후 HP: %f" ) , *Elem.Key.ToString() , DistributedDamage , Elem.Value , NewHP );
+			Elem.Value = NewHP;
 		}
 	}
 }

@@ -9,16 +9,34 @@
 #include "KJH/HealthComp.h"
 
 
+UHPWidget::UHPWidget( const FObjectInitializer& ObjectInitializer ) : Super( ObjectInitializer )
+{
+
+}
 
 void UHPWidget::NativeTick( const FGeometry& MyGeometry , float InDeltaTime )
 {
 	Super::NativeTick( MyGeometry , InDeltaTime );
-	
+
 	if (Bleeding_Img)
 	{
 		Bleeding_Img->SetVisibility( GetBleedingVisibility() );
 	}
+
+	if (Fracture_Img)
+	{
+		Fracture_Img->SetVisibility( GetFractureVisibility() );
+	}
+
+	UpdateBodyPartImageColor( Head_Img , HeadHP() );
+	UpdateBodyPartImageColor( Thorax_Img , ThoraxHP() );
+	UpdateBodyPartImageColor( Stomach_Img , StomachHP() );
+	UpdateBodyPartImageColor( LeftArm_Img , LeftArmHP() );
+	UpdateBodyPartImageColor( RightArm_Img , RightArmHP() );
+	UpdateBodyPartImageColor( LeftLeg_Img , LeftLegHP() );
+	UpdateBodyPartImageColor( RightLeg_Img , RightLegHP() );
 }
+
 float UHPWidget::HeadHP() const
 {
 	APlayerBase* me = Cast<APlayerBase>( UGameplayStatics::GetPlayerCharacter( this , 0 ) );
@@ -131,3 +149,44 @@ ESlateVisibility UHPWidget::GetBleedingVisibility() const
 	}
 	return ESlateVisibility::Hidden;
 }
+
+ESlateVisibility UHPWidget::GetFractureVisibility() const
+{
+	APlayerBase* me = Cast<APlayerBase>( GetOwningPlayerPawn() );
+	if (me)
+	{
+		UStatusEffectComp* StatusEffectComp = me->FindComponentByClass<UStatusEffectComp>();
+		if (StatusEffectComp && StatusEffectComp->IsFractured())
+		{
+			return ESlateVisibility::Visible;
+		}
+	}
+	return ESlateVisibility::Hidden;
+}
+
+void UHPWidget::UpdateBodyPartImageColor( UImage* BodyPartImage , float HPPercentage ) const
+{
+	FLinearColor Color;
+	if (HPPercentage > 0.7f) // 100% ~ 70%
+	{
+		Color = FLinearColor::Green;
+	}
+	else if (HPPercentage > 0.3f) // 69% ~ 30%
+	{
+		Color = FLinearColor::Yellow;
+	}
+	else if (HPPercentage > 0) // 29% ~ 1%
+	{
+		Color = FLinearColor::Red;
+	}
+	else // 0%
+	{
+		Color = FLinearColor::Black;
+	}
+
+	if (BodyPartImage)
+	{
+		BodyPartImage->SetColorAndOpacity( Color );
+	}
+}
+
