@@ -22,7 +22,7 @@ class TARKOVPROJECT_API UPlayerFireComp : public UPlayerBaseComp
 {
 	GENERATED_BODY()
 
-public:
+private:
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	virtual void SetupInput( UEnhancedInputComponent* input ) override;
@@ -60,7 +60,7 @@ public:
 	UPROPERTY()
 	class APistolGun* pistol;
 
-
+public:
 	UPROPERTY( EditAnywhere , BlueprintReadWrite )
 	bool bValidPistol;
 
