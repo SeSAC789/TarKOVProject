@@ -24,6 +24,8 @@ void UPlayerFireComp::BeginPlay()
 	SpawnRifle(RifleGun);
 	SpawnPistol(PistolGun);
 
+	bRepeated = false;
+
 }
 
 void UPlayerFireComp::TickComponent( float DeltaTime , ELevelTick TickType , FActorComponentTickFunction* ThisTickFunction )
@@ -52,6 +54,11 @@ void UPlayerFireComp::SetupInput( UEnhancedInputComponent* input )
 	//Fire
 	input->BindAction( FireAction , ETriggerEvent::Started , this , &UPlayerFireComp::Fire );
 
+	//Reload
+	input->BindAction( ReloadAction , ETriggerEvent::Started , this , &UPlayerFireComp::Reload );
+
+	//Repeating
+	input->BindAction( RepeatingAction , ETriggerEvent::Started , this , &UPlayerFireComp::ChangeRepeating );
 
 }
 
@@ -67,24 +74,30 @@ void UPlayerFireComp::ChooseRifle()
 
 void UPlayerFireComp::SpawnPistol(TSubclassOf<APistolGun> GunFactory)
 {
+	if(!me){return;}
+
 	if (GunFactory)
 	{
 		pistol = GetWorld()->SpawnActor<APistolGun>( GunFactory , FVector( 0 , 0 , 10000 ) , FRotator::ZeroRotator );
-		pistol->AttachToComponent( me->pistolComp , FAttachmentTransformRules::SnapToTargetNotIncludingScale ); 
+		pistol->AttachToComponent( me->pistolComp , FAttachmentTransformRules::SnapToTargetNotIncludingScale );
+		pistol->pistolMesh->SetVisibility( false );
 	}
 
-	me->fireComp->pistol->pistolMesh->SetVisibility(false);
 }
 
 void UPlayerFireComp::SpawnRifle(TSubclassOf<ARifleGun> rifleFactory)
 {
+
+	if(!me ){return;}
+
 	if (rifleFactory)
 	{
 		rifle = GetWorld()->SpawnActor<ARifleGun>( rifleFactory , FVector( 0 , 0 , 10000 ) , FRotator::ZeroRotator );
 		rifle->AttachToComponent( me->rifleComp , FAttachmentTransformRules::SnapToTargetNotIncludingScale );
+		rifle->GunMeshComp->SetVisibility( false );
+
 	}
 
-	me->fireComp->rifle->GunMeshComp->SetVisibility(false);
 }
 
 void UPlayerFireComp::Zoom()
@@ -115,7 +128,8 @@ void UPlayerFireComp::ZoomIn()
 {
 	bAimRifle = true;
 	if (!me->FollowCamera) return;
-	
+
+	//Zoom camera location by gun type
 	switch (aim)
 	{
 		case EWeaponAim::RIFLE:
@@ -137,6 +151,7 @@ void UPlayerFireComp::ZoomOut()
 	bAimRifle = false;
 	if (!me->DefaultCamPos || !me->FollowCamera) return;
 
+	//default camera location 
 	me->FollowCamera->AttachToComponent( me->DefaultCamPos , FAttachmentTransformRules::SnapToTargetIncludingScale );
 }
 
@@ -144,6 +159,7 @@ void UPlayerFireComp::Fire()
 {
 	if (false == bValidPistol && false == bValidRifle) return;
 
+	//call fire function by gun type 
 	switch (aim)
 	{
 	case EWeaponAim::RIFLE:		FireRifle();	break;
@@ -153,9 +169,105 @@ void UPlayerFireComp::Fire()
 	}
 }
 
-void UPlayerFireComp::SetAiming(FHitResult OutHit, FVector Start, FVector EndPoint)
+
+//When choose gun type, the function called
+void UPlayerFireComp::SelectedRifle()
+{
+	bValidRifle = true;
+	bValidPistol = false;
+	bEnableRepeating = rifle->bEnableRepeating;
+
+	aim = EWeaponAim::RIFLE;
+
+	rifle->GunMeshComp->SetVisibility(true);
+	pistol->pistolMesh->SetVisibility( false );
+}
+
+void UPlayerFireComp::SelectedPistol()
+{
+	
+	bValidPistol = true;
+	bValidRifle = false;
+	bEnableRepeating = pistol->bEnableRepeating;
+
+	aim = EWeaponAim::PISTOL;
+
+	if(pistol)
+	{
+		pistol->pistolMesh->SetVisibility( true );
+	}
+	if(rifle)
+	{
+		rifle->GunMeshComp->SetVisibility( false );
+	}
+}
+
+void UPlayerFireComp::SelectedMachineGun()
+{
+}
+
+//When fire gun, the function called
+void UPlayerFireComp::FireRifle()
+{
+
+	if (rifle->currentAmmo <= 0) return;
+	rifle->currentAmmo--;
+
+	FHitResult OutHit;
+	FVector Start = rifle->GunMeshComp->GetSocketLocation( TEXT( "Muzzle" ) );
+
+	PlayerAnim->playFireRifleAnimation();
+
+	if (!me->fireComp->bAimRifle)
+	{
+		FVector End = me->FollowCamera->GetForwardVector() * 100000;
+		SetAiming( OutHit , Start , End );
+	}
+	else
+	{
+		FVector End = rifle->AimCamSocket->GetForwardVector() * 100000;
+		SetAiming( OutHit , Start , End );
+	}
+
+}
+
+void UPlayerFireComp::FirePistol()
+{
+	if (pistol->currentAmmo <= 0) return;
+	pistol->currentAmmo--;
+	UE_LOG( LogTemp , Warning , TEXT( "%d" ) , pistol->currentAmmo );
+
+	FHitResult OutHit;
+	FVector Start = pistol->pistolMesh->GetSocketLocation( TEXT( "Muzzle" ) );
+
+	PlayerAnim->playFirePistolAnimation();
+
+	if (!me->fireComp->bAimRifle)
+	{
+		FVector End = me->FollowCamera->GetForwardVector() * 100000;
+		SetAiming( OutHit , Start , End );
+	}
+	else
+	{
+		FVector End = pistol->AimCamSocket->GetForwardVector() * 100000;
+		SetAiming( OutHit , Start , End );
+	}
+
+}
+
+void UPlayerFireComp::ChangeRepeating()
+{
+	if(bEnableRepeating)
+	{
+		bRepeated = !bRepeated;
+	}
+}
+
+
+void UPlayerFireComp::SetAiming( FHitResult OutHit , FVector Start , FVector EndPoint )
 {
 	FCollisionQueryParams Params;
+
 	Params.AddIgnoredActor( me );
 	Params.AddIgnoredActor( rifle );
 	Params.AddIgnoredActor( pistol );
@@ -165,16 +277,18 @@ void UPlayerFireComp::SetAiming(FHitResult OutHit, FVector Start, FVector EndPoi
 	if (bHits)
 	{
 		UGameplayStatics::SpawnEmitterAtLocation( GetWorld() , ExplosionVFXFactory , OutHit.ImpactPoint );
+
 		FTransform t;
 		float attackDamage = 0.0f;
 
+		//Setting start socket
 		switch (aim)
 		{
-		case EWeaponAim::RIFLE:		
+		case EWeaponAim::RIFLE:
 			t = rifle->GunMeshComp->GetSocketTransform( TEXT( "Muzzle" ) );
 			attackDamage = rifle->gunCP;
-			break;
-		case EWeaponAim::PISTOL:	
+			break; 
+		case EWeaponAim::PISTOL:
 			t = pistol->pistolMesh->GetSocketTransform( TEXT( "Muzzle" ) );
 			attackDamage = pistol->gunCP;
 			break;
@@ -182,7 +296,6 @@ void UPlayerFireComp::SetAiming(FHitResult OutHit, FVector Start, FVector EndPoi
 			break;
 		}
 
-		//FTransform t = rifle->GunMeshComp->GetSocketTransform( TEXT( "Muzzle" ) );
 		DrawDebugLine( GetWorld() , t.GetLocation() , EndPoint , FColor::Silver , false , 0.2f );
 		UE_LOG( LogTemp , Warning , TEXT( "%s" ) , *OutHit.Component->GetName() );
 
@@ -204,70 +317,22 @@ void UPlayerFireComp::SetAiming(FHitResult OutHit, FVector Start, FVector EndPoi
 	}
 }
 
-void UPlayerFireComp::SelectedRifle()
+
+
+void UPlayerFireComp::Reload()
 {
-	bValidRifle = true;
-	bValidPistol = false;
-
-	aim = EWeaponAim::RIFLE;
-
-	rifle->GunMeshComp->SetVisibility(true);
-	pistol->pistolMesh->SetVisibility( false );
-}
-
-void UPlayerFireComp::SelectedPistol()
-{
-	bValidPistol = true;
-	bValidRifle = false;
-
-	aim = EWeaponAim::PISTOL;
-
-	pistol->pistolMesh->SetVisibility(true);
-	rifle->GunMeshComp->SetVisibility( false );
-
-	
-}
-
-void UPlayerFireComp::SelectedMachineGun()
-{
-}
-
-void UPlayerFireComp::FireRifle()
-{
-	FHitResult OutHit;
-	FVector Start = rifle->GunMeshComp->GetSocketLocation( TEXT( "Muzzle" ) );
-
-	PlayerAnim->playFireAnimation();
-
-	if (!me->fireComp->bAimRifle)
+	switch (aim)
 	{
-		FVector End = me->FollowCamera->GetForwardVector() * 100000;
-		SetAiming( OutHit , Start , End );
-	}
-	else
-	{
-		FVector End = rifle->AimCamSocket->GetForwardVector() * 100000;
-		SetAiming( OutHit , Start , End );
+		case EWeaponAim::RIFLE:
+			PlayerAnim->playReloadRifleAnimation();
+			rifle->currentAmmo = rifle->gunMaxAmmo;
+			break;
+		case EWeaponAim::PISTOL:
+			PlayerAnim->playReloadPistolAnimation();
+			pistol->currentAmmo = rifle->gunMaxAmmo;
+			break;
+		case EWeaponAim::MACHINEGUN:
+			break;
+
 	}
 }
-
-void UPlayerFireComp::FirePistol()
-{
-	FHitResult OutHit;
-	FVector Start = pistol->pistolMesh->GetSocketLocation( TEXT( "Muzzle" ) );
-
-	PlayerAnim->playFireAnimation();
-
-	if (!me->fireComp->bAimRifle)
-	{
-		FVector End = me->FollowCamera->GetForwardVector() * 100000;
-		SetAiming( OutHit , Start , End );
-	}
-	else
-	{
-		FVector End = pistol->AimCamSocket->GetForwardVector() * 100000;
-		SetAiming( OutHit , Start , End );
-	}
-}
-
-

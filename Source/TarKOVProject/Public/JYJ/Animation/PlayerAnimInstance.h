@@ -15,7 +15,11 @@ class TARKOVPROJECT_API UPlayerAnimInstance : public UAnimInstance
 	GENERATED_BODY()
 
 public:
+	UPlayerAnimInstance();
 	virtual void NativeUpdateAnimation( float DeltaSeconds ) override;
+
+	UPROPERTY()
+	class APlayerBase* player;
 
 	UPROPERTY( EditAnywhere , BlueprintReadWrite )
 	float speed;
@@ -54,8 +58,15 @@ public:
 	float roll;
 
 	UPROPERTY( EditDefaultsOnly )
-	class UAnimMontage* fireRifleMontage;
+	class UAnimMontage* fireMontage;
 
-	void playFireAnimation();
+	UPROPERTY( EditDefaultsOnly )
+	class UAnimMontage* reloadMontage;
+
+	void playFireRifleAnimation();
+	void playFirePistolAnimation();
+
+	void playReloadRifleAnimation();
+	void playReloadPistolAnimation();
 	
 };

@@ -17,8 +17,9 @@ class TARKOVPROJECT_API ARifleGun : public AGunBase
 protected:
 	ARifleGun();
 	virtual void BeginPlay() override;
-
+	
 public:
+	int32 currentAmmo;
 	
 	
 };

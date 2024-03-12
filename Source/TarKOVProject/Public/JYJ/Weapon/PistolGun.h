@@ -21,5 +21,8 @@ public:
 	UPROPERTY( EditDefaultsOnly )
 	class UStaticMeshComponent* pistolMesh;
 
+public:
+	int32 currentAmmo;
+
 	
 };

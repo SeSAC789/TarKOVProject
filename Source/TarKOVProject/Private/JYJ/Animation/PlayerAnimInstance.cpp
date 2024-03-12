@@ -9,15 +9,34 @@
 #include "JYJ/TestPlayer/YJTestPlayer.h"
 #include "KJH/HealthComp.h"
 
+UPlayerAnimInstance::UPlayerAnimInstance()
+{
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> AM_Fire( TEXT( "/Script/Engine.AnimMontage'/Game/TarKOV/JYJ/Blueprints/Animation/MontageFireRifle.MontageFireRifle'" ) );
+
+	if (AM_Fire.Succeeded())
+	{
+		fireMontage = AM_Fire.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> AM_Reload( TEXT( "/Script/Engine.AnimMontage'/Game/TarKOV/JYJ/Blueprints/Animation/MontageReload.MontageReload'" ) );
+
+	if (AM_Reload.Succeeded())
+	{
+		reloadMontage = AM_Reload.Object;
+	}
+}
+
 void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
 
 	//1. owner pawn 을 가져와서 atpsplayer 로 cast 하고 싶다.
-	APlayerBase* player = Cast<APlayerBase>( TryGetPawnOwner() );
+	player = Cast<APlayerBase>( TryGetPawnOwner() );
 
 	if (nullptr == player )
 		return;
+
+
 
 	
 	//2. 오너의 velocity, forwward vector, right vector를 가져오고 싶다.
@@ -47,8 +66,35 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 }
 
-void UPlayerAnimInstance::playFireAnimation()
+void UPlayerAnimInstance::playFireRifleAnimation( )
 {
-	Montage_Play( fireRifleMontage );
-	UE_LOG(LogTemp, Warning, TEXT("Anim TEST"));
+	if(!Montage_Play(fireMontage))
+	{
+		player->PlayAnimMontage( fireMontage , 1 , TEXT( "Rifle" ) );
+	}
+
+}
+
+void UPlayerAnimInstance::playFirePistolAnimation()
+{
+	if (!Montage_Play( fireMontage ))
+	{
+		player->PlayAnimMontage( fireMontage , 1 , TEXT( "Pistol" ) );
+	}
+}
+
+void UPlayerAnimInstance::playReloadRifleAnimation()
+{
+	if(!Montage_Play(reloadMontage))
+	{
+		player->PlayAnimMontage( fireMontage , 1 , TEXT( "Rifle" ) );
+	}
+}
+
+void UPlayerAnimInstance::playReloadPistolAnimation()
+{
+	if (!Montage_Play( reloadMontage ))
+	{
+		player->PlayAnimMontage( fireMontage , 1 , TEXT( "Pistol" ) );
+	}
 }

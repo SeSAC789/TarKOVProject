@@ -43,6 +43,8 @@ public:
 	UPROPERTY( EditAnywhere , BlueprintReadOnly , Category = Input , meta = (AllowPrivateAccess = "true") )
 	class UInputAction* ReloadAction;
 
+	UPROPERTY( EditAnywhere , BlueprintReadOnly , Category = Input , meta = (AllowPrivateAccess = "true") )
+	class UInputAction* RepeatingAction;
 
 	//Rifle Setting
 	UPROPERTY( EditAnywhere )
@@ -90,6 +92,8 @@ public:
 	UPROPERTY( EditAnywhere , BlueprintReadOnly )
 	EWeaponAim aim;
 
+	void Reload();
+
 private:
 	void SelectedRifle();
 	void SelectedPistol();
@@ -97,5 +101,10 @@ private:
 
 	void FireRifle();
 	void FirePistol();
+
+	void ChangeRepeating();
+
+	bool bEnableRepeating;
+	bool bRepeated;
 
 };

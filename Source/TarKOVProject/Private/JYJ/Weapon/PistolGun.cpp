@@ -32,5 +32,8 @@ void APistolGun::BeginPlay()
 	gunCP = 2.0f;
 
 	//pistol 탄피 (test용으로 10개 셋팅)
-	gunAmmo = 10;
+	gunMaxAmmo = 10;
+	currentAmmo = gunMaxAmmo;
+
+	bEnableRepeating = false;
 }

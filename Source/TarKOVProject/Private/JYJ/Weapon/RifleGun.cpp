@@ -27,7 +27,10 @@ void ARifleGun::BeginPlay()
 	gunCP = 5.0f;
 
 	//rifle 탄피 (test용으로 10개 셋팅)
-	gunAmmo = 10;
+	gunMaxAmmo = 10;
 
+	currentAmmo = gunMaxAmmo;
+
+	bEnableRepeating = true;
 }
 

@@ -32,8 +32,10 @@ public:
 	UPROPERTY( EditDefaultsOnly )
 	class USceneComponent* AimCamSocket;
 
-	float gunAmmo;
-	float gunCP ;
+	float gunMaxAmmo;
+	int32 gunCP ;
+
+	bool bEnableRepeating;
 
 
 };
