@@ -53,14 +53,16 @@ private:
 	UPROPERTY()
 	class ARifleGun* rifle;
 
-	//Pistol Setting
-	UPROPERTY( EditAnywhere )
-	TSubclassOf<class APistolGun> PistolGun;
 
 	UPROPERTY()
 	class APistolGun* pistol;
 
 public:
+
+	//Pistol Setting
+	UPROPERTY( EditAnywhere )
+	TSubclassOf<class APistolGun> PistolGun;
+
 	UPROPERTY( EditAnywhere , BlueprintReadWrite )
 	bool bValidPistol;
 

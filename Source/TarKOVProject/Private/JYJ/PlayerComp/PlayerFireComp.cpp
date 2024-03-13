@@ -24,18 +24,19 @@ void UPlayerFireComp::BeginPlay()
 	check( PlayerAnim );
 
 	//Spawn weapon
-	SpawnPistol(PistolGun);
+	//SpawnPistol(PistolGun);
 	//ServerRPCSpawnPistol(PistolGun);
 	//SpawnRifle( RifleGun );
 
 	bRepeated = false;
+	bAimRifle = false;
 
 }
 
 void UPlayerFireComp::TickComponent( float DeltaTime , ELevelTick TickType , FActorComponentTickFunction* ThisTickFunction )
 {
 	Super::TickComponent( DeltaTime , TickType , ThisTickFunction );
-	Zoom();
+	//Zoom();
 
 	//UE_LOG(LogTemp, Warning, TEXT("1"));
 	//오너가 있는가
@@ -109,10 +110,12 @@ void UPlayerFireComp::SpawnPistol(TSubclassOf<APistolGun> GunFactory)
 	if (GunFactory)
 	{
 		pistol = GetWorld()->SpawnActor<APistolGun>( GunFactory , FVector( 0 , 0 , 10000 ) , FRotator::ZeroRotator );
-		pistol->AttachToComponent( me->pistolComp , FAttachmentTransformRules::SnapToTargetNotIncludingScale );
-		pistol->SetOwner( me );
-		pistol->pistolMesh->SetVisibility( false );
-
+		if(pistol)
+		{
+			pistol->AttachToComponent( me->pistolComp , FAttachmentTransformRules::SnapToTargetNotIncludingScale );
+			pistol->SetOwner( me );
+			pistol->pistolMesh->SetVisibility( false );
+		}
 		//ServerRPCSpawnPistol(GunFactory);
 
 	}
@@ -384,26 +387,56 @@ void UPlayerFireComp::Reload()
 
 void UPlayerFireComp::ServerRPCSpawnPistol_Implementation( TSubclassOf<APistolGun> GunFactory )
 {
+	UE_LOG( LogTemp , Warning , TEXT( "UPlayerFireComp::ServerRPCSpawnPistol_Implementation %s" ), *GetOwner()->GetName() );
+
+
 	if (GunFactory)
 	{
 		pistol = GetWorld()->SpawnActor<APistolGun>( GunFactory , FVector( 0 , 0 , 10000 ) , FRotator::ZeroRotator );
-		//pistol->AttachToComponent( me->pistolComp , FAttachmentTransformRules::SnapToTargetNotIncludingScale );
-		//pistol->SetOwner( me );
-		pistol->pistolMesh->SetVisibility( false );
+		if(pistol)
+		{
+			pistol->AttachToComponent( me->pistolComp , FAttachmentTransformRules::SnapToTargetNotIncludingScale );
+			pistol->SetOwner( me );
+			pistol->pistolMesh->SetVisibility( false );
 
+			//Debug
+			if (pistol->pistolMesh->GetVisibleFlag())
+			{
+				UE_LOG( LogTemp , Warning , TEXT( "UPlayerFireComp::ServerRPCSpawnPistol_Implementation - Visible" ) );
+			}
+			else
+			{
+				UE_LOG( LogTemp , Warning , TEXT( "UPlayerFireComp::ServerRPCSpawnPistol_Implementation - Not Visible" ) );
+			}
+			UE_LOG( LogTemp , Warning , TEXT( "UPlayerFireComp::ServerRPCSpawnPistol_Implementation: Owner: %s" ) , *pistol->GetOwner()->GetName() );
+
+		}
+		
 	}
 
-	//MultiRPCSpawnPistol( pistol );
+	MultiRPCSpawnPistol( pistol );
 }
 
 void UPlayerFireComp::MultiRPCSpawnPistol_Implementation( APistolGun* OwnPistol )
 {
+	if (!OwnPistol || !me->pistolComp)
+	{
+		return;
+	}
+
 	//pistolmesh->SetVisibility( false );
 	OwnPistol->AttachToComponent( me->pistolComp , FAttachmentTransformRules::SnapToTargetNotIncludingScale );
-	//OwnPistol->SetOwner( me );
-	//OwnPistol->pistolMesh->SetVisibility( false );
-
-	UE_LOG(LogTemp, Warning, TEXT("UPlayerFireComp::MultiRPCSpawnPistol_Implementation"));
+	OwnPistol->SetOwner( me );
+	UE_LOG( LogTemp , Warning , TEXT( "UPlayerFireComp::MultiRPCSpawnPistol_Implementation: Owner: %s" ) , *OwnPistol->GetOwner()->GetName() );
+	OwnPistol->pistolMesh->SetVisibility( false );
+	if(OwnPistol->pistolMesh->GetVisibleFlag())
+	{
+		UE_LOG( LogTemp , Warning , TEXT( "UPlayerFireComp::MultiRPCSpawnPistol_Implementation - Visible" ) );
+	}
+	else
+	{
+		UE_LOG( LogTemp , Warning , TEXT( "UPlayerFireComp::MultiRPCSpawnPistol_Implementation - Not Visible" ) );
+	}
 }
 
 
@@ -416,7 +449,11 @@ void UPlayerFireComp::MultiRPCSelectedPistol_Implementation( APistolGun* selecte
 {
 	bValidPistol = true;
 	bValidRifle = false;
-	bEnableRepeating = selectedPistol->bEnableRepeating;
+	if(selectedPistol)
+	{
+		bEnableRepeating = selectedPistol->bEnableRepeating;
+	}
+	
 
 	aim = EWeaponAim::PISTOL;
 
@@ -502,21 +539,25 @@ void UPlayerFireComp::MultiRPCReload_Implementation()
 }
 
 
-void UPlayerFireComp::ServerRPCSelectedRifle_Implementation( ARifleGun* selectedPistol )
+void UPlayerFireComp::ServerRPCSelectedRifle_Implementation( ARifleGun* selectedRifle )
 {
-	MultiRPCSelectedRifle(selectedPistol);
+	MultiRPCSelectedRifle( selectedRifle );
 }
 
-void UPlayerFireComp::MultiRPCSelectedRifle_Implementation( ARifleGun* selectedPistol )
+void UPlayerFireComp::MultiRPCSelectedRifle_Implementation( ARifleGun* selectedRifle )
 {
 	bValidRifle = true;
 	bValidPistol = false;
-	bEnableRepeating = selectedPistol->bEnableRepeating;
+	bEnableRepeating = selectedRifle->bEnableRepeating;
 
 	aim = EWeaponAim::RIFLE;
 
-	selectedPistol->GunMeshComp->SetVisibility( true );
-	pistol->pistolMesh->SetVisibility( false );
+	selectedRifle->GunMeshComp->SetVisibility( true );
+	if(pistol)
+	{
+		pistol->pistolMesh->SetVisibility( false );
+	}
+	
 
 }
 

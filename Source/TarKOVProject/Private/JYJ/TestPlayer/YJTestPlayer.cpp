@@ -21,13 +21,19 @@ void AYJTestPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 
+	
 	if (!hpUI)
 	{
 		// MainUI를 생성해서 기억하고싶다.
 		hpUI = CreateWidget<UHPWidget>( GetWorld() , hpUIFactory );
 		// AddtoViewport하고싶다.
-		hpUI->AddToViewport();
+		if(hpUI)
+		{
+			hpUI->AddToViewport();
+		}
+		
 	}
+
 }
 
 void AYJTestPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -40,6 +46,21 @@ void AYJTestPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	//moveComp1->SetupInput( input );
 }
 
-void AYJTestPlayer::ServerRPCSpawnPistol_Implementation(AActor* pistol)
+void AYJTestPlayer::PossessedBy(AController* NewController)
 {
+	Super::PossessedBy(NewController);
+
+	if (AYJTestPlayer* NewCharacter = Cast<AYJTestPlayer>( NewController->GetCharacter() ))
+	{
+		if (!NewCharacter->fireComp)
+		{
+			UE_LOG( LogTemp , Warning , TEXT( "APlayerGameMode::OnPostLogin - No FireComp" ) )
+		}
+		NewCharacter->fireComp->ServerRPCSpawnPistol( NewCharacter->fireComp->PistolGun );
+	}
+	else
+	{
+		UE_LOG( LogTemp , Warning , TEXT( "APlayerGameMode::OnPostLogin - No Character" ) )
+	}
 }
+
