@@ -293,7 +293,7 @@ void UPlayerFireComp::SelectedMachineGun()
 //When fire gun, the function called
 void UPlayerFireComp::FireRifle()
 {
-
+	/*
 	if (rifle->currentAmmo <= 0) return;
 	rifle->currentAmmo--;
 
@@ -312,6 +312,9 @@ void UPlayerFireComp::FireRifle()
 		FVector End = rifle->AimCamSocket->GetForwardVector() * 100000;
 		SetAiming( OutHit , Start , End );
 	}
+	*/
+
+	ServerRPCFireRifle();
 
 }
 
@@ -545,6 +548,16 @@ void UPlayerFireComp::ServerRPCFirePistol_Implementation()
 	{
 		FVector End = pistol->AimCamSocket->GetForwardVector() * 100000;
 		SetAiming( OutHit , Start , End );
+
+		FCollisionQueryParams Params;
+
+		Params.AddIgnoredActor( me );
+		Params.AddIgnoredActor( rifle );
+		Params.AddIgnoredActor( pistol );
+
+		bool bHits = GetWorld()->LineTraceSingleByChannel( OutHit , Start , End , ECollisionChannel::ECC_Visibility , Params );
+
+		MultiRPCFirePistol( bHits , OutHit );
 	}
 
 	//MultiRPCFirePistol( bHits , OutHit);
@@ -553,7 +566,6 @@ void UPlayerFireComp::ServerRPCFirePistol_Implementation()
 
 void UPlayerFireComp::MultiRPCFirePistol_Implementation(bool bHit, const FHitResult& hitInfo)
 {
-
 	PlayerAnim->playFirePistolAnimation();
 
 	if (bHit)
@@ -561,6 +573,61 @@ void UPlayerFireComp::MultiRPCFirePistol_Implementation(bool bHit, const FHitRes
 		UGameplayStatics::SpawnEmitterAtLocation( GetWorld() , ExplosionVFXFactory , hitInfo.ImpactPoint );
 	}
 }
+
+void UPlayerFireComp::ServerRPCFireRifle_Implementation()
+{
+	if (rifle->currentAmmo <= 0) return;
+	rifle->currentAmmo--;
+
+	FHitResult OutHit;
+	FVector Start = rifle->GunMeshComp->GetSocketLocation( TEXT( "Muzzle" ) );
+
+	PlayerAnim->playFireRifleAnimation();
+
+	if (!me->fireComp->bAimRifle)
+	{
+		FVector End = me->FollowCamera->GetForwardVector() * 100000;
+		SetAiming( OutHit , Start , End );
+
+		FCollisionQueryParams Params;
+
+		Params.AddIgnoredActor( me );
+		Params.AddIgnoredActor( rifle );
+		Params.AddIgnoredActor( pistol );
+
+		bool bHits = GetWorld()->LineTraceSingleByChannel( OutHit , Start , End , ECollisionChannel::ECC_Visibility , Params );
+
+		MultiRPCFireRifle( bHits , OutHit );
+	}
+	else
+	{
+		FVector End = rifle->AimCamSocket->GetForwardVector() * 100000;
+		SetAiming( OutHit , Start , End );
+
+		FCollisionQueryParams Params;
+
+		Params.AddIgnoredActor( me );
+		Params.AddIgnoredActor( rifle );
+		Params.AddIgnoredActor( pistol );
+
+		bool bHits = GetWorld()->LineTraceSingleByChannel( OutHit , Start , End , ECollisionChannel::ECC_Visibility , Params );
+
+		MultiRPCFireRifle( bHits , OutHit );
+	}
+}
+
+void UPlayerFireComp::MultiRPCFireRifle_Implementation( bool bHit , const FHitResult& hitInfo )
+{
+	PlayerAnim->playFireRifleAnimation();
+
+	if (bHit)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation( GetWorld() , ExplosionVFXFactory , hitInfo.ImpactPoint );
+	}
+}
+
+
+
 
 void UPlayerFireComp::ServerRPCReload_Implementation()
 {

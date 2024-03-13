@@ -17,11 +17,14 @@ class TARKOVPROJECT_API APistolGun : public AGunBase
 public:
 	APistolGun();
 	virtual void BeginPlay() override;
+	virtual void GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
 
 	UPROPERTY( EditDefaultsOnly )
 	class UStaticMeshComponent* pistolMesh;
 
 public:
+
+	UPROPERTY( Replicated )
 	int32 currentAmmo;
 
 	

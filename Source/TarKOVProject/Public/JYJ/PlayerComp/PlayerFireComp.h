@@ -171,6 +171,15 @@ public:
 	UFUNCTION( NetMulticast , Reliable )
 	void MultiRPCFirePistol( bool bHit, const FHitResult& hitInfo );		
 
+	// client to server.
+	UFUNCTION( Server , Reliable )
+	void ServerRPCFireRifle();
+
+	// server to multi.
+	UFUNCTION( NetMulticast , Reliable )
+	void MultiRPCFireRifle( bool bHit , const FHitResult& hitInfo );
+
+
 	//Reload
 	// client to server.
 	UFUNCTION( Server , Reliable )

@@ -33,6 +33,7 @@ public:
 	class USceneComponent* AimCamSocket;
 
 	float gunMaxAmmo;
+
 	int32 gunCP ;
 
 	bool bEnableRepeating;

@@ -3,6 +3,8 @@
 
 #include "JYJ/Weapon/PistolGun.h"
 
+#include "Net/UnrealNetwork.h"
+
 APistolGun::APistolGun()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -38,4 +40,11 @@ void APistolGun::BeginPlay()
 	currentAmmo = gunMaxAmmo;
 
 	bEnableRepeating = false;
+}
+
+void APistolGun::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME( APistolGun , currentAmmo );
 }
