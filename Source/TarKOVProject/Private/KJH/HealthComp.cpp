@@ -311,6 +311,23 @@ void UHealthComp::DistributeDamage( float DamageAmount , FName IgnoredBodyPart )
 	}
 }
 
+FName UHealthComp::FindWeakestBodyPart()
+{
+	FName WeakestPart = NAME_None;
+	float MinHP = MAX_FLT; // 매우 큰 수로 초기화
+
+	for (const FBodyPartHealthData& Part : BodyPartHP)
+	{
+		if (Part.HP < MinHP)
+		{
+			MinHP = Part.HP;
+			WeakestPart = Part.BodyPart;
+		}
+	}
+
+	return WeakestPart;
+}
+
 void UHealthComp::GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const
 {
 	Super::GetLifetimeReplicatedProps( OutLifetimeProps );

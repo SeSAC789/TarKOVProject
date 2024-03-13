@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "PainPostProcess.h"
 #include "Components/ActorComponent.h"
 #include "JYJ/PlayerComp/PlayerMoveComp.h"
 #include "StatusEffectComp.generated.h"
@@ -98,6 +99,11 @@ public:
 
 	UPROPERTY()
 	class APlayerBase* me;
+
+	UPROPERTY()
+	class APainPostProcess* painPost;
+
+	FName FindWeakestBodyPart();
 
 	virtual  void GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
 };

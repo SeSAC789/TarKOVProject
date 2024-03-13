@@ -6,6 +6,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "JYJ/PlayerBase.h"
 #include "JYJ/PlayerComp/PlayerMoveComp.h"
+#include "Kismet/GameplayStatics.h"
 #include "KJH/HealthComp.h"
 #include "Net/UnrealNetwork.h"
 #include "TarKOVProject/TarKOVProject.h"
@@ -60,6 +61,7 @@ void UStatusEffectComp::ApplyStatusEffect( EStatusEffectType NewEffectType , FNa
 
 		UE_LOG( LogTemp , Warning , TEXT( " UStatusEffectComp::ApplyStatusEffect, 상태효과 적용 : %s 부위 : %s " ) , *GETENUMSTRING( "EStatusEffectType" , NewEffectType ) , *BodyPart.ToString() );
 	}
+	
 }
 
 void UStatusEffectComp::ClearStatusEffect( EStatusEffectType EffectType , FName BodyPart )
@@ -87,9 +89,12 @@ void UStatusEffectComp::UpdateStatusEffects( float DeltaTime )
 		{
 			EffectData.PainTimer += DeltaTime;
 			// 고통 상태이상을 적용합니다.
-			if (EffectData.PainTimer >= 20.0f && !IsPain())
+			if (EffectData.PainTimer >= 5.0f && !IsPain())
 			{
 				ApplyPainEffect( EffectData , DeltaTime );
+				FStatusEffectData PainEffectData = { EStatusEffectType::Pain, true, EffectData.BodyPart };
+				StatusEffects.Add( PainEffectData );
+				EffectData.PainTimer = 0.0f; // 고통 타이머 리셋
 			}
 		}
 
@@ -106,7 +111,7 @@ void UStatusEffectComp::UpdateStatusEffects( float DeltaTime )
 void UStatusEffectComp::ApplyBleedingEffect( FStatusEffectData& EffectData , float DeltaTime )
 {
 	if (!healthComp) return;
-	UE_LOG( LogTemp , Warning , TEXT( " UStatusEffectComp::ApplyBleedingEffect" ) );
+	
 	// 출혈 상태이상의 타이머 업데이트
 	EffectData.Timer += DeltaTime;
 
@@ -121,8 +126,6 @@ void UStatusEffectComp::ApplyBleedingEffect( FStatusEffectData& EffectData , flo
 		{
 			// 해당 부위에 데미지 3씩 적용
 			healthComp->TakeDamage( EffectData.BodyPart , 3.0f , TEXT( "Bleeding Effect" ) );
-
-			UE_LOG( LogTemp , Warning , TEXT( "UStatusEffectComp::ApplyBleedingEffect, 출혈상태 : %s 부위 %d damage." ) , *EffectData.BodyPart.ToString() , 3 );
 		}
 	}
 }
@@ -166,7 +169,22 @@ void UStatusEffectComp::ApplyFractureEffect( FStatusEffectData& EffectData , flo
 
 void UStatusEffectComp::ApplyPainEffect( FStatusEffectData& EffectData , float DeltaTime )
 {
+	
+	// APainPostProcess 인스턴스를 찾습니다.
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass( GetWorld() , APainPostProcess::StaticClass() , FoundActors );
 
+	// 찾은 인스턴스가 있다면, 그 중 첫 번째 인스턴스의 포스트 프로세스를 활성화합니다.
+	if (FoundActors.Num() > 0)
+	{
+		APainPostProcess* PainPostProcessInstance = Cast<APainPostProcess>( FoundActors[0] );
+		if (PainPostProcessInstance != nullptr && !PainPostProcessInstance->IsPainEffectActive())
+		{
+			PainPostProcessInstance->EnablePainEffect( true );
+			UE_LOG( LogTemp , Warning , TEXT( "UStatusEffectComp::ApplyPainEffect, 고통상태 적용: %s 부위" ) , *EffectData.BodyPart.ToString() );;
+
+		}
+	}
 }
 
 bool UStatusEffectComp::IsBleeding() const
@@ -203,6 +221,14 @@ bool UStatusEffectComp::IsPain() const
 		}
 	}
 	return false;
+}
+
+
+FName UStatusEffectComp::FindWeakestBodyPart()
+{
+	if (!me || !healthComp) return NAME_None;
+
+	return healthComp->FindWeakestBodyPart();
 }
 
 void UStatusEffectComp::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

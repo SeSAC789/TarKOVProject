@@ -15,6 +15,7 @@
 #include "KJH/HealthComp.h"
 #include "KJH/HPWidget.h"
 #include "Blueprint/UserWidget.h"
+#include "KJH/Bandage.h"
 
 //DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -147,9 +148,8 @@ void APlayerBase::SetupPlayerInputComponent( UInputComponent* PlayerInputCompone
 void APlayerBase::OnHitboxOverlap( UPrimitiveComponent* OverlappedComponent , AActor* OtherActor ,
 	UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep , const FHitResult& SweepResult )
 {
-	if (this == OtherActor)
+	if (this == OtherActor || Cast<ABandage>( OtherActor ))
 	{
-		//UE_LOG( LogTemp , Warning , TEXT( "AJHPlayerTest::OnHitboxOverlap" ) );
 		return;
 	}
 
@@ -160,7 +160,6 @@ void APlayerBase::OnHitboxOverlap( UPrimitiveComponent* OverlappedComponent , AA
 		{
 			FString HitObjectName = OtherActor->GetName(); // 충돌한 객체의 이름
 			HealthComp->TakeDamage( BodyPart , 5 , HitObjectName ); // 모든 충돌에 대해 5의 데미지를 적용, 충돌한 객체 이름을 전달
-			//HealthComp->TakeDamage( BodyPart , 5 ); // 모든 충돌에 대해 5의 데미지를 적용
 		}
 	}
 }

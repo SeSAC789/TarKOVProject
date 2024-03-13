@@ -4,6 +4,7 @@
 #include "KJH/DamageTestActor.h"
 
 #include "Components/BoxComponent.h"
+#include "JYJ/PlayerBase.h"
 
 // Sets default values
 ADamageTestActor::ADamageTestActor()
@@ -23,6 +24,9 @@ ADamageTestActor::ADamageTestActor()
     BoxComp->SetCollisionEnabled( ECollisionEnabled::QueryOnly );
     BoxComp->SetCollisionResponseToAllChannels( ECR_Overlap );
     MeshComp->SetCollisionEnabled( ECollisionEnabled::NoCollision );
+
+    BoxComp->OnComponentBeginOverlap.AddDynamic( this , &ADamageTestActor::OnOverlapBegin );
+
 }
 
 // Called when the game starts or when spawned
@@ -39,3 +43,13 @@ void ADamageTestActor::Tick(float DeltaTime)
 
 }
 
+void ADamageTestActor::OnOverlapBegin( UPrimitiveComponent* OverlappedComponent , AActor* OtherActor ,
+    UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep , const FHitResult& SweepResult )
+{
+    // 만약 충돌한 액터가 플레이어 베이스라면
+    if (APlayerBase* PlayerBase = Cast<APlayerBase>( OtherActor ))
+    {
+        // 플레이어 베이스의 데미지 처리 함수 호출
+        PlayerBase->OnHitboxOverlap( BoxComp , this , OtherComp , OtherBodyIndex , bFromSweep , SweepResult );
+    }
+}

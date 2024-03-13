@@ -8,10 +8,12 @@
 #include "KJH/HealthComp.h"
 #include "KJH/HPWidget.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/PostProcessComponent.h"
 
 AJHPlayerTest::AJHPlayerTest()
 {
-	
+	PainPostProcessComp = CreateDefaultSubobject<UPostProcessComponent>( TEXT( "PainPostProcessComp" ) );
+	PainPostProcessComp->SetupAttachment( FollowCamera );
 }
 
 void AJHPlayerTest::BeginPlay()
