@@ -83,6 +83,8 @@ void UHealthComp::TakeDamage( const FName& BodyPart , float DamageAmount , const
 				float NewHP = GetBodyPartHealth( BodyPart ) - DamageAmount;
 				SetBodyPartHP( BodyPart , NewHP );
 
+				//BodyPartData.HP = FMath::Clamp<float>( BodyPartData.HP - DamageAmount , 0.0f , BodyPartData.MaxHP );
+
 				UE_LOG( LogTemp , Warning , TEXT( "%s 부위가 %f 만큼 데미지를 받았습니다 %s로 인해서 현재 남은 HP: %f" ) , *BodyPart.ToString() , DamageAmount , *HitObjectName , BodyPartData.HP );
 			}
 
@@ -90,13 +92,13 @@ void UHealthComp::TakeDamage( const FName& BodyPart , float DamageAmount , const
 			if ((BodyPart == FName( "Head" ) || BodyPart == FName( "Thorax" )) && BodyPartData.HP <= 0.0f && !isBleedingDamage)
 			{
 				bIsDead = true;
-				UE_LOG( LogTemp , Warning , TEXT( "Character has died due to critical damage to %s from %s." ) , *BodyPart.ToString() , *HitObjectName );
+				UE_LOG( LogTemp , Warning , TEXT( "%s 부위가  %s 로 인해 데미지 받아 즉시 사망." ) , *BodyPart.ToString() , *HitObjectName );
 				return; 
 			}
 
 			if (BodyPartData.HP <= 0.0f)
 			{
-				// 체력이 0인 부위에 추가적인 피해 발생 시 분산 로직을 호출합니다.
+				// 체력이 0인 부위에 추가적인 피해 발생 시 분산 로직을 호출.
 				DistributeDamage( DamageAmount , BodyPart );
 			}
 
@@ -136,7 +138,7 @@ void UHealthComp::CheckAndHandleTotalDepletion()
 
 	if (bIsDead)
 	{
-		UE_LOG( LogTemp , Warning , TEXT( "Character has died due to total HP depletion." ) );
+		UE_LOG( LogTemp , Warning , TEXT( "모든 부위 hp가 다 0이 되어 죽음." ) );
 		// 사망 처리 관련 로직 여기에 구현
 	}
 }
@@ -148,7 +150,10 @@ void UHealthComp::HealBodyPart( FName BodyPart , float HealAmount )
 	{
 		if (BodyPartData.BodyPart == BodyPart)
 		{
-			BodyPartData.HP = FMath::Clamp<float>( BodyPartData.HP + HealAmount , 0.0f , BodyPartData.MaxHP );
+			float NewHP = GetBodyPartHealth( BodyPart ) - HealAmount;
+			SetBodyPartHP( BodyPart , NewHP );
+
+			//BodyPartData.HP = FMath::Clamp<float>( BodyPartData.HP + HealAmount , 0.0f , BodyPartData.MaxHP );
 			UE_LOG( LogTemp , Warning , TEXT( "%s 부위가 %f 만큼 회복되었습니다. 현재 HP: %f" ) , *BodyPart.ToString() , HealAmount , BodyPartData.HP );
 
 			// 체력이 특정 수준 이상 회복되었으면 출혈 상태이상 비활성화

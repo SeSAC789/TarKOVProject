@@ -57,7 +57,7 @@ void UStatusEffectComp::ApplyStatusEffect( EStatusEffectType NewEffectType , FNa
 		FStatusEffectData NewEffectData = { NewEffectType, true, BodyPart };
 		StatusEffects.Add( NewEffectData );
 
-		UE_LOG( LogTemp , Warning , TEXT( " UStatusEffectComp::ApplyStatusEffect, 상태효과 적용 : %s to %s" ) , *GETENUMSTRING( "EStatusEffectType" , NewEffectType ) , *BodyPart.ToString() );
+		UE_LOG( LogTemp , Warning , TEXT( " UStatusEffectComp::ApplyStatusEffect, 상태효과 적용 : %s 부위 : %s " ) , *GETENUMSTRING( "EStatusEffectType" , NewEffectType ) , *BodyPart.ToString() );
 	}
 }
 
