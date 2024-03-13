@@ -31,6 +31,7 @@ void UPlayerFireComp::BeginPlay()
 
 	bRepeated = false;
 	bAimRifle = false;
+	bEnableRepeating = false;
 
 }
 
@@ -106,7 +107,7 @@ void UPlayerFireComp::ChooseRifle()
 
 void UPlayerFireComp::SpawnPistol(TSubclassOf<APistolGun> GunFactory)
 {
-	if(!me){return;}
+	if(!me || !pistol){return;}
 
 	if (GunFactory)
 	{
@@ -550,9 +551,11 @@ void UPlayerFireComp::ServerRPCSelectedRifle_Implementation( ARifleGun* selected
 
 void UPlayerFireComp::MultiRPCSelectedRifle_Implementation( ARifleGun* selectedRifle )
 {
+	if (!selectedRifle || !pistol) return;
+
 	bValidRifle = true;
 	bValidPistol = false;
-	bEnableRepeating = selectedRifle->bEnableRepeating;
+	//bEnableRepeating = selectedRifle->bEnableRepeating;
 
 	aim = EWeaponAim::RIFLE;
 
