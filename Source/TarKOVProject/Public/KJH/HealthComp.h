@@ -7,6 +7,25 @@
 #include "Components/ActorComponent.h"
 #include "HealthComp.generated.h"
 
+USTRUCT( BlueprintType )
+struct FBodyPartHealthData
+{
+	GENERATED_BODY()
+
+	UPROPERTY( EditAnywhere , BlueprintReadWrite )
+	FName BodyPart;
+
+	UPROPERTY( EditAnywhere , BlueprintReadWrite )
+	float HP;
+
+	UPROPERTY( EditAnywhere , BlueprintReadWrite )
+	float MaxHP;
+
+	FBodyPartHealthData() : BodyPart( NAME_None ) , HP( 0.0f ) , MaxHP( 0.0f ) {}
+
+	FBodyPartHealthData( FName InBodyPartName , float InCurrentHealth , float InMaxHealth )
+		: BodyPart( InBodyPartName ) , HP( InCurrentHealth ) , MaxHP( InMaxHealth ) {}
+};
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class TARKOVPROJECT_API UHealthComp : public UActorComponent
@@ -22,20 +41,26 @@ protected:
 	virtual void BeginPlay() override;
 
 protected:
-	// 각 신체 부위별 현재 HP
-	UPROPERTY( VisibleAnywhere , Category = "Health" )
-	TMap<FName , float> BodyPartHP;
 
-	// 각 신체 부위별 Max HP
-	UPROPERTY( EditDefaultsOnly , Category = "Health" )
-	TMap<FName , float> BodyPartMaxHP;
+	//// 각 신체 부위별 현재 HP
+	//UPROPERTY( EditDefaultsOnly , Category = "Health" )
+	//TMap<FName , float> BodyPartHP;
+
+	//// 각 신체 부위별 Max HP
+	//UPROPERTY( EditDefaultsOnly , Category = "Health" )
+	//TMap<FName , float> BodyPartMaxHP;
+
+
+	UPROPERTY( ReplicatedUsing = OnRep_BodyPartHP , EditDefaultsOnly , Category = "Health" )
+	TArray<FBodyPartHealthData> BodyPartHP;
+
 
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	// 캐릭터의 사망 상태
-	UPROPERTY( EditDefaultsOnly , Category = "Health" )
+	UPROPERTY( Replicated, EditDefaultsOnly , Category = "Health" )
 	bool bIsDead;
 
 
@@ -45,6 +70,11 @@ public:
 	// 상태이상에서 hp값 확인하기 위해
 	float GetBodyPartHealth(FName BodyPart);
 	float GetBodyPartMaxHealth(FName BodyPart );
+	void SetBodyPartHP( FName BodyPart , float NewHP );
+
+	UFUNCTION()
+	void OnRep_BodyPartHP();
+
 	// 출혈 확인 및 적용을 위해
 	void CheckAndApplyBleeding( const FName& BodyPart );
 	// 골절 확인 및 적용 위해
@@ -53,9 +83,10 @@ public:
 	void DistributeDamage( float DamageAmount , FName IgnoredBodyPart );
 
 
-
-
 	UPROPERTY()
 	class UStatusEffectComp* statusComp;
+
+	virtual  void GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
+
 
 };
