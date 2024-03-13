@@ -23,6 +23,7 @@ void UPlayerFireComp::BeginPlay()
 	PlayerAnim = Cast<UPlayerAnimInstance>( me->GetMesh()->GetAnimInstance() );
 	check( PlayerAnim );
 
+	//BeginPlay에서 RPC 시도 시, 타이밍 상 반복 호출될 수 있음
 	//Spawn weapon
 	//SpawnPistol(PistolGun);
 	//ServerRPCSpawnPistol(PistolGun);
@@ -165,7 +166,7 @@ void UPlayerFireComp::Zoom()
 void UPlayerFireComp::ZoomIn()
 {
 	bAimRifle = true;
-	if (!me->FollowCamera) return;
+	if (!me->FollowCamera || !rifle || !pistol) return;
 
 	//Zoom camera location by gun type
 	switch (aim)
@@ -365,6 +366,8 @@ void UPlayerFireComp::SetAiming( FHitResult OutHit , FVector Start , FVector End
 
 void UPlayerFireComp::Reload()
 {
+	if(!rifle || !pistol) return;
+
 	switch (aim)
 	{
 		case EWeaponAim::RIFLE:
@@ -381,6 +384,7 @@ void UPlayerFireComp::Reload()
 	}
 
 	ServerRPCReload();
+
 }
 
 
@@ -562,10 +566,57 @@ void UPlayerFireComp::MultiRPCSelectedRifle_Implementation( ARifleGun* selectedR
 }
 
 
-void UPlayerFireComp::MultiRPCSpawnRifle_Implementation( ARifleGun* OwnRifle )
-{
-}
-
 void UPlayerFireComp::ServerRPCSpawnRifle_Implementation( TSubclassOf<ARifleGun> GunFactory )
 {
+	UE_LOG( LogTemp , Warning , TEXT( "UPlayerFireComp::ServerRPCSpawnRifle_Implementation %s" ) , *GetOwner()->GetName() );
+
+
+	if (GunFactory)
+	{
+		rifle = GetWorld()->SpawnActor<ARifleGun>( GunFactory , FVector( 0 , 0 , 10000 ) , FRotator::ZeroRotator );
+		if (rifle)
+		{
+			rifle->AttachToComponent( me->pistolComp , FAttachmentTransformRules::SnapToTargetNotIncludingScale );
+			rifle->SetOwner( me );
+			rifle->GunMeshComp->SetVisibility( false );
+
+			//Debug
+			if (rifle->GunMeshComp->GetVisibleFlag())
+			{
+				UE_LOG( LogTemp , Warning , TEXT( "UPlayerFireComp::ServerRPCSpawnRifle_Implementation - Visible" ) );
+			}
+			else
+			{
+				UE_LOG( LogTemp , Warning , TEXT( "UPlayerFireComp::ServerRPCSpawnRifle_Implementation - Not Visible" ) );
+			}
+			UE_LOG( LogTemp , Warning , TEXT( "UPlayerFireComp::ServerRPCSpawnRifle_Implementation: Owner: %s" ) , *rifle->GetOwner()->GetName() );
+
+		}
+
+	}
+
+	MultiRPCSpawnRifle( rifle );
 }
+
+void UPlayerFireComp::MultiRPCSpawnRifle_Implementation( ARifleGun* OwnRifle )
+{
+	if (!OwnRifle || !me->pistolComp)
+	{
+		return;
+	}
+
+	//pistolmesh->SetVisibility( false );
+	OwnRifle->AttachToComponent( me->pistolComp , FAttachmentTransformRules::SnapToTargetNotIncludingScale );
+	OwnRifle->SetOwner( me );
+	UE_LOG( LogTemp , Warning , TEXT( "UPlayerFireComp::MultiRPCSpawnRifle_Implementation: Owner: %s" ) , *OwnRifle->GetOwner()->GetName() );
+	OwnRifle->GunMeshComp->SetVisibility( false );
+	if (OwnRifle->GunMeshComp->GetVisibleFlag())
+	{
+		UE_LOG( LogTemp , Warning , TEXT( "UPlayerFireComp::MultiRPCSpawnRifle_Implementation - Visible" ) );
+	}
+	else
+	{
+		UE_LOG( LogTemp , Warning , TEXT( "UPlayerFireComp::MultiRPCSpawnRifle_Implementation - Not Visible" ) );
+	}
+}
+
