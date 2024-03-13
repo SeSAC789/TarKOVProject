@@ -57,6 +57,7 @@ void AYJTestPlayer::PossessedBy(AController* NewController)
 			UE_LOG( LogTemp , Warning , TEXT( "APlayerGameMode::OnPostLogin - No FireComp" ) )
 		}
 		NewCharacter->fireComp->ServerRPCSpawnPistol( NewCharacter->fireComp->PistolGun );
+		NewCharacter->fireComp->ServerRPCSpawnRifle( NewCharacter->fireComp->RifleGun );
 	}
 	else
 	{

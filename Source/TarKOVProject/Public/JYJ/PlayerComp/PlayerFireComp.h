@@ -46,9 +46,7 @@ private:
 	UPROPERTY( EditAnywhere , BlueprintReadOnly , Category = Input , meta = (AllowPrivateAccess = "true") )
 	class UInputAction* RepeatingAction;
 
-	//Rifle Setting
-	UPROPERTY( EditAnywhere )
-	TSubclassOf<class ARifleGun> RifleGun;
+	
 
 	UPROPERTY()
 	class ARifleGun* rifle;
@@ -58,6 +56,10 @@ private:
 	class APistolGun* pistol;
 
 public:
+
+	//Rifle Setting
+	UPROPERTY( EditAnywhere )
+	TSubclassOf<class ARifleGun> RifleGun;
 
 	//Pistol Setting
 	UPROPERTY( EditAnywhere )
