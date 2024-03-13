@@ -22,6 +22,8 @@ APistolGun::APistolGun()
 	AimCamSocket->SetRelativeLocation( FVector( 0 , -5 , 10 ) );
 	AimCamSocket->SetRelativeRotation( FRotator( 0 , 90 , 0 ) );
 
+	pistolMesh->SetIsReplicated( true );
+
 }
 
 void APistolGun::BeginPlay()

@@ -15,6 +15,11 @@
 #include "Net/UnrealNetwork.h"
 
 
+UPlayerFireComp::UPlayerFireComp()
+{
+
+	SetIsReplicatedByDefault( true );
+}
 
 void UPlayerFireComp::BeginPlay()
 {
@@ -93,30 +98,66 @@ void UPlayerFireComp::SetupInput( UEnhancedInputComponent* input )
 
 }
 
+
+
 void UPlayerFireComp::ChoosePistol()
 {
-	ServerRPCSelectedPistol(pistol);
+	//ServerRPCSelectedPistol(pistol);
 	//SelectedPistol();
+
+	bValidRifle = false;
+	bValidPistol = true;
+	OnRep_Pistol();
+	OnRep_Rifle();
 }
 
 void UPlayerFireComp::ChooseRifle()
 {
-	ServerRPCSelectedRifle(rifle);
+	if(GEngine)
+	{
+		FString Message = FString::Printf( TEXT( "Input by %s" ) , *GetOwner()->GetName() );
+		GEngine->AddOnScreenDebugMessage( -1 , 10 , FColor::Red , Message );
+	}
+
+	//ServerRPCSelectedRifle(rifle);
+	bValidRifle = true;
+	bValidPistol = false;
+	OnRep_Rifle();
+	OnRep_Pistol();
 	//SelectedRifle();
+
+	if (bValidRifle)
+	{
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage( -1 , 10 , FColor::Red , TEXT( "bValidRifle = true" ) );
+		}
+	}
+	else
+	{
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage( -1 , 10 , FColor::Red , TEXT( "bValidRifle = false" ) );
+		}
+	}
+
 }
 
 void UPlayerFireComp::SpawnPistol(TSubclassOf<APistolGun> GunFactory)
 {
-	if(!me || !pistol){return;}
+	if(!me ){return;}
 
 	if (GunFactory)
 	{
 		pistol = GetWorld()->SpawnActor<APistolGun>( GunFactory , FVector( 0 , 0 , 10000 ) , FRotator::ZeroRotator );
+
 		if(pistol)
 		{
 			pistol->AttachToComponent( me->pistolComp , FAttachmentTransformRules::SnapToTargetNotIncludingScale );
-			pistol->SetOwner( me );
-			pistol->pistolMesh->SetVisibility( false );
+			pistol->SetOwner( me->GetController() );
+			//pistol->pistolMesh->SetVisibility( false );
+
+			OnRep_Pistol();
 		}
 		//ServerRPCSpawnPistol(GunFactory);
 
@@ -134,8 +175,10 @@ void UPlayerFireComp::SpawnRifle(TSubclassOf<ARifleGun> rifleFactory)
 	{
 		rifle = GetWorld()->SpawnActor<ARifleGun>( rifleFactory , FVector( 0 , 0 , 10000 ) , FRotator::ZeroRotator );
 		rifle->AttachToComponent( me->rifleComp , FAttachmentTransformRules::SnapToTargetNotIncludingScale );
-		rifle->GunMeshComp->SetVisibility( false );
+		rifle->SetOwner(me->GetController() );
+		//rifle->GunMeshComp->SetVisibility( false );
 
+		OnRep_Rifle();
 	}
 
 }
@@ -546,33 +589,24 @@ void UPlayerFireComp::MultiRPCReload_Implementation()
 
 void UPlayerFireComp::ServerRPCSelectedRifle_Implementation( ARifleGun* selectedRifle )
 {
+	//On_Rep_Rifle( selectedRifle );
 	MultiRPCSelectedRifle( selectedRifle );
 }
 
 void UPlayerFireComp::MultiRPCSelectedRifle_Implementation( ARifleGun* selectedRifle )
 {
-	if (!selectedRifle || !pistol) return;
-
 	bValidRifle = true;
 	bValidPistol = false;
 	//bEnableRepeating = selectedRifle->bEnableRepeating;
 
 	aim = EWeaponAim::RIFLE;
 
-	selectedRifle->GunMeshComp->SetVisibility( true );
-	if(pistol)
-	{
-		pistol->pistolMesh->SetVisibility( false );
-	}
-	
 
 }
 
 
 void UPlayerFireComp::ServerRPCSpawnRifle_Implementation( TSubclassOf<ARifleGun> GunFactory )
 {
-	UE_LOG( LogTemp , Warning , TEXT( "UPlayerFireComp::ServerRPCSpawnRifle_Implementation %s" ) , *GetOwner()->GetName() );
-
 
 	if (GunFactory)
 	{
@@ -581,24 +615,13 @@ void UPlayerFireComp::ServerRPCSpawnRifle_Implementation( TSubclassOf<ARifleGun>
 		{
 			rifle->AttachToComponent( me->pistolComp , FAttachmentTransformRules::SnapToTargetNotIncludingScale );
 			rifle->SetOwner( me );
-			rifle->GunMeshComp->SetVisibility( false );
-
-			//Debug
-			if (rifle->GunMeshComp->GetVisibleFlag())
-			{
-				UE_LOG( LogTemp , Warning , TEXT( "UPlayerFireComp::ServerRPCSpawnRifle_Implementation - Visible" ) );
-			}
-			else
-			{
-				UE_LOG( LogTemp , Warning , TEXT( "UPlayerFireComp::ServerRPCSpawnRifle_Implementation - Not Visible" ) );
-			}
-			UE_LOG( LogTemp , Warning , TEXT( "UPlayerFireComp::ServerRPCSpawnRifle_Implementation: Owner: %s" ) , *rifle->GetOwner()->GetName() );
+			//rifle->GunMeshComp->SetVisibility( false );
 
 		}
 
 	}
-
-	MultiRPCSpawnRifle( rifle );
+	
+	//MultiRPCSpawnRifle( rifle );
 }
 
 void UPlayerFireComp::MultiRPCSpawnRifle_Implementation( ARifleGun* OwnRifle )
@@ -611,15 +634,52 @@ void UPlayerFireComp::MultiRPCSpawnRifle_Implementation( ARifleGun* OwnRifle )
 	//pistolmesh->SetVisibility( false );
 	OwnRifle->AttachToComponent( me->pistolComp , FAttachmentTransformRules::SnapToTargetNotIncludingScale );
 	OwnRifle->SetOwner( me );
-	UE_LOG( LogTemp , Warning , TEXT( "UPlayerFireComp::MultiRPCSpawnRifle_Implementation: Owner: %s" ) , *OwnRifle->GetOwner()->GetName() );
-	OwnRifle->GunMeshComp->SetVisibility( false );
-	if (OwnRifle->GunMeshComp->GetVisibleFlag())
+
+	//OwnRifle->GunMeshComp->SetVisibility( false );
+
+
+	//On_Rep_Rifle( OwnRifle, false );
+}
+
+void UPlayerFireComp::OnRep_Rifle()
+{
+	rifle->GunMeshComp->SetVisibility( bValidRifle );
+	//rifle->SetOwner(me);
+
+	if (bValidRifle)
 	{
-		UE_LOG( LogTemp , Warning , TEXT( "UPlayerFireComp::MultiRPCSpawnRifle_Implementation - Visible" ) );
+		UE_LOG(LogTemp, Warning, TEXT("UPlayerFireComp::OnRep_Rifle - bValidRifle = true"))
+		if (GEngine)
+		{
+			FString Message = FString::Printf( TEXT( "%s - bValidRifle" ) , *GetOwner()->GetName() );
+			GEngine->AddOnScreenDebugMessage( -1 , 10 , FColor::Red , Message );
+		}
 	}
 	else
 	{
-		UE_LOG( LogTemp , Warning , TEXT( "UPlayerFireComp::MultiRPCSpawnRifle_Implementation - Not Visible" ) );
+		UE_LOG( LogTemp , Warning , TEXT( "UPlayerFireComp::OnRep_Rifle - bValidRifle = false" ) )
+		if (GEngine)
+		{
+			FString Message = FString::Printf( TEXT( "%s - !bValidRifle" ) , *GetOwner()->GetName() );
+			GEngine->AddOnScreenDebugMessage( -1 , 10 , FColor::Red , Message );
+		}
 	}
 }
 
+void UPlayerFireComp::OnRep_Pistol()
+{
+	pistol->pistolMesh->SetVisibility( bValidPistol );
+	//pistol->SetOwner(me);
+	
+}
+
+void UPlayerFireComp::GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const
+{
+	Super::GetLifetimeReplicatedProps( OutLifetimeProps );
+
+	DOREPLIFETIME( UPlayerFireComp , rifle );
+	DOREPLIFETIME( UPlayerFireComp , bValidRifle );
+	DOREPLIFETIME( UPlayerFireComp , pistol );
+	DOREPLIFETIME( UPlayerFireComp , bValidPistol );
+
+}
