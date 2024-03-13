@@ -7,6 +7,7 @@
 #include "JYJ/PlayerBase.h"
 #include "JYJ/PlayerComp/PlayerMoveComp.h"
 #include "KJH/HealthComp.h"
+#include "Net/UnrealNetwork.h"
 #include "TarKOVProject/TarKOVProject.h"
 
 
@@ -18,7 +19,7 @@ UStatusEffectComp::UStatusEffectComp()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	// ...
-
+	SetIsReplicatedByDefault( true );
 }
 
 
@@ -202,4 +203,12 @@ bool UStatusEffectComp::IsPain() const
 		}
 	}
 	return false;
+}
+
+void UStatusEffectComp::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME( UStatusEffectComp , StatusEffects );
+	
 }

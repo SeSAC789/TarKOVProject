@@ -64,7 +64,7 @@ public:
 	virtual void TickComponent( float DeltaTime , ELevelTick TickType , FActorComponentTickFunction* ThisTickFunction ) override;
 
 protected:
-	UPROPERTY( VisibleAnywhere , BlueprintReadOnly , Category = "Status Effects" )
+	UPROPERTY( Replicated, VisibleAnywhere , BlueprintReadOnly , Category = "Status Effects" )
 	TArray<FStatusEffectData> StatusEffects;
 
 
@@ -99,4 +99,5 @@ public:
 	UPROPERTY()
 	class APlayerBase* me;
 
+	virtual  void GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
 };
