@@ -1,3 +1,4 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 D:ProjectsTarKOVProjectContentlevel222 filter=lfs diff=lfs merge=lfs -text
+D:/Projects/TarKOVProject filter=lfs diff=lfs merge=lfs -text
