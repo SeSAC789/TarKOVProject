@@ -18,6 +18,8 @@ APistolGun::APistolGun()
 		pistolMesh->SetStaticMesh( tmpMesh.Object );
 		pistolMesh->SetWorldScale3D( FVector( 1.1f ) );
 		//GunMeshComp->SetRelativeRotation( FRotator( 40 , -100 , 80 ) );
+
+		pistolMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 
 	AimCamSocket->SetupAttachment(RootComponent);
@@ -48,3 +50,23 @@ void APistolGun::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 
 	DOREPLIFETIME( APistolGun , currentAmmo );
 }
+
+/*
+void APistolGun::UpdateAmmoCnt( int32 updateAmmo )
+{
+	//currentAmmo = updateAmmo;
+	ServerSetAmmoCnt(updateAmmo);
+}
+
+void APistolGun::MultiSetAmmoCnt_Implementation(int32 newAmmoCnt)
+{
+	currentAmmo = newAmmoCnt;
+	MultiSetAmmoCnt( currentAmmo );
+}
+
+void APistolGun::ServerSetAmmoCnt_Implementation(int32 newAmmoCnt)
+{
+	return;
+}
+
+*/

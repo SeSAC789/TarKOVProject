@@ -48,30 +48,26 @@ private:
 
 	UPROPERTY( EditAnywhere , BlueprintReadOnly , Category = Input , meta = (AllowPrivateAccess = "true") )
 	class UInputAction* RepeatingAction;
-	
 
 
-public:
-
+private:
 	UFUNCTION()
 	void OnRep_Rifle();
 
 	UFUNCTION()
 	void OnRep_Pistol();
 
+
+public:
+	// ---------Call function in Player class.
+	void SpawnPistol( TSubclassOf<APistolGun> GunFactory );
+	void SpawnRifle( TSubclassOf<ARifleGun> rifleFactory );
+
 	UPROPERTY( ReplicatedUsing = OnRep_Rifle , EditDefaultsOnly )
 	class ARifleGun* rifle;
 
 	UPROPERTY( ReplicatedUsing = OnRep_Pistol , EditDefaultsOnly )
 	class APistolGun* pistol;
-
-	UPROPERTY( Replicated, EditAnywhere , BlueprintReadWrite )
-	bool bValidRifle = false;
-
-	UPROPERTY( Replicated, EditAnywhere , BlueprintReadWrite )
-	bool bValidPistol = false;
-
-
 
 	//Rifle Setting
 	UPROPERTY( EditAnywhere )
@@ -80,14 +76,22 @@ public:
 	//Pistol Setting
 	UPROPERTY( EditAnywhere )
 	TSubclassOf<class APistolGun> PistolGun;
-
-	
-
+	// ---------Call function in Player class.
 
 
 	UPROPERTY( Replicated, EditAnywhere , BlueprintReadWrite )
+	bool bValidRifle = false;
+
+	UPROPERTY( Replicated, EditAnywhere , BlueprintReadWrite )
+	bool bValidPistol = false;
+
+	UPROPERTY( Replicated , EditAnywhere , BlueprintReadWrite )
 	bool bAimRifle;
 
+	UPROPERTY( EditAnywhere , BlueprintReadOnly )
+	EWeaponAim aim;
+
+private:
 	UPROPERTY( EditAnywhere )
 	class UPlayerAnimInstance* PlayerAnim;
 
@@ -97,9 +101,6 @@ public:
 	void ChoosePistol();
 	void ChooseRifle();
 
-	void SpawnPistol( TSubclassOf<APistolGun> GunFactory );
-	void SpawnRifle( TSubclassOf<ARifleGun> rifleFactory );
-
 	void Zoom();
 	void ZoomIn();
 	void ZoomOut();
@@ -107,12 +108,8 @@ public:
 	void Fire();
 	void SetAiming(FHitResult OutHit, FVector Start, FVector EndPoint);
 
-	UPROPERTY( EditAnywhere , BlueprintReadOnly )
-	EWeaponAim aim;
-
 	void Reload();
 
-private:
 	void SelectedRifle();
 	void SelectedPistol();
 	void SelectedMachineGun();
@@ -134,9 +131,18 @@ public:
 
 	// server to multi. 손에 붙이세요. (총 액터의 포인터)
 	UFUNCTION( NetMulticast , Reliable )
-	void MultiRPCSpawnPistol( APistolGun* OwnPistol );				
+	void MultiRPCSpawnPistol( APistolGun* OwnPistol );
 
-	//SelectedPistol
+	// client to server. 손에 붙여 주세요. (총 액터의 포인터)
+	UFUNCTION( Server , Reliable )
+	void ServerRPCSpawnRifle( TSubclassOf<ARifleGun> GunFactory );
+
+	// server to multi. 손에 붙이세요. (총 액터의 포인터)
+	UFUNCTION( NetMulticast , Reliable )
+	void MultiRPCSpawnRifle( ARifleGun* OwnRifle );
+
+private:
+	// Selected Pistol
 	// client to server.
 	UFUNCTION( Server , Reliable )
 	void ServerRPCSelectedPistol( APistolGun* selectedPistol );				
@@ -145,13 +151,7 @@ public:
 	UFUNCTION( NetMulticast , Reliable )
 	void MultiRPCSelectedPistol( APistolGun* selectedPistol );				
 
-	// client to server. 손에 붙여 주세요. (총 액터의 포인터)
-	UFUNCTION( Server , Reliable )
-	void ServerRPCSpawnRifle( TSubclassOf<ARifleGun> GunFactory );				
-
-	// server to multi. 손에 붙이세요. (총 액터의 포인터)
-	UFUNCTION( NetMulticast , Reliable )
-	void MultiRPCSpawnRifle( ARifleGun* OwnRifle );				
+		
 
 	//SelectedPistol
 	// client to server.

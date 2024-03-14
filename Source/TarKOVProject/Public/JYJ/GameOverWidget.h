@@ -13,5 +13,24 @@ UCLASS()
 class TARKOVPROJECT_API UGameOverWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
+public:
+	virtual void NativeConstruct() override;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(BindWidget))
+	class UTextBlock* text_deathreason;
+
+	UPROPERTY( EditDefaultsOnly , BlueprintReadOnly , meta = (BindWidget) )
+	class UTextBlock* text_timer;
+
+	UPROPERTY( EditDefaultsOnly , BlueprintReadOnly , meta = (BindWidget) )
+	class UButton* btn_quit;
+
+	UPROPERTY( EditDefaultsOnly , BlueprintReadOnly , meta = (BindWidget) )
+	class UButton* btn_restart;
+
+private:
+	void OnClickbtnQuit();
+	void OnClickbtnRestart();
+
 };

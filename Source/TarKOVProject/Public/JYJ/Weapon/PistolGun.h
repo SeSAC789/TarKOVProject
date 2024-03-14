@@ -27,5 +27,13 @@ public:
 	UPROPERTY( Replicated )
 	int32 currentAmmo;
 
-	
+	void UpdateAmmoCnt(int32 currentAmmo);
+
+	/*
+	UFUNCTION(Server, Reliable)
+	void ServerSetAmmoCnt(int32 newAmmoCnt);
+
+	UFUNCTION( NetMulticast , Reliable )
+	void MultiSetAmmoCnt( int32 newAmmoCnt );
+	*/
 };

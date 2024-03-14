@@ -12,6 +12,8 @@ AGunBase::AGunBase()
 	GunMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("GunMeshComp"));
 	SetRootComponent(GunMeshComp);
 
+	GunMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 	AimCamSocket = CreateDefaultSubobject<USceneComponent>(TEXT("AimCamSocket"));
 	AimCamSocket->SetupAttachment(GunMeshComp);
 

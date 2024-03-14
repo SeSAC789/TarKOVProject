@@ -61,15 +61,8 @@ void AYJTestPlayer::PossessedBy(AController* NewController)
 		NewCharacter->fireComp->SpawnRifle( NewCharacter->fireComp->RifleGun );
 		NewCharacter->fireComp->SpawnPistol( NewCharacter->fireComp->PistolGun );
 
-		//NewCharacter->fireComp->OnRep_Pistol();
-		//NewCharacter->fireComp->OnRep_Rifle();
 		//NewCharacter->fireComp->ServerRPCSpawnRifle( NewCharacter->fireComp->RifleGun );
-		//NewCharacter->fireComp->bValidRifle = false;
-		//NewCharacter->fireComp->On_Rep_Rifle();
-
-		/*NewCharacter->fireComp->ServerRPCSpawnPistol( NewCharacter->fireComp->PistolGun */
-		
-
+		//NewCharacter->fireComp->ServerRPCSpawnPistol( NewCharacter->fireComp->PistolGun );
 	}
 	else
 	{

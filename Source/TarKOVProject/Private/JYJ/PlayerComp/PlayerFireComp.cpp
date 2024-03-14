@@ -215,7 +215,8 @@ void UPlayerFireComp::Zoom()
 void UPlayerFireComp::ZoomIn()
 {
 	bAimRifle = true;
-	if (!me->FollowCamera || !rifle || !pistol) return;
+	if ( !me->FollowCamera || !rifle || !pistol ) return;
+	if ( !bValidPistol && !bValidRifle ) return;
 
 	//Zoom camera location by gun type
 	switch (aim)
@@ -429,6 +430,7 @@ void UPlayerFireComp::Reload()
 		case EWeaponAim::PISTOL:
 			//PlayerAnim->playReloadPistolAnimation();
 			pistol->currentAmmo = pistol->gunMaxAmmo;
+			//pistol->UpdateAmmoCnt( pistol->currentAmmo );
 			break;
 		case EWeaponAim::MACHINEGUN:
 			break;
@@ -760,5 +762,7 @@ void UPlayerFireComp::GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME( UPlayerFireComp , pistol );
 	DOREPLIFETIME( UPlayerFireComp , bValidPistol );
 	DOREPLIFETIME( UPlayerFireComp , bAimRifle );
+	//DOREPLIFETIME( UPlayerFireComp , pistol->currentAmmo );
+	//DOREPLIFETIME( UPlayerFireComp , rifle->currentAmmo );
 
 }

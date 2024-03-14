@@ -87,7 +87,7 @@ void UPlayerAnimInstance::playReloadRifleAnimation()
 {
 	if(!Montage_Play(reloadMontage))
 	{
-		player->PlayAnimMontage( fireMontage , 1 , TEXT( "Rifle" ) );
+		player->PlayAnimMontage( reloadMontage , 1 , TEXT( "Rifle" ) );
 	}
 }
 
@@ -95,6 +95,6 @@ void UPlayerAnimInstance::playReloadPistolAnimation()
 {
 	if (!Montage_Play( reloadMontage ))
 	{
-		player->PlayAnimMontage( fireMontage , 1 , TEXT( "Pistol" ) );
+		player->PlayAnimMontage( reloadMontage , 1 , TEXT( "Pistol" ) );
 	}
 }
