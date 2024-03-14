@@ -3,6 +3,9 @@
 
 #include "JYJ/Weapon/RifleGun.h"
 
+#include "JYJ/Weapon/PistolGun.h"
+#include "Net/UnrealNetwork.h"
+
 ARifleGun::ARifleGun()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -17,6 +20,8 @@ ARifleGun::ARifleGun()
 
 	AimCamSocket->SetRelativeLocation( FVector( 0 , 15 , 20 ) );
 	AimCamSocket->SetRelativeRotation( FRotator( 0 , 90 , 0 ) );
+
+	GunMeshComp->SetIsReplicated(true);
 }
 
 void ARifleGun::BeginPlay()
@@ -32,5 +37,12 @@ void ARifleGun::BeginPlay()
 	currentAmmo = gunMaxAmmo;
 
 	bEnableRepeating = true;
+}
+
+void ARifleGun::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME( ARifleGun , currentAmmo );
 }
 

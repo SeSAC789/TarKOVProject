@@ -23,9 +23,12 @@ class TARKOVPROJECT_API UPlayerFireComp : public UPlayerBaseComp
 	GENERATED_BODY()
 
 private:
+	UPlayerFireComp();
+
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	virtual void SetupInput( UEnhancedInputComponent* input ) override;
+	virtual void GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
 
 	//Fire Input
 	UPROPERTY( EditAnywhere , BlueprintReadOnly , Category = Input , meta = (AllowPrivateAccess = "true") )
@@ -45,17 +48,30 @@ private:
 
 	UPROPERTY( EditAnywhere , BlueprintReadOnly , Category = Input , meta = (AllowPrivateAccess = "true") )
 	class UInputAction* RepeatingAction;
-
 	
 
-	UPROPERTY()
-	class ARifleGun* rifle;
-
-
-	UPROPERTY()
-	class APistolGun* pistol;
 
 public:
+
+	UFUNCTION()
+	void OnRep_Rifle();
+
+	UFUNCTION()
+	void OnRep_Pistol();
+
+	UPROPERTY( ReplicatedUsing = OnRep_Rifle , EditDefaultsOnly )
+	class ARifleGun* rifle;
+
+	UPROPERTY( ReplicatedUsing = OnRep_Pistol , EditDefaultsOnly )
+	class APistolGun* pistol;
+
+	UPROPERTY( Replicated, EditAnywhere , BlueprintReadWrite )
+	bool bValidRifle = false;
+
+	UPROPERTY( Replicated, EditAnywhere , BlueprintReadWrite )
+	bool bValidPistol = false;
+
+
 
 	//Rifle Setting
 	UPROPERTY( EditAnywhere )
@@ -65,11 +81,9 @@ public:
 	UPROPERTY( EditAnywhere )
 	TSubclassOf<class APistolGun> PistolGun;
 
-	UPROPERTY( EditAnywhere , BlueprintReadWrite )
-	bool bValidPistol;
+	
 
-	UPROPERTY( EditAnywhere , BlueprintReadWrite )
-	bool bValidRifle;
+
 
 	UPROPERTY( EditAnywhere , BlueprintReadWrite )
 	bool bAimRifle;
@@ -111,59 +125,69 @@ private:
 	bool bEnableRepeating;
 	bool bRepeated;
 
+
 	//-----------------NetWork-----------------//
 public:
 	// client to server. 손에 붙여 주세요. (총 액터의 포인터)
 	UFUNCTION( Server , Reliable )
-	void ServerRPCSpawnPistol( TSubclassOf<APistolGun> GunFactory );				//요청
+	void ServerRPCSpawnPistol( TSubclassOf<APistolGun> GunFactory );				
 
 	// server to multi. 손에 붙이세요. (총 액터의 포인터)
 	UFUNCTION( NetMulticast , Reliable )
-	void MultiRPCSpawnPistol( APistolGun* OwnPistol );				//요청
+	void MultiRPCSpawnPistol( APistolGun* OwnPistol );				
 
 	//SelectedPistol
 	// client to server.
 	UFUNCTION( Server , Reliable )
-	void ServerRPCSelectedPistol( APistolGun* selectedPistol );				//요청
+	void ServerRPCSelectedPistol( APistolGun* selectedPistol );				
 
 	// server to multi.
 	UFUNCTION( NetMulticast , Reliable )
-	void MultiRPCSelectedPistol( APistolGun* selectedPistol );				//요청
+	void MultiRPCSelectedPistol( APistolGun* selectedPistol );				
 
 	// client to server. 손에 붙여 주세요. (총 액터의 포인터)
 	UFUNCTION( Server , Reliable )
-	void ServerRPCSpawnRifle( TSubclassOf<ARifleGun> GunFactory );				//요청
+	void ServerRPCSpawnRifle( TSubclassOf<ARifleGun> GunFactory );				
 
 	// server to multi. 손에 붙이세요. (총 액터의 포인터)
 	UFUNCTION( NetMulticast , Reliable )
-	void MultiRPCSpawnRifle( ARifleGun* OwnRifle );				//요청
+	void MultiRPCSpawnRifle( ARifleGun* OwnRifle );				
 
 	//SelectedPistol
 	// client to server.
 	UFUNCTION( Server , Reliable )
-	void ServerRPCSelectedRifle( ARifleGun* selectedPistol );				//요청
+	void ServerRPCSelectedRifle( ARifleGun* selectedPistol );				
 
 	// server to multi.
 	UFUNCTION( NetMulticast , Reliable )
-	void MultiRPCSelectedRifle( ARifleGun* selectedPistol );				//요청
+	void MultiRPCSelectedRifle( ARifleGun* selectedPistol );				
 
 	//Fire
 	// client to server.
 	UFUNCTION( Server , Reliable )
-	void ServerRPCFirePistol( );											//요청
+	void ServerRPCFirePistol( );											
 
 	// server to multi.
 	UFUNCTION( NetMulticast , Reliable )
-	void MultiRPCFirePistol( bool bHit, const FHitResult& hitInfo );		//요청
+	void MultiRPCFirePistol( bool bHit, const FHitResult& hitInfo );		
+
+	// client to server.
+	UFUNCTION( Server , Reliable )
+	void ServerRPCFireRifle();
+
+	// server to multi.
+	UFUNCTION( NetMulticast , Reliable )
+	void MultiRPCFireRifle( bool bHit , const FHitResult& hitInfo );
+
 
 	//Reload
 	// client to server.
 	UFUNCTION( Server , Reliable )
-	void ServerRPCReload();											//요청
+	void ServerRPCReload();											
 
 	// server to multi.
 	UFUNCTION( NetMulticast , Reliable )
-	void MultiRPCReload( );		//요청
+	void MultiRPCReload( );		
 
 
 

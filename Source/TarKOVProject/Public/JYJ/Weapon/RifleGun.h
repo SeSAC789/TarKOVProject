@@ -17,8 +17,11 @@ class TARKOVPROJECT_API ARifleGun : public AGunBase
 protected:
 	ARifleGun();
 	virtual void BeginPlay() override;
+	virtual void GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
 	
 public:
+
+	UPROPERTY( Replicated )
 	int32 currentAmmo;
 	
 	
