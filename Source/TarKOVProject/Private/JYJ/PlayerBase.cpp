@@ -16,6 +16,7 @@
 #include "KJH/HPWidget.h"
 #include "Blueprint/UserWidget.h"
 #include "KJH/Bandage.h"
+#include "KJH/StaminaComp.h"
 
 //DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 

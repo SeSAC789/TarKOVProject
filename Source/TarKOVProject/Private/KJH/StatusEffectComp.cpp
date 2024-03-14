@@ -84,11 +84,11 @@ void UStatusEffectComp::UpdateStatusEffects( float DeltaTime )
 
 		EffectData.Timer += DeltaTime;
 
-		// 출혈이나 골절 상태이상이 활성화된 경우, 고통 타이머를 업데이트합니다.
+		// 출혈이나 골절 상태이상이 활성화된 경우, 고통 타이머를 업데이트.
 		if (EffectData.EffectType == EStatusEffectType::Bleeding || EffectData.EffectType == EStatusEffectType::Fracture)
 		{
 			EffectData.PainTimer += DeltaTime;
-			// 고통 상태이상을 적용합니다.
+			// 5초 지나면 고통 상태이상을 적용합니다.
 			if (EffectData.PainTimer >= 5.0f && !IsPain())
 			{
 				ApplyPainEffect( EffectData , DeltaTime );

@@ -247,7 +247,7 @@ void UHealthComp::CheckAndApplyBleeding( const FName& BodyPart )
 				statusComp->ApplyStatusEffect( EStatusEffectType::Bleeding , BodyPart );
 				UE_LOG( LogTemp , Warning , TEXT( "UHealthComp::CheckAndApplyBleeding, 출혈상태 생긴 부위 :  %s" ) , *BodyPart.ToString() );
 			}
-			break; // 해당하는 부위를 처리했으므로 반복문을 종료합니다.
+			break;
 		}
 	}
 }
