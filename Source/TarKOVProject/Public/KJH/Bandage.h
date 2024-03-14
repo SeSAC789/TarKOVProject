@@ -25,7 +25,7 @@ public:
 
 	// 출혈 상태이상 해제를 위한 함수
 	UFUNCTION( BlueprintCallable )
-	void RemoveBleedingStatus( AActor* OverlappedActor );
+	void RemoveBleedingStatus( AActor* OverlappedActor , FName OverlappedBodyPart );
 
 public:
 	// 오버랩 시작 이벤트 처리

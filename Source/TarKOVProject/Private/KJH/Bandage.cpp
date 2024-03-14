@@ -4,7 +4,10 @@
 #include "KJH/Bandage.h"
 
 #include "Components/BoxComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
+#include "JYJ/PlayerBase.h"
+#include "KJH/HealthComp.h"
 #include "KJH/StatusEffectComp.h"
 
 ABandage::ABandage()
@@ -14,7 +17,7 @@ ABandage::ABandage()
 
     BoxComp = CreateDefaultSubobject<UBoxComponent>( TEXT( "BoxComp" ) );
     this->SetRootComponent( BoxComp );
-    BoxComp->InitBoxExtent( FVector( 30.0f , 30.0f , 30.0f ) );
+    BoxComp->InitBoxExtent( FVector( 5.0f , 5.0f , 5.0f ) );
 
     MeshComp = CreateDefaultSubobject<UStaticMeshComponent>( TEXT( "MeshComp" ) );
     MeshComp->SetupAttachment( RootComponent );
@@ -27,25 +30,31 @@ ABandage::ABandage()
 
 void ABandage::NotifyActorBeginOverlap(AActor* OtherActor)
 {
-	Super::NotifyActorBeginOverlap(OtherActor);
+    Super::NotifyActorBeginOverlap( OtherActor );
 
-    RemoveBleedingStatus( OtherActor );
+    UHealthComp* healthComp = Cast<UHealthComp>( OtherActor->GetComponentByClass( UHealthComp::StaticClass() ) );
+    if (healthComp)
+    {
+        TArray<FName> BleedingParts = healthComp->GetBleedingBodyParts();
+        for (FName BodyPart : BleedingParts)
+        {
+            RemoveBleedingStatus( OtherActor , BodyPart );
+        }
+    }
 }
 
-void ABandage::RemoveBleedingStatus(AActor* OverlappedActor)
+void ABandage::RemoveBleedingStatus( AActor* OverlappedActor , FName OverlappedBodyPart )
 {
     if (!OverlappedActor)
     {
         return;
     }
 
-    UStatusEffectComp* statusComp = OverlappedActor->FindComponentByClass<UStatusEffectComp>();
-    if (statusComp && statusComp->IsBleeding())
+    UStatusEffectComp* StatusComp = Cast<UStatusEffectComp>( OverlappedActor->GetComponentByClass( UStatusEffectComp::StaticClass() ) );
+    if (StatusComp && StatusComp->IsBleeding( OverlappedBodyPart ))
     {
-        // 가장 체력이 적은 부위의 출혈 상태이상을 해제
-        FName WeakestBodyPart = statusComp->FindWeakestBodyPart();
-        statusComp->ClearStatusEffect( EStatusEffectType::Bleeding , WeakestBodyPart );
-        UE_LOG( LogTemp , Warning , TEXT( "ABandage::RemoveBleedingStatus, 출혈상태 해제: %s" ) , *WeakestBodyPart.ToString() );
+        StatusComp->ClearStatusEffect( EStatusEffectType::Bleeding , OverlappedBodyPart );
+        UE_LOG( LogTemp , Warning , TEXT( "ABandage::RemoveBleedingStatus, 출혈상태 해제: %s" ) , *OverlappedBodyPart.ToString() );
     }
 }
 

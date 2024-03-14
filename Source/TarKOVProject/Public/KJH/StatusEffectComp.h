@@ -84,7 +84,7 @@ public:
 
 
 	UFUNCTION( BlueprintCallable , Category = "Status Effects" )
-	bool IsBleeding() const;
+	bool IsBleeding( FName BodyPart ) const;
 
 	UFUNCTION( BlueprintCallable , Category = "Status Effects" )
 	bool IsFractured() const;
@@ -104,6 +104,8 @@ public:
 	class APainPostProcess* painPost;
 
 	FName FindWeakestBodyPart();
+	int32 GetBleedingCount() const;
+	int32 GetFractureCount() const;
 
 	virtual  void GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
 };
