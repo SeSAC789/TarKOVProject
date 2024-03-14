@@ -29,6 +29,7 @@ public:
 	UPROPERTY( EditAnywhere , BlueprintReadOnly , Category = Input , meta = (AllowPrivateAccess = "true") )
 	UInputMappingContext* DefaultMappingContext;
 
+
 	APlayerBase();
 
 
@@ -56,6 +57,12 @@ public:
 
 	UPROPERTY( EditDefaultsOnly )
 	class USceneComponent* pistolComp;
+
+	// 고통상태이상 위한 포스트프로세스 추가
+	UPROPERTY( EditDefaultsOnly , BlueprintReadWrite)
+	class UPostProcessComponent* PainPostProcessComp;
+
+
 
 public:
 	/** Returns FollowCamera subobject **/

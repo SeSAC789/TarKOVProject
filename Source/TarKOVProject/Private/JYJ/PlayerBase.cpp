@@ -15,6 +15,7 @@
 #include "KJH/HealthComp.h"
 #include "KJH/HPWidget.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/PostProcessComponent.h"
 #include "KJH/Bandage.h"
 #include "KJH/StaminaComp.h"
 
@@ -64,6 +65,9 @@ APlayerBase::APlayerBase()
 		FollowCamera->SetRelativeLocation(FVector( 0 , -14.927225 , -27.355890 ));
 		FollowCamera->SetRelativeRotation(FRotator( -9.333045 , 0.415788 , -92.469920 ));
 
+		PainPostProcessComp = CreateDefaultSubobject<UPostProcessComponent>( TEXT( "PainPostProcessComp" ) );
+		PainPostProcessComp->SetupAttachment( FollowCamera );
+
 		//사용하는지 확인 필요
 		aimingCamPos = CreateDefaultSubobject<USceneComponent>( TEXT( "aimingCamPos" ) );
 		DefaultCamPos = CreateDefaultSubobject<USceneComponent>( TEXT( "DefaultCamPos" ) );
@@ -96,7 +100,7 @@ APlayerBase::APlayerBase()
 	statusComp = CreateDefaultSubobject<UStatusEffectComp>( TEXT( "statusComp" ) );
 	staminaComp = CreateDefaultSubobject<UStaminaComp>( TEXT( "staminaComp" ) );
 	
-
+	
 }
 
 void APlayerBase::BeginPlay()

@@ -12,8 +12,7 @@
 
 AJHPlayerTest::AJHPlayerTest()
 {
-	PainPostProcessComp = CreateDefaultSubobject<UPostProcessComponent>( TEXT( "PainPostProcessComp" ) );
-	PainPostProcessComp->SetupAttachment( FollowCamera );
+	
 }
 
 void AJHPlayerTest::BeginPlay()

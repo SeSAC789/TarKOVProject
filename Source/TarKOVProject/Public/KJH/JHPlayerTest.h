@@ -22,7 +22,6 @@ public:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	virtual void OnHitboxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 
-	UPROPERTY( VisibleAnywhere , BlueprintReadOnly , Category = Camera )
-	UPostProcessComponent* PainPostProcessComp;
+
 
 };
