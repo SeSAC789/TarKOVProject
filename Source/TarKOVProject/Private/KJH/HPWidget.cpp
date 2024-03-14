@@ -36,10 +36,10 @@ void UHPWidget::NativeTick( const FGeometry& MyGeometry , float InDeltaTime )
 	UpdateBodyPartImageColor( Head_Img , HeadHP() );
 	UpdateBodyPartImageColor( Thorax_Img , ThoraxHP() );
 	UpdateBodyPartImageColor( Stomach_Img , StomachHP() );
-	UpdateBodyPartImageColor( LeftArm_Img , LeftArmHP() );
-	UpdateBodyPartImageColor( RightArm_Img , RightArmHP() );
-	UpdateBodyPartImageColor( LeftLeg_Img , LeftLegHP() );
-	UpdateBodyPartImageColor( RightLeg_Img , RightLegHP() );
+	UpdateBodyPartImageColor( LeftArm_Img , RightArmHP() );
+	UpdateBodyPartImageColor( RightArm_Img , LeftArmHP() );
+	UpdateBodyPartImageColor( LeftLeg_Img , RightLegHP() ); 
+	UpdateBodyPartImageColor( RightLeg_Img , LeftLegHP() );
 }
 
 float UHPWidget::HeadHP() const

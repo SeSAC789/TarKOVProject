@@ -182,7 +182,6 @@ void UStatusEffectComp::ApplyPainEffect( FStatusEffectData& EffectData , float D
 		{
 			PainPostProcessInstance->EnablePainEffect( true );
 			UE_LOG( LogTemp , Warning , TEXT( "UStatusEffectComp::ApplyPainEffect, 고통상태 적용: %s 부위" ) , *EffectData.BodyPart.ToString() );;
-
 		}
 	}
 }
