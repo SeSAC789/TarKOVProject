@@ -247,7 +247,7 @@ void UHealthComp::CheckAndApplyBleeding( const FName& BodyPart )
 				statusComp->ApplyStatusEffect( EStatusEffectType::Bleeding , BodyPart );
 				UE_LOG( LogTemp , Warning , TEXT( "UHealthComp::CheckAndApplyBleeding, 출혈상태 생긴 부위 :  %s" ) , *BodyPart.ToString() );
 			}
-			break; // 해당하는 부위를 처리했으므로 반복문을 종료합니다.
+			break;
 		}
 	}
 }
@@ -309,6 +309,23 @@ void UHealthComp::DistributeDamage( float DamageAmount , FName IgnoredBodyPart )
 			BodyPartData.HP = NewHP;
 		}
 	}
+}
+
+FName UHealthComp::FindWeakestBodyPart()
+{
+	FName WeakestPart = NAME_None;
+	float MinHP = MAX_FLT; // 매우 큰 수로 초기화
+
+	for (const FBodyPartHealthData& Part : BodyPartHP)
+	{
+		if (Part.HP < MinHP)
+		{
+			MinHP = Part.HP;
+			WeakestPart = Part.BodyPart;
+		}
+	}
+
+	return WeakestPart;
 }
 
 void UHealthComp::GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const

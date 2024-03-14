@@ -82,6 +82,8 @@ public:
 	// 피해 분산 함수
 	void DistributeDamage( float DamageAmount , FName IgnoredBodyPart );
 
+	// 가장 체력이 적은 부위를 찾는 함수
+	FName FindWeakestBodyPart();
 
 	UPROPERTY()
 	class UStatusEffectComp* statusComp;

@@ -28,6 +28,11 @@ void UHPWidget::NativeTick( const FGeometry& MyGeometry , float InDeltaTime )
 		Fracture_Img->SetVisibility( GetFractureVisibility() );
 	}
 
+	if (Pain_Img)
+	{
+		Pain_Img->SetVisibility( GetPainVisibility() );
+	}
+
 	UpdateBodyPartImageColor( Head_Img , HeadHP() );
 	UpdateBodyPartImageColor( Thorax_Img , ThoraxHP() );
 	UpdateBodyPartImageColor( Stomach_Img , StomachHP() );
@@ -157,6 +162,20 @@ ESlateVisibility UHPWidget::GetFractureVisibility() const
 	{
 		UStatusEffectComp* StatusEffectComp = me->FindComponentByClass<UStatusEffectComp>();
 		if (StatusEffectComp && StatusEffectComp->IsFractured())
+		{
+			return ESlateVisibility::Visible;
+		}
+	}
+	return ESlateVisibility::Hidden;
+}
+
+ESlateVisibility UHPWidget::GetPainVisibility() const
+{
+	APlayerBase* me = Cast<APlayerBase>( GetOwningPlayerPawn() );
+	if (me)
+	{
+		UStatusEffectComp* StatusEffectComp = me->FindComponentByClass<UStatusEffectComp>();
+		if (StatusEffectComp && StatusEffectComp->IsPain())
 		{
 			return ESlateVisibility::Visible;
 		}

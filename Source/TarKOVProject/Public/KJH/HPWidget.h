@@ -79,6 +79,12 @@ public:
 	ESlateVisibility GetFractureVisibility() const;
 
 	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
+	class UImage* Pain_Img;
+
+	UFUNCTION( BlueprintCallable , Category = "Health" )
+	ESlateVisibility GetPainVisibility() const;
+
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
 	class UImage* Head_Img;
 
 	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
