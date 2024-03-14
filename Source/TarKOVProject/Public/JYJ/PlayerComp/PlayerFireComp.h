@@ -85,7 +85,7 @@ public:
 
 
 
-	UPROPERTY( EditAnywhere , BlueprintReadWrite )
+	UPROPERTY( Replicated, EditAnywhere , BlueprintReadWrite )
 	bool bAimRifle;
 
 	UPROPERTY( EditAnywhere )

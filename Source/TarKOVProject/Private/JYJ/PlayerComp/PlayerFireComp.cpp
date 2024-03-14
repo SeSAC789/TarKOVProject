@@ -102,13 +102,15 @@ void UPlayerFireComp::SetupInput( UEnhancedInputComponent* input )
 
 void UPlayerFireComp::ChoosePistol()
 {
-	//ServerRPCSelectedPistol(pistol);
+	ServerRPCSelectedPistol(pistol);
 	//SelectedPistol();
 
+	/*
 	bValidRifle = false;
 	bValidPistol = true;
 	OnRep_Pistol();
 	OnRep_Rifle();
+	*/
 }
 
 void UPlayerFireComp::ChooseRifle()
@@ -119,11 +121,14 @@ void UPlayerFireComp::ChooseRifle()
 		GEngine->AddOnScreenDebugMessage( -1 , 10 , FColor::Red , Message );
 	}
 
-	//ServerRPCSelectedRifle(rifle);
+	ServerRPCSelectedRifle(rifle);
+
+	/*
 	bValidRifle = true;
 	bValidPistol = false;
 	OnRep_Rifle();
 	OnRep_Pistol();
+	*/
 	//SelectedRifle();
 
 	if (bValidRifle)
@@ -504,10 +509,13 @@ void UPlayerFireComp::MultiRPCSelectedPistol_Implementation( APistolGun* selecte
 	{
 		bEnableRepeating = selectedPistol->bEnableRepeating;
 	}
-	
 
 	aim = EWeaponAim::PISTOL;
 
+	OnRep_Pistol();
+	OnRep_Rifle();
+
+	/*
 	if (selectedPistol)
 	{
 		selectedPistol->pistolMesh->SetVisibility( true );
@@ -517,6 +525,7 @@ void UPlayerFireComp::MultiRPCSelectedPistol_Implementation( APistolGun* selecte
 	{
 		rifle->GunMeshComp->SetVisibility( false );
 	}
+	*/
 }
 
 void UPlayerFireComp::ServerRPCFirePistol_Implementation()
@@ -668,6 +677,8 @@ void UPlayerFireComp::MultiRPCSelectedRifle_Implementation( ARifleGun* selectedR
 
 	aim = EWeaponAim::RIFLE;
 
+	OnRep_Rifle();
+	OnRep_Pistol();
 
 }
 
@@ -748,5 +759,6 @@ void UPlayerFireComp::GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME( UPlayerFireComp , bValidRifle );
 	DOREPLIFETIME( UPlayerFireComp , pistol );
 	DOREPLIFETIME( UPlayerFireComp , bValidPistol );
+	DOREPLIFETIME( UPlayerFireComp , bAimRifle );
 
 }
