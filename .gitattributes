@@ -2,3 +2,4 @@
 * text=auto
 D:ProjectsTarKOVProjectContentlevel222 filter=lfs diff=lfs merge=lfs -text
 D:/Projects/TarKOVProject filter=lfs diff=lfs merge=lfs -text
+D:ProjectsTarKOVProjectContentlevel222Export.uasset filter=lfs diff=lfs merge=lfs -text
