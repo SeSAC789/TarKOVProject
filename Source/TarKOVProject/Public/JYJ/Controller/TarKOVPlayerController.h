@@ -22,6 +22,14 @@ public:
 
 	virtual void BeginPlay() override;
 
+	UPROPERTY()
+	int32 killCnt = 0;
+
+	// Kill Count
+	void UpdatekillCnt(int32 killOtherPlayer);
+
+
+
 	// Player MainUI
 	UPROPERTY( EditDefaultsOnly )
 	TSubclassOf<class UHPWidget> PlayerMainUIFactory;

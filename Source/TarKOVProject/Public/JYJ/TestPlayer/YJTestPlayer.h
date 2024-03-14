@@ -22,6 +22,6 @@ public:
 
 	virtual void PossessedBy(AController* NewController) override;
 
-public:
+private:
 	
 };
