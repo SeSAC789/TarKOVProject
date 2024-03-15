@@ -19,21 +19,6 @@ UHealthComp::UHealthComp()
 
 	// ...
 
-	// // 각 신체 부위별 기본 HP 값 초기화
-	//BodyPartMaxHP.Add( "Head" , 35.0f );
-	//BodyPartMaxHP.Add( "Thorax" , 85.0f );
-	//BodyPartMaxHP.Add( "Stomach" , 70.0f );
-	//BodyPartMaxHP.Add( "RightArm" , 60.0f );
-	//BodyPartMaxHP.Add( "LeftArm" , 60.0f );
-	//BodyPartMaxHP.Add( "RightLeg" , 65.0f );
-	//BodyPartMaxHP.Add( "LeftLeg" , 65.0f );
-
-	//// MaxHP 값을 사용하여 각 부위의 현재 건강 상태 초기화
-	//for (const auto& Elem : BodyPartMaxHP)
-	//{
-	//	BodyPartHP.Add( Elem.Key , Elem.Value );
-	//}
-	// 
 
 	 // 각 신체 부위별 기본 HP 값 TArray로 초기화
 	BodyPartHP.Add( FBodyPartHealthData( "Head" , 35.0f , 35.0f ) );
@@ -97,6 +82,7 @@ void UHealthComp::TakeDamage( const FName& BodyPart , float DamageAmount , const
 			if ((BodyPart == FName( "Head" ) || BodyPart == FName( "Thorax" )) && BodyPartData.HP <= 0.0f && !isBleedingDamage)
 			{
 				bIsDead = true;
+				invenDie();
 				UE_LOG( LogTemp , Warning , TEXT( "%s 부위가 %s 로 인해 데미지 받아 즉시 사망." ) , *BodyPart.ToString() , *HitObjectName );
 				return;
 			}
@@ -149,7 +135,8 @@ void UHealthComp::CheckAndHandleTotalDepletion()
 	if (bIsDead)
 	{
 		UE_LOG( LogTemp , Warning , TEXT( "모든 부위 hp가 다 0이 되어 죽음." ) );
-		// 사망 처리 관련 로직 여기에 구현
+		invenDie();
+		
 	}
 }
 
@@ -160,33 +147,11 @@ void UHealthComp::HealBodyPart( FName BodyPart , float HealAmount )
 	{
 		if (BodyPartData.BodyPart == BodyPart)
 		{
-			float NewHP = GetBodyPartHealth( BodyPart ) - HealAmount;
+			float NewHP = GetBodyPartHealth( BodyPart ) + HealAmount;
 			SetBodyPartHP( BodyPart , NewHP );
 
 			//BodyPartData.HP = FMath::Clamp<float>( BodyPartData.HP + HealAmount , 0.0f , BodyPartData.MaxHP );
 			UE_LOG( LogTemp , Warning , TEXT( "%s 부위가 %f 만큼 회복되었습니다. 현재 HP: %f" ) , *BodyPart.ToString() , HealAmount , BodyPartData.HP );
-
-			// 체력이 특정 수준 이상 회복되었으면 출혈 상태이상 비활성화
-			if (BodyPartData.HP > BodyPartData.MaxHP * 0.5f)
-			{
-				if (statusComp)
-				{
-					// 출혈 상태이상 해제
-					statusComp->ClearStatusEffect( EStatusEffectType::Bleeding , BodyPart );
-				}
-			}
-
-			// 골절은 추후에 힐 아이템 구현 시 부목을 통해서만 해제가능 하게
-			//// 체력이 30% 초과로 회복되었으면 골절 상태이상 비활성화
-			//if (BodyPartData.HP > BodyPartData.MaxHP * 0.3f)
-			//{
-			//    if (statusComp)
-			//    {
-			//        // 골절 상태이상 해제
-			//        statusComp->ClearStatusEffect(EStatusEffectType::Fracture, BodyPart);
-			//        UE_LOG(LogTemp, Warning, TEXT("%s 부위의 골절 상태이상이 해제되었습니다."), *BodyPart.ToString());
-			//    }
-			//}
 
 			break; // 해당 부위를 찾았으니 루프를 종료합니다.
 		}
@@ -376,5 +341,9 @@ void UHealthComp::GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLife
 
 	DOREPLIFETIME( UHealthComp , BodyPartHP );
 	DOREPLIFETIME( UHealthComp , bIsDead );
+}
+
+void UHealthComp::invenDie()
+{
 }
 
