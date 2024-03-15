@@ -14,6 +14,9 @@ class TARKOVPROJECT_API AMedikit : public AHealItemBase
 {
 	GENERATED_BODY()
 
+protected:
+	virtual void BeginPlay() override;
+
 public:
 	AMedikit();
 
@@ -23,5 +26,15 @@ public:
 	UPROPERTY( EditAnywhere , BlueprintReadWrite )
 	class UStaticMeshComponent* MeshComp;
 
+	UPROPERTY()
+	class APlayerBase* me;
+
+	UPROPERTY()
+	class UHealthComp* healthComp;
+
+	virtual void NotifyActorBeginOverlap( AActor* OtherActor ) override;
+
+	UFUNCTION( BlueprintCallable )
+	void RecoveryHP( AActor* OverlappedActor , FName OverlappedBodyPart );
 
 };
