@@ -114,6 +114,7 @@ void UPlayerAnimInstance::AnimNotify_OnGameOver()
 
 	if(GameOverUI)
 	{
+
 	}
 	
 }
