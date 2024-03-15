@@ -17,6 +17,8 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/PostProcessComponent.h"
 #include "JYJ/PlayerComp/PlayerThrowComp.h"
+#include "JYJ/Trigger/TriggerEscapeLocation.h"
+#include "JYJ/Weapon/BombBase.h"
 #include "KJH/Bandage.h"
 #include "KJH/Medikit.h"
 #include "KJH/Splint.h"
@@ -122,7 +124,7 @@ void APlayerBase::BeginPlay()
 	LeftLegUpperHitbox->OnComponentBeginOverlap.AddDynamic( this , &APlayerBase::OnHitboxOverlap );
 	LeftLegLowerHitbox->OnComponentBeginOverlap.AddDynamic( this , &APlayerBase::OnHitboxOverlap );
 
-	/*
+	
 	if (!hpUI)
 	{
 		// MainUI를 생성해서 기억하고싶다.
@@ -130,7 +132,7 @@ void APlayerBase::BeginPlay()
 		// AddtoViewport하고싶다.
 		hpUI->AddToViewport();
 	}
-	*/
+
 
 	// Player Controller Input Settings
 	if (APlayerController* PlayerController = Cast<APlayerController>( Controller ))
@@ -149,14 +151,15 @@ void APlayerBase::SetupPlayerInputComponent( UInputComponent* PlayerInputCompone
 	UEnhancedInputComponent* input = CastChecked<UEnhancedInputComponent>( PlayerInputComponent);
 
 	//자식 class 에서 호출 
-	//SetupInputDelegate.Broadcast(input);
+	SetupInputDelegate.Broadcast(input);
 	
 }
 
 void APlayerBase::OnHitboxOverlap( UPrimitiveComponent* OverlappedComponent , AActor* OtherActor ,
 	UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep , const FHitResult& SweepResult )
 {
-	if (this == OtherActor || Cast<ABandage>( OtherActor ) || Cast<ASplint>(OtherActor) || Cast<AMedikit>( OtherActor ))
+	if (this == OtherActor || Cast<ABandage>( OtherActor ) || Cast<ASplint>(OtherActor) || Cast<AMedikit>( OtherActor ) || Cast<ATriggerEscapeLocation>( OtherActor )
+		|| Cast<ABombBase>( OtherActor ))
 	{
 		return;
 	}
@@ -169,6 +172,30 @@ void APlayerBase::OnHitboxOverlap( UPrimitiveComponent* OverlappedComponent , AA
 			FString HitObjectName = OtherActor->GetName(); // 충돌한 객체의 이름
 			HealthComp->TakeDamage( BodyPart , 5 , HitObjectName ); // 모든 충돌에 대해 5의 데미지를 적용, 충돌한 객체 이름을 전달
 		}
+	}
+}
+
+void APlayerBase::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy( NewController );
+
+	if (APlayerBase* NewCharacter = Cast<APlayerBase>( NewController->GetCharacter() ))
+	{
+		if (!NewCharacter->fireComp)
+		{
+			UE_LOG( LogTemp , Warning , TEXT( "APlayerGameMode::OnPostLogin - No FireComp" ) )
+				return;
+		}
+
+		NewCharacter->fireComp->SpawnRifle( NewCharacter->fireComp->RifleGun );
+		NewCharacter->fireComp->SpawnPistol( NewCharacter->fireComp->PistolGun );
+
+		//NewCharacter->fireComp->ServerRPCSpawnRifle( NewCharacter->fireComp->RifleGun );
+		//NewCharacter->fireComp->ServerRPCSpawnPistol( NewCharacter->fireComp->PistolGun );
+	}
+	else
+	{
+		UE_LOG( LogTemp , Warning , TEXT( "APlayerGameMode::OnPostLogin - No Character" ) )
 	}
 }
 

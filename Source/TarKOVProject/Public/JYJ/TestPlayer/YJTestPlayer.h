@@ -20,7 +20,7 @@ public:
 
 	virtual void SetupPlayerInputComponent( class UInputComponent* PlayerInputComponent ) override;
 
-	virtual void PossessedBy(AController* NewController) override;
+	//virtual void PossessedBy(AController* NewController) override;
 
 	// Throw Comp Test
 	//UPROPERTY( VisibleAnywhere , BlueprintReadOnly , Category = "Components" )

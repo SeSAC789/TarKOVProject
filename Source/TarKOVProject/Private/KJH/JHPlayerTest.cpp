@@ -19,13 +19,13 @@ void AJHPlayerTest::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (!hpUI)
-	{
-		// MainUI를 생성해서 기억하고싶다.
-		hpUI = CreateWidget<UHPWidget>( GetWorld() , hpUIFactory );
-		// AddtoViewport하고싶다.
-		hpUI->AddToViewport();
-	}
+	//if (!hpUI)
+	//{
+	//	 //MainUI를 생성해서 기억하고싶다.
+	//	hpUI = CreateWidget<UHPWidget>( GetWorld() , hpUIFactory );
+	//	// AddtoViewport하고싶다.
+	//	hpUI->AddToViewport();
+	//}
 
 }
 
@@ -35,7 +35,7 @@ void AJHPlayerTest::SetupPlayerInputComponent( UInputComponent* PlayerInputCompo
 
 	UEnhancedInputComponent* input = CastChecked<UEnhancedInputComponent>( PlayerInputComponent );
 
-	SetupInputDelegate.Broadcast( input );
+	//SetupInputDelegate.Broadcast( input );
 }
 
 void AJHPlayerTest::OnHitboxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,

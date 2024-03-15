@@ -24,18 +24,7 @@ void AYJTestPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 
-	
-	if (!hpUI)
-	{
-		// MainUI를 생성해서 기억하고싶다.
-		hpUI = CreateWidget<UHPWidget>( GetWorld() , hpUIFactory );
-		// AddtoViewport하고싶다.
-		if(hpUI)
-		{
-			hpUI->AddToViewport();
-		}
-		
-	}
+
 
 }
 
@@ -45,10 +34,11 @@ void AYJTestPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 	UEnhancedInputComponent* input = CastChecked<UEnhancedInputComponent>( PlayerInputComponent );
 
-	SetupInputDelegate.Broadcast( input );
+	//SetupInputDelegate.Broadcast( input );
 	//moveComp1->SetupInput( input );
 }
 
+/*
 void AYJTestPlayer::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
@@ -72,4 +62,5 @@ void AYJTestPlayer::PossessedBy(AController* NewController)
 		UE_LOG( LogTemp , Warning , TEXT( "APlayerGameMode::OnPostLogin - No Character" ) )
 	}
 }
+*/
 
