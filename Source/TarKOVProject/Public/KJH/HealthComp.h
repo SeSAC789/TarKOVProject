@@ -67,6 +67,7 @@ public:
 	void TakeDamage( const FName& BodyPart , float DamageAmount, const FString& HitObjectName );
 	void CheckAndHandleTotalDepletion();
 	void HealBodyPart( FName BodyPart , float HealAmount );
+	bool IsInjured(FName BodyPart) const;
 	// 상태이상에서 hp값 확인하기 위해
 	float GetBodyPartHealth(FName BodyPart);
 	float GetBodyPartMaxHealth(FName BodyPart );
@@ -101,7 +102,12 @@ public:
 
 	virtual  void GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
 
-	//UFUNCTION(BlueprintImplementableEvent)
-	//void invenDie();
+	UFUNCTION(BlueprintCallable)
+	void invenDie();
 
+	UPROPERTY()
+	class UGameOverWidget* GameOverUI;
+
+	UPROPERTY( EditDefaultsOnly )
+	TSubclassOf<class UUserWidget> GameOverUIFactory;
 };

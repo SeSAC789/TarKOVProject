@@ -5,7 +5,7 @@
 #include "KJH/HPWidget.h"
 #include "Blueprint/UserWidget.h"
 #include <Subsystems/PanelExtensionSubsystem.h>
-
+#include "JYJ/GameOverWidget.h"
 #include "JYJ/PlayerBase.h"
 #include "Net/UnrealNetwork.h"
 
@@ -156,6 +156,18 @@ void UHealthComp::HealBodyPart( FName BodyPart , float HealAmount )
 			break; // 해당 부위를 찾았으니 루프를 종료합니다.
 		}
 	}
+}
+
+bool UHealthComp::IsInjured( FName BodyPart ) const
+{
+	for (const FBodyPartHealthData& BodyPartData : BodyPartHP)
+	{
+		/*if (Effect.bIsActive && Effect.EffectType == EStatusEffectType::Fracture && Effect.BodyPart == BodyPart)
+		{
+			return true;
+		}*/
+	}
+	return false;
 }
 
 float UHealthComp::GetBodyPartHealth( FName BodyPart )
