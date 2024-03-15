@@ -168,11 +168,11 @@ bool UStatusEffectComp::IsBleeding( FName BodyPart ) const
 	return false;
 }
 
-bool UStatusEffectComp::IsFractured() const
+bool UStatusEffectComp::IsFractured( FName BodyPart ) const
 {
 	for (const FStatusEffectData& Effect : StatusEffects)
 	{
-		if (Effect.bIsActive && Effect.EffectType == EStatusEffectType::Fracture)
+		if (Effect.bIsActive && Effect.EffectType == EStatusEffectType::Fracture && Effect.BodyPart == BodyPart)
 		{
 			return true;
 		}

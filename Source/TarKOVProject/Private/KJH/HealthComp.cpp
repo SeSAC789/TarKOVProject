@@ -354,6 +354,22 @@ TArray<FName> UHealthComp::GetBleedingBodyParts() const
 	return BleedingParts;
 }
 
+TArray<FName> UHealthComp::GetFracturedBodyParts() const
+{
+	TArray<FName> FracturedParts;
+	if (statusComp)
+	{
+		for (const FBodyPartHealthData& BodyPartData : BodyPartHP)
+		{
+			if (statusComp->IsFractured( BodyPartData.BodyPart ))
+			{
+				FracturedParts.Add( BodyPartData.BodyPart );
+			}
+		}
+	}
+	return FracturedParts;
+}
+
 void UHealthComp::GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const
 {
 	Super::GetLifetimeReplicatedProps( OutLifetimeProps );

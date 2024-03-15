@@ -96,8 +96,17 @@ public:
 	UFUNCTION( BlueprintCallable  )
 	ESlateVisibility GetBleedingVisibility() const;
 
+	UFUNCTION( BlueprintCallable )
+	ESlateVisibility GetFracturedVisibilityBodyPart( FName BodyPart ) const;
+
 	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
 	class UImage* Fracture_Img;
+
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
+	class UImage* RightLeg_Fracture_Img;
+
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
+	class UImage* LeftLeg_Fracture_Img;
 
 	UFUNCTION( BlueprintCallable  )
 	ESlateVisibility GetFractureVisibility() const;
@@ -144,8 +153,8 @@ public:
 	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
 	class UTextBlock* Fracture_Text;
 
-	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
-	class UWidgetAnimation* HitAnim;
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidgetAnim),Transient )
+	class UWidgetAnimation* HitAnimation;
 
 	void PlayAnim();
 	void UpdateStaminaBar();

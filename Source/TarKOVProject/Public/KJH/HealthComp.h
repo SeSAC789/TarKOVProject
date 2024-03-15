@@ -88,6 +88,8 @@ public:
 	// 출혈 상태이상이 있는 모든 신체 부위의 이름을 반환하는 함수
 	TArray<FName> GetBleedingBodyParts() const;
 
+	TArray<FName> GetFracturedBodyParts() const;
+
 	UPROPERTY()
 	class UStatusEffectComp* statusComp;
 

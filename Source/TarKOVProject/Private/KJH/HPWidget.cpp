@@ -20,6 +20,7 @@ void UHPWidget::NativeTick( const FGeometry& MyGeometry , float InDeltaTime )
 {
 	Super::NativeTick( MyGeometry , InDeltaTime );
 
+	// 츨혈
 	if (Head_Bleeding_Img) { Head_Bleeding_Img->SetVisibility( GetBleedingVisibilityBodyPart( TEXT( "Head" ) ) ); }
 	if (Thorax_Bleeding_Img) { Thorax_Bleeding_Img->SetVisibility( GetBleedingVisibilityBodyPart( TEXT( "Thorax" ) ) ); }
 	if (Stomach_Bleeding_Img) { Stomach_Bleeding_Img->SetVisibility( GetBleedingVisibilityBodyPart( TEXT( "Stomach" ) ) ); }
@@ -28,13 +29,15 @@ void UHPWidget::NativeTick( const FGeometry& MyGeometry , float InDeltaTime )
 	if (RightLeg_Bleeding_Img) { RightLeg_Bleeding_Img->SetVisibility( GetBleedingVisibilityBodyPart( TEXT( "RightLeg" ) ) ); }
 	if (LeftLeg_Bleeding_Img) { LeftLeg_Bleeding_Img->SetVisibility( GetBleedingVisibilityBodyPart( TEXT( "LeftLeg" ) ) ); }
 
-	
-	if (Bleeding_Img)
-	{
-		Bleeding_Img->SetVisibility( GetBleedingVisibility() );
-	}
+	if (Bleeding_Img) { Bleeding_Img->SetVisibility( GetBleedingVisibility() ); }
+
+	// 골절
+	if (RightLeg_Bleeding_Img) { RightLeg_Fracture_Img->SetVisibility( GetFracturedVisibilityBodyPart( TEXT( "RightLeg" ) ) ); }
+	if (LeftLeg_Bleeding_Img) { LeftLeg_Fracture_Img->SetVisibility( GetFracturedVisibilityBodyPart( TEXT( "LeftLeg" ) ) ); }
 
 	if (Fracture_Img) { Fracture_Img->SetVisibility( GetFractureVisibility() ); }
+
+
 
 	//if (Pain_Img)
 	//{
@@ -180,13 +183,27 @@ ESlateVisibility UHPWidget::GetBleedingVisibility() const
 	return ESlateVisibility::Hidden;
 }
 
+ESlateVisibility UHPWidget::GetFracturedVisibilityBodyPart( FName BodyPart ) const
+{
+	APlayerBase* me = Cast<APlayerBase>( GetOwningPlayerPawn() );
+	if (me)
+	{
+		UStatusEffectComp* StatusEffectComp = me->FindComponentByClass<UStatusEffectComp>();
+		if (StatusEffectComp && StatusEffectComp->IsFractured( BodyPart ))
+		{
+			return ESlateVisibility::Visible;
+		}
+	}
+	return ESlateVisibility::Hidden;
+}
+
 ESlateVisibility UHPWidget::GetFractureVisibility() const
 {
 	APlayerBase* me = Cast<APlayerBase>( GetOwningPlayerPawn() );
 	if (me)
 	{
 		UStatusEffectComp* StatusEffectComp = me->FindComponentByClass<UStatusEffectComp>();
-		if (StatusEffectComp && StatusEffectComp->IsFractured())
+		if (StatusEffectComp && StatusEffectComp->GetFractureCount() > 0)
 		{
 			return ESlateVisibility::Visible;
 		}
@@ -272,7 +289,7 @@ void UHPWidget::UpdateStatusText()
 
 void UHPWidget::PlayAnim()
 {
-	PlayAnimation( HitAnim );
+	PlayAnimation( HitAnimation );
 }
 
 void UHPWidget::UpdateStaminaBar()
