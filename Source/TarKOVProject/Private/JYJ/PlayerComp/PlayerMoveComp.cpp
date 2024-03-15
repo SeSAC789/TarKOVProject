@@ -5,6 +5,7 @@
 #include "JYJ/PlayerBase.h"
 #include "EnhancedInputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "KJH/StaminaComp.h"
 
 
 void UPlayerMoveComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -79,6 +80,13 @@ void UPlayerMoveComp::Jump(const FInputActionValue& Value)
 {
 	me->Jump();
 	UE_LOG(LogTemp, Warning, TEXT("TEST1"));
+	
+	UStaminaComp* StaminaComp = me->FindComponentByClass<UStaminaComp>();
+	if (StaminaComp)
+	{
+		// 점프할 때 스태미나 10 소모
+		StaminaComp->ConsumeStamina( 10.0f );
+	}
 }
 
 void UPlayerMoveComp::Running(const FInputActionValue& Value)
@@ -87,6 +95,12 @@ void UPlayerMoveComp::Running(const FInputActionValue& Value)
 	{
 		bIsRunning = true;
 		me->GetCharacterMovement()->MaxWalkSpeed *= runningSpeed;
+		UStaminaComp* staminaComp = me->FindComponentByClass<UStaminaComp>();
+		if (staminaComp)
+		{
+			// 달리기 시작할 때 스태미나 소모
+			staminaComp->ConsumeStamina( staminaComp->StaminaConsumptionRate );
+		}
 	}
 }
 

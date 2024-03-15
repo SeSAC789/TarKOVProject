@@ -18,6 +18,8 @@
 #include "Components/PostProcessComponent.h"
 #include "JYJ/PlayerComp/PlayerThrowComp.h"
 #include "KJH/Bandage.h"
+#include "KJH/Medikit.h"
+#include "KJH/Splint.h"
 #include "KJH/StaminaComp.h"
 
 //DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -154,7 +156,7 @@ void APlayerBase::SetupPlayerInputComponent( UInputComponent* PlayerInputCompone
 void APlayerBase::OnHitboxOverlap( UPrimitiveComponent* OverlappedComponent , AActor* OtherActor ,
 	UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep , const FHitResult& SweepResult )
 {
-	if (this == OtherActor || Cast<ABandage>( OtherActor ))
+	if (this == OtherActor || Cast<ABandage>( OtherActor ) || Cast<ASplint>(OtherActor) || Cast<AMedikit>( OtherActor ))
 	{
 		return;
 	}

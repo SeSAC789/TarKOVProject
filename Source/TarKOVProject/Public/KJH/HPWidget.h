@@ -44,44 +44,77 @@ public:
 	class UProgressBar* RightArmHp_Bar;
 
 
-	UFUNCTION( BlueprintCallable , Category = "Health" )
+	UFUNCTION( BlueprintCallable  )
 	float HeadHP() const;
 
-	UFUNCTION( BlueprintCallable , Category = "Health" )
+	UFUNCTION( BlueprintCallable  )
 	float LeftLegHP() const;
 
-	UFUNCTION( BlueprintCallable , Category = "Health" )
+	UFUNCTION( BlueprintCallable  )
 	float RightLegHP() const;
 
-	UFUNCTION( BlueprintCallable , Category = "Health" )
+	UFUNCTION( BlueprintCallable  )
 	float StomachHP() const;
 
-	UFUNCTION( BlueprintCallable , Category = "Health" )
+	UFUNCTION( BlueprintCallable  )
 	float ThoraxHP() const;
 
-	UFUNCTION( BlueprintCallable , Category = "Health" )
+	UFUNCTION( BlueprintCallable  )
 	float LeftArmHP() const;
 
-	UFUNCTION( BlueprintCallable , Category = "Health" )
+	UFUNCTION( BlueprintCallable  )
 	float RightArmHP() const;
 
 	UPROPERTY( EditDefaultsOnly, meta = (BindWidget))
+	class UImage* Head_Bleeding_Img;
+
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
+	class UImage* Thorax_Bleeding_Img;
+
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
+	class UImage* Stomach_Bleeding_Img;
+
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
+	class UImage* RightArm_Bleeding_Img;
+
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
+	class UImage* LeftArm_Bleeding_Img;
+
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
+	class UImage* RightLeg_Bleeding_Img;
+
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
+	class UImage* LeftLeg_Bleeding_Img;
+
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
 	class UImage* Bleeding_Img;
 
-	// 출혈 상태를 확인하여 가시성을 반환하는 함수 선언
-	UFUNCTION( BlueprintCallable , Category = "Health" )
+	
+	UFUNCTION( BlueprintCallable  )
+	ESlateVisibility GetBleedingVisibilityBodyPart( FName BodyPart ) const;
+
+	UFUNCTION( BlueprintCallable  )
 	ESlateVisibility GetBleedingVisibility() const;
+
+	UFUNCTION( BlueprintCallable )
+	ESlateVisibility GetFracturedVisibilityBodyPart( FName BodyPart ) const;
 
 	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
 	class UImage* Fracture_Img;
 
-	UFUNCTION( BlueprintCallable , Category = "Health" )
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
+	class UImage* RightLeg_Fracture_Img;
+
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
+	class UImage* LeftLeg_Fracture_Img;
+
+	UFUNCTION( BlueprintCallable  )
 	ESlateVisibility GetFractureVisibility() const;
 
 	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
 	class UImage* Pain_Img;
 
-	UFUNCTION( BlueprintCallable , Category = "Health" )
+	UFUNCTION( BlueprintCallable  )
 	ESlateVisibility GetPainVisibility() const;
 
 	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
@@ -105,12 +138,28 @@ public:
 	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
 	class UImage* RightLeg_Img;
 
-	UFUNCTION( BlueprintCallable , Category = "Health" )
+	UFUNCTION( BlueprintCallable )
 	void UpdateBodyPartImageColor( UImage* BodyPartImage , float HPPercentage ) const;
 
+	UFUNCTION( BlueprintCallable )
+	void UpdateStatusText();
+
 	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
-	class UProgressBar* StaminaDown_Bar;
-	
+	class UProgressBar* Stamina_Bar;
+
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
+	class UTextBlock* Bleeding_Text;
+
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
+	class UTextBlock* Fracture_Text;
+
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidgetAnim),Transient )
+	class UWidgetAnimation* HitAnimation;
+
+	void PlayAnim();
+	void UpdateStaminaBar();
+
+
 	/*UPROPERTY()
 	class UHealthComp* healthComp;*/
 };

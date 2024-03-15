@@ -5,7 +5,10 @@
 #include "KJH/HPWidget.h"
 #include "Blueprint/UserWidget.h"
 #include <Subsystems/PanelExtensionSubsystem.h>
+
+#include "JYJ/PlayerBase.h"
 #include "Net/UnrealNetwork.h"
+
 
 // Sets default values for this component's properties
 UHealthComp::UHealthComp()
@@ -52,6 +55,7 @@ void UHealthComp::BeginPlay()
 
 	// ...
 	statusComp = Cast<UStatusEffectComp>( GetOwner()->GetComponentByClass( UStatusEffectComp::StaticClass() ) );
+	me = Cast<APlayerBase>( GetOwner() );
 
 }
 
@@ -83,6 +87,7 @@ void UHealthComp::TakeDamage( const FName& BodyPart , float DamageAmount , const
 				float NewHP = GetBodyPartHealth( BodyPart ) - DamageAmount;
 				SetBodyPartHP( BodyPart , NewHP );
 
+				CheckAndApplyBleeding( BodyPart );
 				//BodyPartData.HP = FMath::Clamp<float>( BodyPartData.HP - DamageAmount , 0.0f , BodyPartData.MaxHP );
 
 				UE_LOG( LogTemp , Warning , TEXT( "%s 부위가 %f 만큼 데미지를 받았습니다 %s로 인해서 현재 남은 HP: %f" ) , *BodyPart.ToString() , DamageAmount , *HitObjectName , BodyPartData.HP );
@@ -92,8 +97,8 @@ void UHealthComp::TakeDamage( const FName& BodyPart , float DamageAmount , const
 			if ((BodyPart == FName( "Head" ) || BodyPart == FName( "Thorax" )) && BodyPartData.HP <= 0.0f && !isBleedingDamage)
 			{
 				bIsDead = true;
-				UE_LOG( LogTemp , Warning , TEXT( "%s 부위가  %s 로 인해 데미지 받아 즉시 사망." ) , *BodyPart.ToString() , *HitObjectName );
-				return; 
+				UE_LOG( LogTemp , Warning , TEXT( "%s 부위가 %s 로 인해 데미지 받아 즉시 사망." ) , *BodyPart.ToString() , *HitObjectName );
+				return;
 			}
 
 			if (BodyPartData.HP <= 0.0f)
@@ -112,8 +117,13 @@ void UHealthComp::TakeDamage( const FName& BodyPart , float DamageAmount , const
 		// 모든 신체 부위 체력이 0 이하인지 확인합니다.
 		CheckAndHandleTotalDepletion();
 		// 해당 부위에 출혈 및 골절 상태를 적용.
-		CheckAndApplyBleeding( BodyPart );
+		//CheckAndApplyBleeding( BodyPart );
 		CheckAndApplyFracture( BodyPart );
+		// 데미지 받으면 위젯 애님 재생
+		if (me && me->hpUI)
+		{
+			me->hpUI->PlayAnim();
+		}
 	}
 	else
 	{
@@ -326,6 +336,38 @@ FName UHealthComp::FindWeakestBodyPart()
 	}
 
 	return WeakestPart;
+}
+
+TArray<FName> UHealthComp::GetBleedingBodyParts() const
+{
+	TArray<FName> BleedingParts;
+	if (statusComp)
+	{
+		for (const FBodyPartHealthData& BodyPartData : BodyPartHP)
+		{
+			if (statusComp->IsBleeding( BodyPartData.BodyPart ))
+			{
+				BleedingParts.Add( BodyPartData.BodyPart );
+			}
+		}
+	}
+	return BleedingParts;
+}
+
+TArray<FName> UHealthComp::GetFracturedBodyParts() const
+{
+	TArray<FName> FracturedParts;
+	if (statusComp)
+	{
+		for (const FBodyPartHealthData& BodyPartData : BodyPartHP)
+		{
+			if (statusComp->IsFractured( BodyPartData.BodyPart ))
+			{
+				FracturedParts.Add( BodyPartData.BodyPart );
+			}
+		}
+	}
+	return FracturedParts;
 }
 
 void UHealthComp::GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const

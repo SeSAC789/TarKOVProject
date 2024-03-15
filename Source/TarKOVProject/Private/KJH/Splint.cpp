@@ -1,18 +1,14 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "KJH/Bandage.h"
+#include "KJH/Splint.h"
 
 #include "Components/BoxComponent.h"
-#include "Components/CapsuleComponent.h"
-#include "Components/SphereComponent.h"
-#include "JYJ/PlayerBase.h"
 #include "KJH/HealthComp.h"
 #include "KJH/StatusEffectComp.h"
 
-ABandage::ABandage()
+ASplint::ASplint()
 {
-  
     PrimaryActorTick.bCanEverTick = false;
 
     BoxComp = CreateDefaultSubobject<UBoxComponent>( TEXT( "BoxComp" ) );
@@ -25,25 +21,24 @@ ABandage::ABandage()
     BoxComp->SetCollisionEnabled( ECollisionEnabled::QueryOnly );
     BoxComp->SetCollisionResponseToAllChannels( ECR_Overlap );
     MeshComp->SetCollisionEnabled( ECollisionEnabled::NoCollision );
-
 }
 
-void ABandage::NotifyActorBeginOverlap(AActor* OtherActor)
+void ASplint::NotifyActorBeginOverlap(AActor* OtherActor)
 {
-    Super::NotifyActorBeginOverlap( OtherActor );
+	Super::NotifyActorBeginOverlap(OtherActor);
 
     UHealthComp* healthComp = Cast<UHealthComp>( OtherActor->GetComponentByClass( UHealthComp::StaticClass() ) );
     if (healthComp)
     {
-        TArray<FName> BleedingParts = healthComp->GetBleedingBodyParts();
-        for (FName BodyPart : BleedingParts)
+        TArray<FName> FracturedParts = healthComp->GetFracturedBodyParts();
+        for (FName BodyPart : FracturedParts)
         {
-            RemoveBleedingStatus( OtherActor , BodyPart );
+            RemoveFractureStatus( OtherActor , BodyPart );
         }
     }
 }
 
-void ABandage::RemoveBleedingStatus( AActor* OverlappedActor , FName OverlappedBodyPart )
+void ASplint::RemoveFractureStatus(AActor* OverlappedActor, FName OverlappedBodyPart)
 {
     if (!OverlappedActor)
     {
@@ -51,10 +46,10 @@ void ABandage::RemoveBleedingStatus( AActor* OverlappedActor , FName OverlappedB
     }
 
     UStatusEffectComp* StatusComp = Cast<UStatusEffectComp>( OverlappedActor->GetComponentByClass( UStatusEffectComp::StaticClass() ) );
-    if (StatusComp && StatusComp->IsBleeding( OverlappedBodyPart ))
+    if (StatusComp && StatusComp->IsFractured( OverlappedBodyPart ))
     {
-        StatusComp->ClearStatusEffect( EStatusEffectType::Bleeding , OverlappedBodyPart );
-        UE_LOG( LogTemp , Warning , TEXT( "ABandage::RemoveBleedingStatus, 출혈상태 해제: %s" ) , *OverlappedBodyPart.ToString() );
+        StatusComp->ClearStatusEffect( EStatusEffectType::Fracture , OverlappedBodyPart );
+        UE_LOG( LogTemp , Warning , TEXT( "ABandage::RemoveBleedingStatus, 골절상태 해제: %s" ) , *OverlappedBodyPart.ToString() );
     }
 }
 

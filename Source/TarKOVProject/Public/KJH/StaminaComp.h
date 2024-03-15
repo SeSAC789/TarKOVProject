@@ -24,4 +24,23 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+
+
+	UPROPERTY( EditDefaultsOnly , BlueprintReadOnly , Category = "Stamina" )
+	float MaxStamina = 100.0f;
+
+	UPROPERTY( VisibleAnywhere , BlueprintReadOnly , Category = "Stamina" )
+	float Stamina = MaxStamina;
+
+	// 스태미나 회복률
+	UPROPERTY( EditDefaultsOnly , BlueprintReadOnly , Category = "Stamina" )
+	float StaminaRecoveryRate = 1.0f;
+
+	// 스태미나 소모률
+	UPROPERTY( EditDefaultsOnly , BlueprintReadOnly , Category = "Stamina" )
+	float StaminaConsumptionRate = 1.0f;
+
+	void ConsumeStamina( float Amount );
+
+	void RecoverStamina( float DeltaTime );
 };

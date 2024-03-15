@@ -29,8 +29,20 @@ void UStaminaComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
-	//RecoverStamina( DeltaTime );
+	RecoverStamina( DeltaTime );
+}
+
+void UStaminaComp::ConsumeStamina(float Amount)
+{
+	Stamina = FMath::Clamp( Stamina - Amount , 0.0f , MaxStamina );
+}
+
+void UStaminaComp::RecoverStamina(float DeltaTime)
+{
+	if (Stamina < MaxStamina)
+	{
+		Stamina = FMath::Clamp( Stamina + StaminaRecoveryRate * DeltaTime , 0.0f , MaxStamina );
+	}
 }
 
 

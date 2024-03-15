@@ -65,7 +65,7 @@ public:
 	virtual void TickComponent( float DeltaTime , ELevelTick TickType , FActorComponentTickFunction* ThisTickFunction ) override;
 
 protected:
-	UPROPERTY( Replicated, VisibleAnywhere , BlueprintReadOnly , Category = "Status Effects" )
+	UPROPERTY( Replicated, VisibleAnywhere , BlueprintReadOnly  )
 	TArray<FStatusEffectData> StatusEffects;
 
 
@@ -83,11 +83,11 @@ public:
 	void ApplyPainEffect( FStatusEffectData& EffectData , float DeltaTime );
 
 
-	UFUNCTION( BlueprintCallable , Category = "Status Effects" )
-	bool IsBleeding() const;
+	UFUNCTION( BlueprintCallable  )
+	bool IsBleeding( FName BodyPart ) const;
 
-	UFUNCTION( BlueprintCallable , Category = "Status Effects" )
-	bool IsFractured() const;
+	UFUNCTION( BlueprintCallable  )
+	bool IsFractured( FName BodyPart ) const;
 
 	bool IsPain() const;
 
@@ -104,6 +104,8 @@ public:
 	class APainPostProcess* painPost;
 
 	FName FindWeakestBodyPart();
+	int32 GetBleedingCount() const;
+	int32 GetFractureCount() const;
 
 	virtual  void GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
 };

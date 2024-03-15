@@ -7,6 +7,8 @@
 #include "JYJ/PlayerBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "KJH/HealthComp.h"
+#include "Components/TextBlock.h"
+#include "KJH/StaminaComp.h"
 
 
 UHPWidget::UHPWidget( const FObjectInitializer& ObjectInitializer ) : Super( ObjectInitializer )
@@ -18,28 +20,40 @@ void UHPWidget::NativeTick( const FGeometry& MyGeometry , float InDeltaTime )
 {
 	Super::NativeTick( MyGeometry , InDeltaTime );
 
-	if (Bleeding_Img)
-	{
-		Bleeding_Img->SetVisibility( GetBleedingVisibility() );
-	}
+	// 츨혈
+	if (Head_Bleeding_Img) { Head_Bleeding_Img->SetVisibility( GetBleedingVisibilityBodyPart( TEXT( "Head" ) ) ); }
+	if (Thorax_Bleeding_Img) { Thorax_Bleeding_Img->SetVisibility( GetBleedingVisibilityBodyPart( TEXT( "Thorax" ) ) ); }
+	if (Stomach_Bleeding_Img) { Stomach_Bleeding_Img->SetVisibility( GetBleedingVisibilityBodyPart( TEXT( "Stomach" ) ) ); }
+	if (RightArm_Bleeding_Img) { RightArm_Bleeding_Img->SetVisibility( GetBleedingVisibilityBodyPart( TEXT( "RightArm" ) ) ); }
+	if (LeftArm_Bleeding_Img) { LeftArm_Bleeding_Img->SetVisibility( GetBleedingVisibilityBodyPart( TEXT( "LeftArm" ) ) ); }
+	if (RightLeg_Bleeding_Img) { RightLeg_Bleeding_Img->SetVisibility( GetBleedingVisibilityBodyPart( TEXT( "RightLeg" ) ) ); }
+	if (LeftLeg_Bleeding_Img) { LeftLeg_Bleeding_Img->SetVisibility( GetBleedingVisibilityBodyPart( TEXT( "LeftLeg" ) ) ); }
 
-	if (Fracture_Img)
-	{
-		Fracture_Img->SetVisibility( GetFractureVisibility() );
-	}
+	if (Bleeding_Img) { Bleeding_Img->SetVisibility( GetBleedingVisibility() ); }
 
-	if (Pain_Img)
-	{
-		Pain_Img->SetVisibility( GetPainVisibility() );
-	}
+	// 골절
+	if (RightLeg_Bleeding_Img) { RightLeg_Fracture_Img->SetVisibility( GetFracturedVisibilityBodyPart( TEXT( "RightLeg" ) ) ); }
+	if (LeftLeg_Bleeding_Img) { LeftLeg_Fracture_Img->SetVisibility( GetFracturedVisibilityBodyPart( TEXT( "LeftLeg" ) ) ); }
+
+	if (Fracture_Img) { Fracture_Img->SetVisibility( GetFractureVisibility() ); }
+
+
+
+	//if (Pain_Img)
+	//{
+	//	Pain_Img->SetVisibility( GetPainVisibility() );
+	//}
 
 	UpdateBodyPartImageColor( Head_Img , HeadHP() );
 	UpdateBodyPartImageColor( Thorax_Img , ThoraxHP() );
 	UpdateBodyPartImageColor( Stomach_Img , StomachHP() );
-	UpdateBodyPartImageColor( LeftArm_Img , LeftArmHP() );
-	UpdateBodyPartImageColor( RightArm_Img , RightArmHP() );
-	UpdateBodyPartImageColor( LeftLeg_Img , LeftLegHP() );
-	UpdateBodyPartImageColor( RightLeg_Img , RightLegHP() );
+	UpdateBodyPartImageColor( LeftArm_Img , RightArmHP() );
+	UpdateBodyPartImageColor( RightArm_Img , LeftArmHP() );
+	UpdateBodyPartImageColor( LeftLeg_Img , RightLegHP() );
+	UpdateBodyPartImageColor( RightLeg_Img , LeftLegHP() );
+
+	UpdateStatusText();
+	UpdateStaminaBar();
 }
 
 float UHPWidget::HeadHP() const
@@ -141,13 +155,41 @@ float UHPWidget::RightArmHP() const
 	return 0.0f;
 }
 
+ESlateVisibility UHPWidget::GetBleedingVisibilityBodyPart( FName BodyPart ) const
+{
+	APlayerBase* me = Cast<APlayerBase>( GetOwningPlayerPawn() );
+	if (me)
+	{
+		UStatusEffectComp* StatusEffectComp = me->FindComponentByClass<UStatusEffectComp>();
+		if (StatusEffectComp && StatusEffectComp->IsBleeding( BodyPart ))
+		{
+			return ESlateVisibility::Visible;
+		}
+	}
+	return ESlateVisibility::Hidden;
+}
+
 ESlateVisibility UHPWidget::GetBleedingVisibility() const
 {
 	APlayerBase* me = Cast<APlayerBase>( GetOwningPlayerPawn() );
 	if (me)
 	{
 		UStatusEffectComp* StatusEffectComp = me->FindComponentByClass<UStatusEffectComp>();
-		if (StatusEffectComp && StatusEffectComp->IsBleeding())
+		if (StatusEffectComp && StatusEffectComp->GetBleedingCount() > 0)
+		{
+			return ESlateVisibility::Visible;
+		}
+	}
+	return ESlateVisibility::Hidden;
+}
+
+ESlateVisibility UHPWidget::GetFracturedVisibilityBodyPart( FName BodyPart ) const
+{
+	APlayerBase* me = Cast<APlayerBase>( GetOwningPlayerPawn() );
+	if (me)
+	{
+		UStatusEffectComp* StatusEffectComp = me->FindComponentByClass<UStatusEffectComp>();
+		if (StatusEffectComp && StatusEffectComp->IsFractured( BodyPart ))
 		{
 			return ESlateVisibility::Visible;
 		}
@@ -161,7 +203,7 @@ ESlateVisibility UHPWidget::GetFractureVisibility() const
 	if (me)
 	{
 		UStatusEffectComp* StatusEffectComp = me->FindComponentByClass<UStatusEffectComp>();
-		if (StatusEffectComp && StatusEffectComp->IsFractured())
+		if (StatusEffectComp && StatusEffectComp->GetFractureCount() > 0)
 		{
 			return ESlateVisibility::Visible;
 		}
@@ -209,3 +251,57 @@ void UHPWidget::UpdateBodyPartImageColor( UImage* BodyPartImage , float HPPercen
 	}
 }
 
+void UHPWidget::UpdateStatusText()
+{
+	APlayerBase* me = Cast<APlayerBase>( GetOwningPlayerPawn() );
+	if (me)
+	{
+		UStatusEffectComp* StatusEffectComp = me->FindComponentByClass<UStatusEffectComp>();
+		if (StatusEffectComp)
+		{
+			int32 BleedingCount = StatusEffectComp->GetBleedingCount();
+			int32 FractureCount = StatusEffectComp->GetFractureCount();
+
+			// 출혈 상태이상 부위가 있다면 텍스트를 업데이트합니다.
+			if (BleedingCount > 0)
+			{
+				Bleeding_Text->SetText( FText::FromString( FString::Printf( TEXT( "%d" ) , BleedingCount ) ) );
+				Bleeding_Text->SetVisibility( ESlateVisibility::Visible );
+			}
+			else
+			{
+				Bleeding_Text->SetVisibility( ESlateVisibility::Collapsed );
+			}
+
+			// 골절 상태이상 부위가 있다면 텍스트를 업데이트합니다.
+			if (FractureCount > 0)
+			{
+				Fracture_Text->SetText( FText::FromString( FString::Printf( TEXT( "%d" ) , FractureCount ) ) );
+				Fracture_Text->SetVisibility( ESlateVisibility::Visible );
+			}
+			else
+			{
+				Fracture_Text->SetVisibility( ESlateVisibility::Collapsed );
+			}
+		}
+	}
+}
+
+void UHPWidget::PlayAnim()
+{
+	PlayAnimation( HitAnimation );
+}
+
+void UHPWidget::UpdateStaminaBar()
+{
+	APlayerBase* me = Cast<APlayerBase>( GetOwningPlayerPawn() );
+	if (me)
+	{
+		UStaminaComp* StaminaComp = me->FindComponentByClass<UStaminaComp>();
+		if (StaminaComp && Stamina_Bar)
+		{
+			float StaminaPercent = StaminaComp->Stamina / StaminaComp->MaxStamina;
+			Stamina_Bar->SetPercent( StaminaPercent );
+		}
+	}
+}

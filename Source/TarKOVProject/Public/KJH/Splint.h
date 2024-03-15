@@ -4,27 +4,27 @@
 
 #include "CoreMinimal.h"
 #include "KJH/HealItemBase.h"
-#include "Bandage.generated.h"
+#include "Splint.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class TARKOVPROJECT_API ABandage : public AHealItemBase
+class TARKOVPROJECT_API ASplint : public AHealItemBase
 {
 	GENERATED_BODY()
-
 public:
-	ABandage();
 
-	UPROPERTY( EditAnywhere , BlueprintReadWrite)
+	ASplint();
+
+	UPROPERTY( EditAnywhere , BlueprintReadWrite )
 	class UBoxComponent* BoxComp;
 
 	UPROPERTY( EditAnywhere , BlueprintReadWrite )
 	class UStaticMeshComponent* MeshComp;
 
 	UFUNCTION( BlueprintCallable )
-	void RemoveBleedingStatus( AActor* OverlappedActor , FName OverlappedBodyPart );
+	void RemoveFractureStatus( AActor* OverlappedActor , FName OverlappedBodyPart );
 
 	virtual void NotifyActorBeginOverlap( AActor* OtherActor ) override;
 };

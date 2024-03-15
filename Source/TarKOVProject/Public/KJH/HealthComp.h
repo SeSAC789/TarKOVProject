@@ -85,8 +85,19 @@ public:
 	// 가장 체력이 적은 부위를 찾는 함수
 	FName FindWeakestBodyPart();
 
+	// 출혈 상태이상이 있는 모든 신체 부위의 이름을 반환하는 함수
+	TArray<FName> GetBleedingBodyParts() const;
+
+	TArray<FName> GetFracturedBodyParts() const;
+
 	UPROPERTY()
 	class UStatusEffectComp* statusComp;
+
+	UPROPERTY()
+	class UHPWidget* hpUI;
+
+	UPROPERTY()
+	class APlayerBase* me;
 
 	virtual  void GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
 
