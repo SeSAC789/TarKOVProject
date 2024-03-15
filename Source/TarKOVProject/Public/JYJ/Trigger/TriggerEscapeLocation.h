@@ -26,6 +26,10 @@ private:
 	UPROPERTY( EditDefaultsOnly )
 	TSubclassOf<class UUserWidget> GameOverUIFactory;
 
-	
+	UPROPERTY()
+	class UGameClearWidget* GameClearUI;
+
+	UPROPERTY( EditDefaultsOnly )
+	TSubclassOf<class UUserWidget> GameClearUIFactory;
 	
 };
