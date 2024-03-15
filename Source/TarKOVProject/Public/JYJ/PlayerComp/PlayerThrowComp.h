@@ -6,6 +6,7 @@
 #include "JYJ/PlayerBaseComp.h"
 #include "PlayerThrowComp.generated.h"
 
+class ABombBase;
 /**
  * 
  */
@@ -20,7 +21,15 @@ public:
 	virtual void BeginPlay() override;
 	virtual void SetupInput( UEnhancedInputComponent* input ) override;
 
-	//void SpawnGrenade( TSubclassOf<ABombBase> BombFactory );
+	void SpawnGrenade( TSubclassOf<ABombBase> BombFactory );
+
+	UPROPERTY( EditDefaultsOnly )
+	class ABombBase* grenade;
+
+	UPROPERTY( EditDefaultsOnly )
+	TSubclassOf<class ABombBase> BombBase;
+
+	
 
 private:
 	UPROPERTY( EditAnywhere )

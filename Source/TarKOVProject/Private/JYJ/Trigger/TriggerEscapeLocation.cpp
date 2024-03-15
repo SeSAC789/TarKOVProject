@@ -23,7 +23,6 @@ void ATriggerEscapeLocation::OnTriggerBoxOverlap(UPrimitiveComponent* Overlapped
 	                           SweepResult);
 
 	// Test Mission Sucess UI
-
 	if(OtherActor == Cast<APlayerBase>(OtherActor))
 	{
 		FTimerHandle handler;

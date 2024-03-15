@@ -11,10 +11,13 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "JYJ/PlayerComp/PlayerFireComp.h"
+#include "JYJ/PlayerComp/PlayerThrowComp.h"
 
 AYJTestPlayer::AYJTestPlayer()
 {
-	
+	//Test ThrowComp
+	//throwComp = CreateDefaultSubobject<UPlayerThrowComp>( TEXT( "throwComp" ) );
+
 }
 
 void AYJTestPlayer::BeginPlay()

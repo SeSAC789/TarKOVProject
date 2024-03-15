@@ -16,6 +16,7 @@
 #include "KJH/HPWidget.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/PostProcessComponent.h"
+#include "JYJ/PlayerComp/PlayerThrowComp.h"
 #include "KJH/Bandage.h"
 #include "KJH/StaminaComp.h"
 
@@ -99,7 +100,7 @@ APlayerBase::APlayerBase()
 	fireComp = CreateDefaultSubobject<UPlayerFireComp>( TEXT( "fireComp" ) );
 	statusComp = CreateDefaultSubobject<UStatusEffectComp>( TEXT( "statusComp" ) );
 	staminaComp = CreateDefaultSubobject<UStaminaComp>( TEXT( "staminaComp" ) );
-	
+	throwComp = CreateDefaultSubobject<UPlayerThrowComp>( TEXT( "throwComp" ) );
 	
 }
 

@@ -3,6 +3,7 @@
 #include "JYJ/PlayerComp/PlayerThrowComp.h"
 #include "JYJ/Animation/PlayerAnimInstance.h"
 #include "JYJ/PlayerBase.h"
+#include "JYJ/Weapon/BombBase.h"
 #include "EnhancedInputComponent.h"
 
 UPlayerThrowComp::UPlayerThrowComp()
@@ -30,25 +31,25 @@ void UPlayerThrowComp::SetupInput(UEnhancedInputComponent* input)
 
 void UPlayerThrowComp::throwBomb()
 {
-	//SpawnGrenade( GrenadeBomb );
+	SpawnGrenade( BombBase);
 
 	FTimerHandle handler;
 	GetWorld()->GetTimerManager().SetTimer( handler , [&]()
 	{
-		//grenade->explosiveBomb();
+		grenade->explosiveBomb();
 
-	} , 10 , false );
+	} , 5 , false );
 	
 }
 
-/*
-void UPlayerThrowComp::SpawnGrenade(TSubclassOf<ABombBase> BombFactory)
+
+void UPlayerThrowComp::SpawnGrenade( TSubclassOf<ABombBase> BombFactory )
 {
 	if (!me) { return; }
 
 	if (BombFactory)
 	{
-		grenade = GetWorld()->SpawnActor<ABombBase>( BombFactory , me->GetActorLocation() , FRotator::ZeroRotator );
+		grenade = GetWorld()->SpawnActor<ABombBase>( BombFactory , me->GetActorLocation() , me->GetActorRotation() );
 
 		if (grenade)
 		{
@@ -59,4 +60,3 @@ void UPlayerThrowComp::SpawnGrenade(TSubclassOf<ABombBase> BombFactory)
 
 	}
 }
-*/

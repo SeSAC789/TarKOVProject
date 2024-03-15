@@ -4,6 +4,7 @@
 #include "JYJ/PlayerBase.h"
 #include "EngineUtils.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "KJH/HealthComp.h"
 
 // Sets default values
@@ -21,7 +22,7 @@ ABombBase::ABombBase()
 		GrenadeMesh->SetStaticMesh( tmpMesh.Object );
 		GrenadeMesh->SetWorldScale3D( FVector( 1.1f ) );
 
-		GrenadeMesh->SetCollisionEnabled( ECollisionEnabled::NoCollision );
+		//GrenadeMesh->SetCollisionEnabled( ECollisionEnabled::NoCollision );
 	}
 
 	if (!throwDir)
@@ -29,13 +30,15 @@ ABombBase::ABombBase()
 		// 이 컴포넌트를 사용하여 이 발사체의 이동을 주도합니다.
 		throwDir = CreateDefaultSubobject<UProjectileMovementComponent>( TEXT( "ProjectileMovementComponent" ) );
 		//throwDir->SetUpdatedComponent();
-		throwDir->InitialSpeed = 3000.0f;
-		throwDir->MaxSpeed = 3000.0f;
-		throwDir->bRotationFollowsVelocity = true;
-		throwDir->bShouldBounce = true;
+		throwDir->InitialSpeed = 800.0f;
+		throwDir->MaxSpeed = 8000.0f;
+		//throwDir->bRotationFollowsVelocity = true;
+		throwDir->bShouldBounce = false;
 		throwDir->Bounciness = 0.3f;
 		throwDir->ProjectileGravityScale = 0.0f;
 	}
+
+	GrenadeMesh->SetSimulatePhysics(true);
 
 
 }
@@ -52,11 +55,12 @@ void ABombBase::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
 
+	DrawDebugSphere( GetWorld() , GetActorLocation() , detectRadius , 32 , FColor::Cyan , false , 0 );
+
 }
 
 void ABombBase::explosiveBomb()
 {
-	DrawDebugSphere( GetWorld() , GetActorLocation() , detectRadius , 32 , FColor::Cyan , false , 0 );
 
 	//레벨에 있는 ANetTPSCharacter 객체들을 다 검사해서 detectRadius안에 있고 그중에서도 가장 가까운 녀석을 내 오너로 하고 싶다.
 	if (HasAuthority())	//서버
@@ -68,11 +72,11 @@ void ABombBase::explosiveBomb()
 			APlayerBase* player = *It;
 
 			// TakeDamage 하는 동작 필요
-
+			//if()
 			//FName BodyPart = HitComp->ComponentTags[0];
 			//FString HitObjectName = OutHit.GetComponent()->GetName();
 
-			//player->HealthComp->TakeDamage()
+			//player->HealthComp->TakeDamage();
 			//상대방과 나의 거리를 측정해서 tempDist보다 가깝다면 newOwner로 기억하고 싶다
 			/*
 			float temp = player->GetDistanceTo( this );
@@ -87,5 +91,10 @@ void ABombBase::explosiveBomb()
 		}
 
 	}
+
+	UGameplayStatics::SpawnEmitterAtLocation( GetWorld() , ExplosionVFXFactory , this->GetActorLocation() );
+	this->Destroy( true );
+
+
 }
 

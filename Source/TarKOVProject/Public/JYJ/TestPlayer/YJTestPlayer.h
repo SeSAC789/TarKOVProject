@@ -22,6 +22,8 @@ public:
 
 	virtual void PossessedBy(AController* NewController) override;
 
-private:
+	// Throw Comp Test
+	//UPROPERTY( VisibleAnywhere , BlueprintReadOnly , Category = "Components" )
+	//class UPlayerThrowComp* throwComp;
 	
 };

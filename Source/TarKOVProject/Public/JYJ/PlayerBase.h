@@ -120,6 +120,8 @@ public:
 	UPROPERTY( EditDefaultsOnly , BlueprintReadOnly , Category = "Components" )
 	class UStaminaComp* staminaComp;
 
+	UPROPERTY( VisibleAnywhere , BlueprintReadOnly , Category = "Components" )
+	class UPlayerThrowComp* throwComp;
 	
 	void SetPartitionDamageCollision();
 
