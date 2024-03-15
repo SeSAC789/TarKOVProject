@@ -82,7 +82,7 @@ void UHealthComp::TakeDamage( const FName& BodyPart , float DamageAmount , const
 			if ((BodyPart == FName( "Head" ) || BodyPart == FName( "Thorax" )) && BodyPartData.HP <= 0.0f && !isBleedingDamage)
 			{
 				bIsDead = true;
-				invenDie();
+				me->invenDie();
 				UE_LOG( LogTemp , Warning , TEXT( "%s 부위가 %s 로 인해 데미지 받아 즉시 사망." ) , *BodyPart.ToString() , *HitObjectName );
 				return;
 			}
@@ -135,7 +135,7 @@ void UHealthComp::CheckAndHandleTotalDepletion()
 	if (bIsDead)
 	{
 		UE_LOG( LogTemp , Warning , TEXT( "모든 부위 hp가 다 0이 되어 죽음." ) );
-		invenDie();
+		me->invenDie();
 		
 	}
 }
@@ -343,7 +343,4 @@ void UHealthComp::GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLife
 	DOREPLIFETIME( UHealthComp , bIsDead );
 }
 
-void UHealthComp::invenDie()
-{
-}
 

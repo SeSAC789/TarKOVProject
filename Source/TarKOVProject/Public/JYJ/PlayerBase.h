@@ -132,5 +132,9 @@ public:
 
 	UPROPERTY( EditDefaultsOnly )
 	TSubclassOf<class UUserWidget> hpUIFactory;
+
+
+	UFUNCTION( BlueprintImplementableEvent )
+	void invenDie();
 };
 
