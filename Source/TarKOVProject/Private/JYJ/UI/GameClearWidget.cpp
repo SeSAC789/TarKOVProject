@@ -9,7 +9,7 @@ void UGameClearWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	PlayAnimation(GameClearAnimation);
+	PlayAnimation(GameClearAnimation, 0, 0);
 
 	btn_restart->OnClicked.AddDynamic( this , &UGameClearWidget::OnClickbtnRestart ); 
 	btn_quit->OnClicked.AddDynamic( this , &UGameClearWidget::OnClickbtnQuit );

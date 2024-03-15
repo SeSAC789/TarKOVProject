@@ -104,6 +104,7 @@ void UPlayerAnimInstance::AnimNotify_OnGameOver()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Before Create Widget"))
 
+	/*
 	GameOverUI = CreateWidget<UGameOverWidget>( GetWorld() , GameOverUIFactory );
 	GameOverUI->AddToViewport();
 
@@ -116,5 +117,6 @@ void UPlayerAnimInstance::AnimNotify_OnGameOver()
 	{
 
 	}
+	*/
 	
 }
