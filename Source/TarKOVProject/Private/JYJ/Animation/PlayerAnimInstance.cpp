@@ -2,6 +2,8 @@
 
 
 #include "JYJ/Animation/PlayerAnimInstance.h"
+#include "JYJ/GameOverWidget.h"
+#include "Blueprint/UserWidget.h"
 #include "JYJ/PlayerComp/PlayerMoveComp.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "JYJ/PlayerBase.h"
@@ -35,7 +37,6 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	if (nullptr == player )
 		return;
-
 
 
 	
@@ -97,4 +98,23 @@ void UPlayerAnimInstance::playReloadPistolAnimation()
 	{
 		player->PlayAnimMontage( reloadMontage , 1 , TEXT( "Pistol" ) );
 	}
+}
+
+void UPlayerAnimInstance::AnimNotify_OnGameOver()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Before Create Widget"))
+
+	GameOverUI = CreateWidget<UGameOverWidget>( GetWorld() , GameOverUIFactory );
+	GameOverUI->AddToViewport();
+
+	UE_LOG( LogTemp , Warning , TEXT( "After Create Widget" ) )
+
+	auto pc = GetWorld()->GetFirstPlayerController();
+	pc->SetShowMouseCursor( true );
+
+	if(GameOverUI)
+	{
+
+	}
+	
 }

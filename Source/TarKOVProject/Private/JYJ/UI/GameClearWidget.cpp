@@ -1,25 +1,27 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "JYJ/GameOverWidget.h"
+#include "JYJ/UI/GameClearWidget.h"
 #include "Components/Button.h"
 #include "JYJ/Controller/TarKOVPlayerController.h"
 
-void UGameOverWidget::NativeConstruct()
+void UGameClearWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	btn_restart->OnClicked.AddDynamic( this , &UGameOverWidget::OnClickbtnRestart );
-	btn_quit->OnClicked.AddDynamic(this, &UGameOverWidget::OnClickbtnQuit );
+	PlayAnimation(GameClearAnimation);
+
+	btn_restart->OnClicked.AddDynamic( this , &UGameClearWidget::OnClickbtnRestart ); 
+	btn_quit->OnClicked.AddDynamic( this , &UGameClearWidget::OnClickbtnQuit );
 }
 
-void UGameOverWidget::OnClickbtnQuit()
+void UGameClearWidget::OnClickbtnQuit()
 {
 	auto pc = Cast<ATarKOVPlayerController>( GetWorld()->GetFirstPlayerController() );
 	pc->Pause();
 }
 
-void UGameOverWidget::OnClickbtnRestart()
+void UGameClearWidget::OnClickbtnRestart()
 {
 	//플레이어 컨트롤러를 가져오고 싶다.
 	auto pc = Cast<ATarKOVPlayerController>( GetWorld()->GetFirstPlayerController() );
@@ -33,6 +35,6 @@ void UGameOverWidget::OnClickbtnRestart()
 		//server retry를 호출하고 싶다.
 		pc->ServerRetry();
 
-		
+
 	}
 }

@@ -5,14 +5,13 @@
 #include "GPUMessaging.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/BoxComponent.h"
-#include "JYJ/GameOverWidget.h"
+#include "JYJ/UI/GameClearWidget.h"
 #include "JYJ/PlayerBase.h"
 #include "JYJ/Controller/TarKOVPlayerController.h"
 
 ATriggerEscapeLocation::ATriggerEscapeLocation()
 {
 	TriggerBox->OnComponentBeginOverlap.AddDynamic( this , &ATriggerEscapeLocation::OnTriggerBoxOverlap );
-
 
 }
 
@@ -29,11 +28,19 @@ void ATriggerEscapeLocation::OnTriggerBoxOverlap(UPrimitiveComponent* Overlapped
 		GetWorld()->GetTimerManager().SetTimer( handler , [&]()
 		{
 				//나중엔 Game Clear UI Open
+				//GameOverUI = CreateWidget<UGameOverWidget>(GetWorld(), GameOverUIFactory);
+				//GameOverUI->AddToViewport();
+
+				GameClearUI = CreateWidget<UGameClearWidget>(GetWorld(), GameClearUIFactory);
+				GameClearUI->AddToViewport();
+
+				auto pc = GetWorld()->GetFirstPlayerController();
+				pc->SetShowMouseCursor( true );
 
 				//10초 뒤, 탈출 Log 출력
 				UE_LOG( LogTemp , Warning , TEXT( "ATriggerEscapeLocation::OnTriggerBoxOverlap" ) )
 
-		} , 10, false );
+		} , 5, false );
 
 	}
 

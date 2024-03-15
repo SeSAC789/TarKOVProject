@@ -63,10 +63,19 @@ public:
 	UPROPERTY( EditDefaultsOnly )
 	class UAnimMontage* reloadMontage;
 
+	UPROPERTY()
+	class UGameOverWidget* GameOverUI;
+
+	UPROPERTY( EditDefaultsOnly )
+	TSubclassOf<class UUserWidget> GameOverUIFactory;
+
 	void playFireRifleAnimation();
 	void playFirePistolAnimation();
 
 	void playReloadRifleAnimation();
 	void playReloadPistolAnimation();
+
+	UFUNCTION()
+	void AnimNotify_OnGameOver();
 	
 };
