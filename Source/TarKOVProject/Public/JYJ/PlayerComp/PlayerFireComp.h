@@ -88,6 +88,12 @@ public:
 	UPROPERTY( Replicated , EditAnywhere , BlueprintReadWrite )
 	bool bAimRifle;
 
+	UPROPERTY( Replicated , EditAnywhere , BlueprintReadOnly )
+	FVector AimStartPoint;
+
+	UPROPERTY( Replicated, EditAnywhere , BlueprintReadOnly )
+	FVector AimEndPoint;
+
 	UPROPERTY( EditAnywhere , BlueprintReadOnly )
 	EWeaponAim aim;
 
@@ -125,23 +131,11 @@ private:
 
 	//-----------------NetWork-----------------//
 public:
-	// client to server. 손에 붙여 주세요. (총 액터의 포인터)
-	UFUNCTION( Server , Reliable )
-	void ServerRPCSpawnPistol( TSubclassOf<APistolGun> GunFactory );				
 
-	// server to multi. 손에 붙이세요. (총 액터의 포인터)
-	UFUNCTION( NetMulticast , Reliable )
-	void MultiRPCSpawnPistol( APistolGun* OwnPistol );
-
-	// client to server. 손에 붙여 주세요. (총 액터의 포인터)
-	UFUNCTION( Server , Reliable )
-	void ServerRPCSpawnRifle( TSubclassOf<ARifleGun> GunFactory );
-
-	// server to multi. 손에 붙이세요. (총 액터의 포인터)
-	UFUNCTION( NetMulticast , Reliable )
-	void MultiRPCSpawnRifle( ARifleGun* OwnRifle );
 
 private:
+	void PrintNetLog();
+
 	// Selected Pistol
 	// client to server.
 	UFUNCTION( Server , Reliable )
@@ -151,16 +145,14 @@ private:
 	UFUNCTION( NetMulticast , Reliable )
 	void MultiRPCSelectedPistol( APistolGun* selectedPistol );				
 
-		
-
-	//SelectedPistol
+	//Selected Rifle
 	// client to server.
 	UFUNCTION( Server , Reliable )
-	void ServerRPCSelectedRifle( ARifleGun* selectedPistol );				
+	void ServerRPCSelectedRifle( ARifleGun* selectedRifle );				
 
 	// server to multi.
 	UFUNCTION( NetMulticast , Reliable )
-	void MultiRPCSelectedRifle( ARifleGun* selectedPistol );				
+	void MultiRPCSelectedRifle( ARifleGun* selectedRifle );
 
 	//Fire
 	// client to server.
@@ -169,7 +161,8 @@ private:
 
 	// server to multi.
 	UFUNCTION( NetMulticast , Reliable )
-	void MultiRPCFirePistol( bool bHit, const FHitResult& hitInfo );		
+	void MultiRPCFirePistol( FHitResult OutHits );
+
 
 	// client to server.
 	UFUNCTION( Server , Reliable )

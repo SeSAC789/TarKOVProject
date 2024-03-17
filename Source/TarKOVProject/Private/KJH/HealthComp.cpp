@@ -355,4 +355,8 @@ void UHealthComp::GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLife
 	DOREPLIFETIME( UHealthComp , bIsDead );
 }
 
+void UHealthComp::invenDie()
+{
+}
+
 

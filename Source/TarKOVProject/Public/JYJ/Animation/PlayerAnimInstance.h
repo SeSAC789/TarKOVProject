@@ -63,6 +63,9 @@ public:
 	UPROPERTY( EditDefaultsOnly )
 	class UAnimMontage* reloadMontage;
 
+	UPROPERTY( EditDefaultsOnly )
+	class UAnimMontage* grenadeMontage;
+
 	UPROPERTY()
 	class UGameOverWidget* GameOverUI;
 
@@ -75,7 +78,12 @@ public:
 	void playReloadRifleAnimation();
 	void playReloadPistolAnimation();
 
+	void playGrenadeAnimation();
+
 	UFUNCTION()
 	void AnimNotify_OnGameOver();
+
+	UFUNCTION()
+	void AnimNotify_OnThrowGrenade();
 	
 };

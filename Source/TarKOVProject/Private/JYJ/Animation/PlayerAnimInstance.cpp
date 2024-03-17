@@ -8,11 +8,13 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "JYJ/PlayerBase.h"
 #include "JYJ/PlayerComp/PlayerFireComp.h"
+#include "JYJ/PlayerComp/PlayerThrowComp.h"
 #include "JYJ/TestPlayer/YJTestPlayer.h"
 #include "KJH/HealthComp.h"
 
 UPlayerAnimInstance::UPlayerAnimInstance()
 {
+	// Animation Montage Load
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> AM_Fire( TEXT( "/Script/Engine.AnimMontage'/Game/TarKOV/JYJ/Blueprints/Animation/MontageFireRifle.MontageFireRifle'" ) );
 
 	if (AM_Fire.Succeeded())
@@ -25,6 +27,13 @@ UPlayerAnimInstance::UPlayerAnimInstance()
 	if (AM_Reload.Succeeded())
 	{
 		reloadMontage = AM_Reload.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> AM_Grenade( TEXT( "/Script/Engine.AnimMontage'/Game/TarKOV/JYJ/Blueprints/Animation/MontageGrenade.MontageGrenade'" ) );
+
+	if (AM_Grenade.Succeeded())
+	{
+		grenadeMontage = AM_Grenade.Object;
 	}
 }
 
@@ -40,7 +49,7 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 
 	
-	//2. 오너의 velocity, forwward vector, right vector를 가져오고 싶다.
+	//2. 오너의 velocity, forward vector, right vector를 가져오고 싶다.
 	FVector v = player->GetVelocity();
 	FVector forward = player->GetActorForwardVector();
 	FVector right = player->GetActorRightVector();
@@ -69,7 +78,7 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 void UPlayerAnimInstance::playFireRifleAnimation( )
 {
-	if(!Montage_Play(fireMontage))
+	if(Montage_Play(fireMontage))
 	{
 		player->PlayAnimMontage( fireMontage , 1 , TEXT( "Rifle" ) );
 	}
@@ -78,7 +87,7 @@ void UPlayerAnimInstance::playFireRifleAnimation( )
 
 void UPlayerAnimInstance::playFirePistolAnimation()
 {
-	if (!Montage_Play( fireMontage ))
+	if (Montage_Play( fireMontage ))
 	{
 		player->PlayAnimMontage( fireMontage , 1 , TEXT( "Pistol" ) );
 	}
@@ -86,7 +95,7 @@ void UPlayerAnimInstance::playFirePistolAnimation()
 
 void UPlayerAnimInstance::playReloadRifleAnimation()
 {
-	if(!Montage_Play(reloadMontage))
+	if(Montage_Play(reloadMontage))
 	{
 		player->PlayAnimMontage( reloadMontage , 1 , TEXT( "Rifle" ) );
 	}
@@ -94,15 +103,23 @@ void UPlayerAnimInstance::playReloadRifleAnimation()
 
 void UPlayerAnimInstance::playReloadPistolAnimation()
 {
-	if (!Montage_Play( reloadMontage ))
+	if (Montage_Play( reloadMontage ))
 	{
 		player->PlayAnimMontage( reloadMontage , 1 , TEXT( "Pistol" ) );
 	}
 }
 
+void UPlayerAnimInstance::playGrenadeAnimation()
+{
+	if (Montage_Play( grenadeMontage ))
+	{
+		player->PlayAnimMontage( grenadeMontage );
+	}
+
+}
+
 void UPlayerAnimInstance::AnimNotify_OnGameOver()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Before Create Widget"))
 
 	/*
 	GameOverUI = CreateWidget<UGameOverWidget>( GetWorld() , GameOverUIFactory );
@@ -119,4 +136,9 @@ void UPlayerAnimInstance::AnimNotify_OnGameOver()
 	}
 	*/
 	
+}
+
+void UPlayerAnimInstance::AnimNotify_OnThrowGrenade()
+{
+	player->throwComp->throwBomb();
 }

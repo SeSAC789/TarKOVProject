@@ -1,6 +1,9 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "JYJ/PlayerComp/PlayerThrowComp.h"
+
+#include <iso646.h>
+
 #include "JYJ/Animation/PlayerAnimInstance.h"
 #include "JYJ/PlayerBase.h"
 #include "JYJ/Weapon/BombBase.h"
@@ -26,7 +29,12 @@ void UPlayerThrowComp::SetupInput(UEnhancedInputComponent* input)
 	if (nullptr == input) return;
 
 	// Bomb
-	input->BindAction( BombThrowAction , ETriggerEvent::Started , this , &UPlayerThrowComp::throwBomb );
+	input->BindAction( BombThrowAction , ETriggerEvent::Started , this , &UPlayerThrowComp::InputThrow );
+}
+
+void UPlayerThrowComp::InputThrow()
+{
+	PlayerAnim->playGrenadeAnimation();
 }
 
 void UPlayerThrowComp::throwBomb()
@@ -54,6 +62,8 @@ void UPlayerThrowComp::SpawnGrenade( TSubclassOf<ABombBase> BombFactory )
 		if (grenade)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("UPlayerThrowComp::SpawnGrenade - Success"))
+			grenade->AttachToComponent( me->pistolComp , FAttachmentTransformRules::SnapToTargetNotIncludingScale );
+			grenade->SetOwner( me );
 			//OnRep_Pistol();
 		}
 		//ServerRPCSpawnPistol(GunFactory);

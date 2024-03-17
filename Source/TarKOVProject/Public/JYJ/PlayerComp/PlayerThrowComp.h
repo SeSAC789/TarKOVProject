@@ -21,7 +21,10 @@ public:
 	virtual void BeginPlay() override;
 	virtual void SetupInput( UEnhancedInputComponent* input ) override;
 
+	void InputThrow();
+
 	void SpawnGrenade( TSubclassOf<ABombBase> BombFactory );
+	void throwBomb();
 
 	UPROPERTY( EditDefaultsOnly )
 	class ABombBase* grenade;
@@ -38,7 +41,7 @@ private:
 	UPROPERTY( EditAnywhere , BlueprintReadOnly , Category = Input , meta = (AllowPrivateAccess = "true") )
 	class UInputAction* BombThrowAction;
 
-	void throwBomb();
+	
 
 	//UPROPERTY( EditDefaultsOnly )
 	//class ABombBase* grenade;

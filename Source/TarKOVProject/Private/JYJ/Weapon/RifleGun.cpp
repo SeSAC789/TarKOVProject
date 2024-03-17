@@ -14,7 +14,7 @@ ARifleGun::ARifleGun()
 	if (tmpMesh.Succeeded())
 	{
 		GunMeshComp->SetSkeletalMesh( tmpMesh.Object );
-		GunMeshComp->SetWorldScale3D( FVector( 1.1f ) );
+		GunMeshComp->SetWorldScale3D( FVector( 0.8f ) );
 		//GunMeshComp->SetRelativeRotation( FRotator( 40 , -100 , 80 ) );
 	}
 

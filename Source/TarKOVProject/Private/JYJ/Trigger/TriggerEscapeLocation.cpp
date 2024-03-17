@@ -11,6 +11,7 @@
 
 ATriggerEscapeLocation::ATriggerEscapeLocation()
 {
+	// Collision Setting
 	TriggerBox->OnComponentBeginOverlap.AddDynamic( this , &ATriggerEscapeLocation::OnTriggerBoxOverlap );
 
 }
@@ -27,10 +28,6 @@ void ATriggerEscapeLocation::OnTriggerBoxOverlap(UPrimitiveComponent* Overlapped
 		FTimerHandle handler;
 		GetWorld()->GetTimerManager().SetTimer( handler , [&]()
 		{
-				//나중엔 Game Clear UI Open
-				//GameOverUI = CreateWidget<UGameOverWidget>(GetWorld(), GameOverUIFactory);
-				//GameOverUI->AddToViewport();
-
 				GameClearUI = CreateWidget<UGameClearWidget>(GetWorld(), GameClearUIFactory);
 				GameClearUI->AddToViewport();
 
