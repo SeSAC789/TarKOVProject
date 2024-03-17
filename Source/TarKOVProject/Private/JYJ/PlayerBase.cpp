@@ -86,8 +86,8 @@ APlayerBase::APlayerBase()
 
 	// Rifle Hand Socket Settings
 	rifleComp = CreateDefaultSubobject<USceneComponent>( TEXT( "rifleComp" ) );
-	rifleComp->SetupAttachment(GetMesh(), TEXT("RifleSocket"));
-	rifleComp->SetRelativeRotation(FRotator(0, 0, -10));
+	rifleComp->SetupAttachment(GetMesh(), TEXT("RifleSocket1"));
+	//rifleComp->SetRelativeRotation(FRotator(0, 0, -10));
 
 	// Pistol Hand Socket Settings
 	pistolComp = CreateDefaultSubobject<USceneComponent>( TEXT( "pistolComp" ) );

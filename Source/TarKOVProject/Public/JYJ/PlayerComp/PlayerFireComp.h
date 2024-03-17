@@ -170,7 +170,7 @@ private:
 
 	// server to multi.
 	UFUNCTION( NetMulticast , Reliable )
-	void MultiRPCFireRifle( bool bHit , const FHitResult& hitInfo );
+	void MultiRPCFireRifle( FHitResult OutHits );
 
 
 	//Reload

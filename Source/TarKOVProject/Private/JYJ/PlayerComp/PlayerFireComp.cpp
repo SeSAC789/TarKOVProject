@@ -88,13 +88,6 @@ void UPlayerFireComp::ChoosePistol()
 
 void UPlayerFireComp::ChooseRifle()
 {
-	/*
-	if(GEngine)
-	{
-		FString Message = FString::Printf( TEXT( "Input by %s" ) , *GetOwner()->GetName() );
-		GEngine->AddOnScreenDebugMessage( -1 , 10 , FColor::Red , Message );
-	}*/
-
 	ServerRPCSelectedRifle(rifle);
 }
 
@@ -118,7 +111,6 @@ void UPlayerFireComp::SpawnPistol(TSubclassOf<APistolGun> GunFactory)
 
 void UPlayerFireComp::SpawnRifle(TSubclassOf<ARifleGun> rifleFactory)
 {
-
 	if(!me ){return;}
 
 	if (rifleFactory)
@@ -389,8 +381,8 @@ void UPlayerFireComp::MultiRPCFirePistol_Implementation( FHitResult OutHits )
 
 	// Client Gun Start, End Point Settings
 	FTransform t = pistol->pistolMesh->GetSocketTransform( TEXT( "Muzzle" ) );
-	FVector _Start = AimStartPoint;
-	FVector _End = AimEndPoint;
+	FVector _Start = pistol->pistolMesh->GetSocketLocation( TEXT( "Muzzle" ) );
+	FVector _End = pistol->AimCamSocket->GetForwardVector() * 100000;
 	bool bHits = GetWorld()->LineTraceSingleByChannel( OutHits , _Start , _End , ECollisionChannel::ECC_Visibility , Params );
 
 	DrawDebugLine( GetWorld() , t.GetLocation() , _End , FColor::Silver , false , 0.2f );
@@ -399,52 +391,47 @@ void UPlayerFireComp::MultiRPCFirePistol_Implementation( FHitResult OutHits )
 
 void UPlayerFireComp::ServerRPCFireRifle_Implementation()
 {
+	// Ammo Cnt
 	if (rifle->currentAmmo <= 0) return;
 	rifle->currentAmmo--;
+	UE_LOG( LogTemp , Warning , TEXT( "%d" ) , rifle->currentAmmo );
 
+	// Gun Start, End Point Settings
+	AimStartPoint = rifle->GunMeshComp->GetSocketLocation( TEXT( "Muzzle" ) );
+	AimEndPoint = rifle->AimCamSocket->GetForwardVector() * 100000;
+
+	// Param Settings
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor( me );
+	Params.AddIgnoredActor( rifle );
+	Params.AddIgnoredActor( pistol );
+
+	// Aim, Fire Network Connection
 	FHitResult OutHit;
-	FVector Start = rifle->GunMeshComp->GetSocketLocation( TEXT( "Muzzle" ) );
-
-	if (!me->fireComp->bAimRifle)
-	{
-		FVector End = me->FollowCamera->GetForwardVector() * 100000;
-
-		FCollisionQueryParams Params;
-
-		Params.AddIgnoredActor( me );
-		Params.AddIgnoredActor( rifle );
-		Params.AddIgnoredActor( pistol );
-
-		bool bHits = GetWorld()->LineTraceSingleByChannel( OutHit , Start , End , ECollisionChannel::ECC_Visibility , Params );
-		SetAiming( OutHit , Start , End );
-
-		MultiRPCFireRifle( bHits , OutHit );
-	}
-	else
-	{
-		FVector End = rifle->AimCamSocket->GetForwardVector() * 100000;
-		SetAiming( OutHit , Start , End );
-
-		FCollisionQueryParams Params;
-
-		Params.AddIgnoredActor( me );
-		Params.AddIgnoredActor( rifle );
-		Params.AddIgnoredActor( pistol );
-
-		bool bHits = GetWorld()->LineTraceSingleByChannel( OutHit , Start , End , ECollisionChannel::ECC_Visibility , Params );
-
-		MultiRPCFireRifle( bHits , OutHit );
-	}
+	bool bHits = GetWorld()->LineTraceSingleByChannel( OutHit , AimStartPoint , AimEndPoint , ECollisionChannel::ECC_Visibility , Params );
+	MultiRPCFireRifle( OutHit );
+	SetAiming( OutHit , AimStartPoint , AimEndPoint );
 }
 
-void UPlayerFireComp::MultiRPCFireRifle_Implementation( bool bHit , const FHitResult& hitInfo )
+void UPlayerFireComp::MultiRPCFireRifle_Implementation( FHitResult OutHits )
 {
 	PlayerAnim->playFireRifleAnimation();
 
-	if (bHit)
-	{
-		UGameplayStatics::SpawnEmitterAtLocation( GetWorld() , ExplosionVFXFactory , hitInfo.ImpactPoint );
-	}
+	// Param Settings
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor( me );
+	Params.AddIgnoredActor( rifle );
+	Params.AddIgnoredActor( pistol );
+
+	// Client Gun Start, End Point Settings
+	FTransform t = rifle->GunMeshComp->GetSocketTransform( TEXT( "Muzzle" ) );
+	FVector _Start = rifle->GunMeshComp->GetSocketLocation( TEXT( "Muzzle" ) );
+	FVector _End = rifle->AimCamSocket->GetForwardVector() * 100000;
+	bool bHits = GetWorld()->LineTraceSingleByChannel( OutHits , _Start , _End , ECollisionChannel::ECC_Visibility , Params );
+
+	DrawDebugLine( GetWorld() , t.GetLocation() , _End , FColor::Silver , false , 0.2f );
+	UGameplayStatics::SpawnEmitterAtLocation( GetWorld() , ExplosionVFXFactory , OutHits.ImpactPoint );
+
 }
 
 void UPlayerFireComp::ServerRPCReload_Implementation()
@@ -487,8 +474,8 @@ void UPlayerFireComp::MultiRPCSelectedRifle_Implementation( ARifleGun* selectedR
 
 	aim = EWeaponAim::RIFLE;
 
-	OnRep_Rifle();
 	OnRep_Pistol();
+	OnRep_Rifle();
 }
 
 void UPlayerFireComp::OnRep_Rifle()
