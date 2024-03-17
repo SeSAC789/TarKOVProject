@@ -27,7 +27,7 @@ public:
 	class UStaticMeshComponent* MeshComp;
 
 	UPROPERTY()
-	class APlayerBase* me;
+	class APlayerBase* player;
 
 	UPROPERTY()
 	class UHealthComp* healthComp;
@@ -36,5 +36,7 @@ public:
 
 	UFUNCTION( BlueprintCallable )
 	void RecoveryHP( AActor* OverlappedActor , FName OverlappedBodyPart );
+
+
 
 };
