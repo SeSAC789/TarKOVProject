@@ -118,7 +118,7 @@ void UHealthComp::TakeDamage( const FName& BodyPart , float DamageAmount , const
 	}
 }
 
-void UHealthComp::TakeDamage(float DamageAmount, const FString& HitObjectName)
+void UHealthComp::TakeDamage( float DamageAmount , const FString& HitObjectName )
 {
 	for (FBodyPartHealthData& BodyPartData : BodyPartHP)
 	{
@@ -145,7 +145,7 @@ void UHealthComp::CheckAndHandleTotalDepletion()
 	{
 		UE_LOG( LogTemp , Warning , TEXT( "모든 부위 hp가 다 0이 되어 죽음." ) );
 		me->invenDie();
-		
+
 	}
 }
 
@@ -229,7 +229,7 @@ void UHealthComp::SetBodyPartHP( FName BodyPart , float NewHP )
 
 void UHealthComp::OnRep_BodyPartHP()
 {
-	
+
 }
 
 void UHealthComp::CheckAndApplyBleeding( const FName& BodyPart )
@@ -288,7 +288,7 @@ void UHealthComp::DistributeDamage( float DamageAmount , FName IgnoredBodyPart )
 	int DistributablePartsCount = BodyPartHP.Num(); // 모든 신체 부위를 기본 값으로 설정
 
 	// IgnoredBodyPart가 지정되어 있다면, 분산될 신체 부위의 수에서 1을 빼서 계산
-	if (!IgnoredBodyPart.IsNone()) 
+	if (!IgnoredBodyPart.IsNone())
 	{
 		DistributablePartsCount -= 1;
 	}
@@ -311,7 +311,7 @@ void UHealthComp::DistributeDamage( float DamageAmount , FName IgnoredBodyPart )
 FName UHealthComp::FindWeakestBodyPart()
 {
 	FName WeakestPart = NAME_None;
-	float MinHP = MAX_FLT; // 매우 큰 수로 초기화
+	float MinHP = 100;
 
 	for (const FBodyPartHealthData& Part : BodyPartHP)
 	{
@@ -321,9 +321,10 @@ FName UHealthComp::FindWeakestBodyPart()
 			WeakestPart = Part.BodyPart;
 		}
 	}
-
 	return WeakestPart;
 }
+
+
 
 TArray<FName> UHealthComp::GetBleedingBodyParts() const
 {

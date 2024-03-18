@@ -27,8 +27,7 @@ void AMedikit::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	player = Cast<APlayerBase>( GetOwner() );
-	healthComp = Cast<UHealthComp>( player->GetComponentByClass( UHealthComp::StaticClass() ) );
+	
 }
 
 void AMedikit::NotifyActorBeginOverlap(AActor* OtherActor)

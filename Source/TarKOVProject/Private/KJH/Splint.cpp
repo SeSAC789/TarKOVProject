@@ -30,13 +30,34 @@ void ASplint::NotifyActorBeginOverlap(AActor* OtherActor)
     UHealthComp* healthComp = Cast<UHealthComp>( OtherActor->GetComponentByClass( UHealthComp::StaticClass() ) );
     if (healthComp)
     {
+        //골절된 부위를 다 담아온다
         TArray<FName> FracturedParts = healthComp->GetFracturedBodyParts();
+
+        //골절된 부위들 중에 가장 아픈부위를 찾는다
         for (FName BodyPart : FracturedParts)
         {
-            RemoveFractureStatus( OtherActor , BodyPart );
+            //만약에 골절된 부위가 가장 아픈 부위라면
+            //Find FracturedBodyPart with the weakest
+
+
+
+            if(healthComp->FindWeakestBodyPart() == BodyPart)
+            {
+                //골절상태 해제
+                RemoveFractureStatus( OtherActor , BodyPart );
+                UE_LOG(LogTemp, Warning, TEXT("Removed Fractured for %s"), *BodyPart.ToString())
+                break;
+            }
+
+
         }
+       // RemoveFractureStatus( OtherActor , healthComp->FindWeakestBodyPart() );
+
+
     }
 }
+
+
 
 void ASplint::RemoveFractureStatus(AActor* OverlappedActor, FName OverlappedBodyPart)
 {

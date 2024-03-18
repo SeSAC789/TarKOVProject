@@ -44,4 +44,9 @@ void AJHPlayerTest::OnHitboxOverlap(UPrimitiveComponent* OverlappedComponent, AA
 	Super::OnHitboxOverlap(OverlappedComponent , OtherActor , OtherComp , OtherBodyIndex , bFromSweep , SweepResult);
 }
 
+void AJHPlayerTest::InitUI()
+{
+
+}
+
 
