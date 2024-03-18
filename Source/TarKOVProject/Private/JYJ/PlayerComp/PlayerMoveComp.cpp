@@ -6,7 +6,13 @@
 #include "EnhancedInputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "KJH/StaminaComp.h"
+#include "Net/UnrealNetwork.h"
 
+
+UPlayerMoveComp::UPlayerMoveComp()
+{
+	SetIsReplicatedByDefault( true );
+}
 
 void UPlayerMoveComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -91,17 +97,7 @@ void UPlayerMoveComp::Jump(const FInputActionValue& Value)
 
 void UPlayerMoveComp::Running(const FInputActionValue& Value)
 {
-	if (!bIsRunning)
-	{
-		bIsRunning = true;
-		me->GetCharacterMovement()->MaxWalkSpeed *= runningSpeed;
-		UStaminaComp* staminaComp = me->FindComponentByClass<UStaminaComp>();
-		if (staminaComp)
-		{
-			// 달리기 시작할 때 스태미나 소모
-			staminaComp->ConsumeStamina( staminaComp->StaminaConsumptionRate );
-		}
-	}
+	Server_Running();
 }
 
 void UPlayerMoveComp::StopRunning(const FInputActionValue& Value)
@@ -115,27 +111,14 @@ void UPlayerMoveComp::StopRunning(const FInputActionValue& Value)
 
 void UPlayerMoveComp::Crouch(const FInputActionValue& Value)
 {
-	
-	if (isCrouched)
-	{
-		me->GetCharacterMovement()->UnCrouch();
-		//isCrouched = false;
-		UE_LOG( LogTemp , Warning , TEXT( "test2" ) );
-	}
-	else {
-		me->GetCharacterMovement()->Crouch();
-		//isCrouched = true;
-		UE_LOG( LogTemp , Warning , TEXT( "test3" ) );
-	}
-	
-
-	isCrouched = !isCrouched;
+	Server_Crouch();
 }
 
 void UPlayerMoveComp::Prone(const FInputActionValue& Value)
 {
-	isProned = !isProned;
+	Server_Prone();
 }
+
 
 void UPlayerMoveComp::SetRunning(bool IsRunning)
 {
@@ -147,4 +130,82 @@ void UPlayerMoveComp::SetRunning(bool IsRunning)
 bool UPlayerMoveComp::IsRunning() const
 {
 	return bIsRunning;
+}
+
+/*------------Network Connection--------------*/
+void UPlayerMoveComp::OnRep_Crouch()
+{
+	if (isCrouched)
+	{
+		me->GetCharacterMovement()->UnCrouch();
+		//isCrouched = false;
+	}
+	else {
+		me->GetCharacterMovement()->Crouch();
+		//isCrouched = true;
+	}
+
+	isCrouched = !isCrouched;
+}
+
+void UPlayerMoveComp::Server_Crouch_Implementation()
+{
+	Multicast_Crouch();
+}
+
+void UPlayerMoveComp::Multicast_Crouch_Implementation()
+{
+	OnRep_Crouch();
+}
+
+void UPlayerMoveComp::OnReq_Prone()
+{
+	isProned = !isProned;
+}
+
+void UPlayerMoveComp::Server_Prone_Implementation()
+{
+	Multicast_Prone();
+}
+
+void UPlayerMoveComp::Multicast_Prone_Implementation()
+{
+	OnReq_Prone();
+}
+
+void UPlayerMoveComp::OnReq_Running()
+{
+	if (!bIsRunning)
+	{
+		bIsRunning = true;
+		me->GetCharacterMovement()->MaxWalkSpeed *= runningSpeed;
+		UStaminaComp* staminaComp = me->FindComponentByClass<UStaminaComp>();
+		if (staminaComp)
+		{
+			// 달리기 시작할 때 스태미나 소모
+			staminaComp->ConsumeStamina( staminaComp->StaminaConsumptionRate );
+		}
+	}
+}
+
+void UPlayerMoveComp::Server_Running_Implementation()
+{
+	Multicast_Running();
+}
+
+void UPlayerMoveComp::Multicast_Running_Implementation()
+{
+	OnReq_Running();
+}
+
+
+void UPlayerMoveComp::GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const
+{
+	Super::GetLifetimeReplicatedProps( OutLifetimeProps );
+
+	DOREPLIFETIME( UPlayerMoveComp , isCrouched );
+	DOREPLIFETIME( UPlayerMoveComp , isProned );
+	DOREPLIFETIME( UPlayerMoveComp , runningSpeed );
+	DOREPLIFETIME( UPlayerMoveComp , bIsRunning );
+
 }

@@ -133,6 +133,9 @@ void APlayerBase::BeginPlay()
 		hpUI->AddToViewport();
 	}
 
+	//네트워크 업데이트 빈도
+	NetUpdateFrequency = 100;
+
 
 	// Player Controller Input Settings
 	if (APlayerController* PlayerController = Cast<APlayerController>( Controller ))

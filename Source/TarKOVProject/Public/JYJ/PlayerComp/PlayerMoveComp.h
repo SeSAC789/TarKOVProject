@@ -16,8 +16,10 @@ class TARKOVPROJECT_API UPlayerMoveComp : public UPlayerBaseComp
 	GENERATED_BODY()
 
 public:
+	UPlayerMoveComp();
 	virtual void TickComponent( float DeltaTime , ELevelTick TickType , FActorComponentTickFunction* ThisTickFunction ) override;
 	virtual void SetupInput( UEnhancedInputComponent* input ) override;
+	virtual void GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
 
 	/** Jump Input Action */
 	UPROPERTY( EditAnywhere , BlueprintReadOnly , Category = Input , meta = (AllowPrivateAccess = "true") )
@@ -55,21 +57,54 @@ public:
 	void Prone( const FInputActionValue& Value );
 
 public:
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(Replicated, EditDefaultsOnly)
 	float runningSpeed = 2.0f;
 
-	UPROPERTY( EditAnywhere , BlueprintReadWrite )
+	UPROPERTY( ReplicatedUsing = OnRep_Crouch, EditAnywhere , BlueprintReadWrite )
 	bool isCrouched;
 
-	UPROPERTY( EditAnywhere , BlueprintReadWrite )
+	UPROPERTY( ReplicatedUsing= OnReq_Prone , EditAnywhere , BlueprintReadWrite)
 	bool isProned;
 
-private:
+public:
+	UPROPERTY( ReplicatedUsing = OnReq_Running , EditAnywhere , BlueprintReadWrite )
 	bool bIsRunning;
 
-public:
 	// 달리기 상태를 설정하고 가져오는 함수
 	void SetRunning( bool IsRunning );
 	bool IsRunning() const;
+
+	/*------------Network Connection--------------*/
+	// Courch
+	UFUNCTION()
+	void OnRep_Crouch();
+
+	UFUNCTION( Server , UnReliable )
+	void Server_Crouch();
+
+	UFUNCTION( NetMulticast , UnReliable )
+	void Multicast_Crouch();
+
+	// Prone
+	UFUNCTION()
+	void OnReq_Prone();
+
+	UFUNCTION( Server , UnReliable )
+	void Server_Prone();
+
+	UFUNCTION( NetMulticast , UnReliable )
+	void Multicast_Prone();
+
+	//Running
+	UFUNCTION()
+	void OnReq_Running();
+
+	UFUNCTION( Server , UnReliable )
+	void Server_Running();
+
+	UFUNCTION( NetMulticast , UnReliable )
+	void Multicast_Running();
+
+
 
 };

@@ -23,12 +23,12 @@ AMedikit::AMedikit()
 	MeshComp->SetCollisionEnabled( ECollisionEnabled::NoCollision );
 }
 
-void AMedikit::BeginPlay()
+void AMedikit::BeginPlay() 
 {
 	Super::BeginPlay();
 	
-	player = Cast<APlayerBase>( GetOwner() );
-	healthComp = Cast<UHealthComp>( player->GetComponentByClass( UHealthComp::StaticClass() ) );
+	//player = Cast<APlayerBase>( GetOwner() );
+	//healthComp = Cast<UHealthComp>( player->GetComponentByClass( UHealthComp::StaticClass() ) );
 }
 
 void AMedikit::NotifyActorBeginOverlap(AActor* OtherActor)
