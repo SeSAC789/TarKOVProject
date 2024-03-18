@@ -118,6 +118,15 @@ void UHealthComp::TakeDamage( const FName& BodyPart , float DamageAmount , const
 	}
 }
 
+void UHealthComp::TakeDamage(float DamageAmount, const FString& HitObjectName)
+{
+	for (FBodyPartHealthData& BodyPartData : BodyPartHP)
+	{
+		float NewHP = GetBodyPartHealth( BodyPartData.BodyPart ) - DamageAmount;
+		SetBodyPartHP( BodyPartData.BodyPart , NewHP );
+	}
+}
+
 void UHealthComp::CheckAndHandleTotalDepletion()
 {
 	bIsDead = true; // 일단 사망한 것으로 가정
