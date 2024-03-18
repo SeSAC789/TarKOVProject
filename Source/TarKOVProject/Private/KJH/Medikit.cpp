@@ -26,12 +26,36 @@ AMedikit::AMedikit()
 void AMedikit::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
+	player = Cast<APlayerBase>( GetOwner() );
+	healthComp = Cast<UHealthComp>( player->GetComponentByClass( UHealthComp::StaticClass() ) );
 }
 
 void AMedikit::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
+
+	
+	APlayerBase* Player = Cast<APlayerBase>( OtherActor );
+	if (Player)
+	{
+		UHealthComp* HealthComp = Cast<UHealthComp>( Player->GetComponentByClass( UHealthComp::StaticClass() ) );
+		if (HealthComp)
+		{
+			// 모든 부위를 검사하여 다친 부위를 회복
+			TArray<FName> InjuredParts = HealthComp->GetInjuredBodyParts();
+			for (const FName& InjuredPart : InjuredParts)
+			{
+				if (HealthComp->IsInjured( InjuredPart ))
+				{
+					HealthComp->HealBodyPart( InjuredPart , 25.0f );
+				}
+			}
+
+			//// 메디킷 사용 후 파괴
+			//Destroy();
+		}
+	}
 }
 
 void AMedikit::RecoveryHP(AActor* OverlappedActor, FName OverlappedBodyPart)

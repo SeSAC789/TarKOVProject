@@ -162,12 +162,13 @@ bool UHealthComp::IsInjured( FName BodyPart ) const
 {
 	for (const FBodyPartHealthData& BodyPartData : BodyPartHP)
 	{
-		/*if (Effect.bIsActive && Effect.EffectType == EStatusEffectType::Fracture && Effect.BodyPart == BodyPart)
+		if (BodyPartData.BodyPart == BodyPart)
 		{
-			return true;
-		}*/
+			// 해당 부위의 체력이 최대 체력보다 낮은 경우 다친 것으로 판단
+			return BodyPartData.HP < BodyPartData.MaxHP;
+		}
 	}
-	return false;
+	return false; // 해당 부위를 찾지 못하면 다치지 않은 것으로 간주
 }
 
 float UHealthComp::GetBodyPartHealth( FName BodyPart )
@@ -345,6 +346,19 @@ TArray<FName> UHealthComp::GetFracturedBodyParts() const
 		}
 	}
 	return FracturedParts;
+}
+
+TArray<FName> UHealthComp::GetInjuredBodyParts() const
+{
+	TArray<FName> InjuredParts;
+	for (const FBodyPartHealthData& BodyPartData : BodyPartHP)
+	{
+		if (BodyPartData.HP < BodyPartData.MaxHP)
+		{
+			InjuredParts.Add( BodyPartData.BodyPart );
+		}
+	}
+	return InjuredParts;
 }
 
 void UHealthComp::GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const

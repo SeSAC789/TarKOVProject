@@ -91,6 +91,8 @@ public:
 
 	TArray<FName> GetFracturedBodyParts() const;
 
+	TArray<FName> GetInjuredBodyParts() const;
+
 	UPROPERTY()
 	class UStatusEffectComp* statusComp;
 
