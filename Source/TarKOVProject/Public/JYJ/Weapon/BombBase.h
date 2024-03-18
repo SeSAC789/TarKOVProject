@@ -30,7 +30,7 @@ private:
 	class UStaticMeshComponent* GrenadeMesh;
 
 	UPROPERTY( EditDefaultsOnly )
-	float detectRadius = 100.f;
+	float detectRadius = 300.f;
 
 	UPROPERTY( EditDefaultsOnly )
 	class UProjectileMovementComponent* throwDir;

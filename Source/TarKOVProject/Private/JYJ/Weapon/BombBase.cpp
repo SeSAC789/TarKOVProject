@@ -67,9 +67,20 @@ void ABombBase::explosiveBomb()
 	{
 		AActor* newOwner = nullptr;
 		float tmpDist = detectRadius;
+		UE_LOG( LogTemp , Warning , TEXT( "Bomb Damage Test1" ) );
 		for (TActorIterator<APlayerBase> It( GetWorld() ); It; ++It)
 		{
+			UE_LOG(LogTemp, Warning, TEXT("Bomb Damage Test2"));
 			APlayerBase* player = *It;
+
+			float temp = player->GetDistanceTo( this );
+			UE_LOG(LogTemp, Warning, TEXT("Distancce => %f, Radius -> %f"), temp, tmpDist );
+			if (temp < tmpDist)
+			{
+				FString HitObjectName = player->GetName();
+				player->HealthComp->TakeDamage( 30 , HitObjectName );
+				UE_LOG( LogTemp , Warning , TEXT( "Bomb Damage Test3" ) );
+			}
 
 			// TakeDamage 하는 동작 필요
 			//if()

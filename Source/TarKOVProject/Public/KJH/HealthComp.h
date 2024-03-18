@@ -65,6 +65,8 @@ public:
 
 
 	void TakeDamage( const FName& BodyPart , float DamageAmount, const FString& HitObjectName );
+	void TakeDamage( float DamageAmount , const FString& HitObjectName );
+
 	void CheckAndHandleTotalDepletion();
 	void HealBodyPart( FName BodyPart , float HealAmount );
 	bool IsInjured(FName BodyPart) const;
