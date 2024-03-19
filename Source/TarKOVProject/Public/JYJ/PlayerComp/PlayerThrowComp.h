@@ -41,8 +41,6 @@ private:
 	UPROPERTY( EditAnywhere , BlueprintReadOnly , Category = Input , meta = (AllowPrivateAccess = "true") )
 	class UInputAction* BombThrowAction;
 
-	
-
 	//UPROPERTY( EditDefaultsOnly )
 	//class ABombBase* grenade;
 

@@ -128,11 +128,7 @@ private:
 	bool bEnableRepeating;
 	bool bRepeated;
 
-
 	//-----------------NetWork-----------------//
-public:
-
-
 private:
 	void PrintNetLog();
 
