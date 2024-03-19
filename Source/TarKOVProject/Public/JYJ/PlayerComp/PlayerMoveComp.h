@@ -72,4 +72,10 @@ public:
 	void SetRunning( bool IsRunning );
 	bool IsRunning() const;
 
+	UPROPERTY( EditAnywhere , BlueprintReadOnly , Category = Input , meta = (AllowPrivateAccess = "true") )
+	class UInputAction* SplintTestAction;
+
+	void test();
+
+	void RemoveFractureStatusInven( FName OverlappedBodyPart );
 };

@@ -6,6 +6,7 @@
 #include "EnhancedInputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "KJH/StaminaComp.h"
+#include "KJH/StatusEffectComp.h"
 
 
 void UPlayerMoveComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -38,6 +39,9 @@ void UPlayerMoveComp::SetupInput(UEnhancedInputComponent* input)
 
 	//Prone
 	input->BindAction( ProneAction , ETriggerEvent::Started , this , &UPlayerMoveComp::Prone );
+
+	//Test
+	input->BindAction( SplintTestAction , ETriggerEvent::Started , this , &UPlayerMoveComp::test );
 }
 
 void UPlayerMoveComp::Move(const FInputActionValue& Value)
@@ -147,4 +151,26 @@ void UPlayerMoveComp::SetRunning(bool IsRunning)
 bool UPlayerMoveComp::IsRunning() const
 {
 	return bIsRunning;
+}
+
+void UPlayerMoveComp::test()
+{
+	UE_LOG( LogTemp , Warning , TEXT( "UPlayerMoveComp::test" ) );
+	RemoveFractureStatusInven( TEXT( "LeftLeg" ) );
+}
+
+void UPlayerMoveComp::RemoveFractureStatusInven(FName OverlappedBodyPart)
+{
+	if (!OverlappedBodyPart.IsValid())
+	{
+		UE_LOG( LogTemp , Warning , TEXT( "UPlayerMoveComp::RemoveFractureStatusInven IsValid" ) );
+		return;
+	}
+	UE_LOG( LogTemp , Warning , TEXT( "UPlayerMoveComp::RemoveFractureStatusInven %s" ),*OverlappedBodyPart.ToString() );
+	UStatusEffectComp* StatusComp = Cast<UStatusEffectComp>( me->GetComponentByClass( UStatusEffectComp::StaticClass() ) );
+	if (StatusComp && StatusComp->IsFractured( OverlappedBodyPart ))
+	{
+		StatusComp->ClearStatusEffect( EStatusEffectType::Fracture , OverlappedBodyPart );
+		UE_LOG( LogTemp , Warning , TEXT( "UPlayerMoveComp::RemoveFractureStatusInven, 골절상태 해제: %s" ) , *OverlappedBodyPart.ToString() );
+	}
 }

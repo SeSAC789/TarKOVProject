@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "JYJ/PlayerBase.h"
 #include "KJH/HealItemBase.h"
 #include "Splint.generated.h"
 
@@ -26,5 +27,11 @@ public:
 	UFUNCTION( BlueprintCallable )
 	void RemoveFractureStatus( AActor* OverlappedActor , FName OverlappedBodyPart );
 
+	UFUNCTION( BlueprintCallable )
+	void RemoveFractureStatusInven( FName OverlappedBodyPart );
+
 	virtual void NotifyActorBeginOverlap( AActor* OtherActor ) override;
+
+	UPROPERTY()
+	class APlayerBase* player;
 };

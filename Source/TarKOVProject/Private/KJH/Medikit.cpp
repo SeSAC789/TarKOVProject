@@ -75,8 +75,3 @@ void AMedikit::RecoveryHP(AActor* OverlappedActor, FName OverlappedBodyPart)
 		}
 	}
 }
-
-
-
-
-

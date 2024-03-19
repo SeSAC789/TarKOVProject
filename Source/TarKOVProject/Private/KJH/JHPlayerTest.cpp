@@ -27,6 +27,7 @@ void AJHPlayerTest::BeginPlay()
 	//	hpUI->AddToViewport();
 	//}
 
+
 }
 
 void AJHPlayerTest::SetupPlayerInputComponent( UInputComponent* PlayerInputComponent )
@@ -48,5 +49,4 @@ void AJHPlayerTest::InitUI()
 {
 
 }
-
 

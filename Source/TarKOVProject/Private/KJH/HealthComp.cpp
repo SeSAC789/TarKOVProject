@@ -324,6 +324,22 @@ FName UHealthComp::FindWeakestBodyPart()
 	return WeakestPart;
 }
 
+FName UHealthComp::FindWeakestFracturedBodyPart() const
+{
+	FName WeakestPart = NAME_None;
+	float MinHP = 100; 
+
+	for (const FBodyPartHealthData& Part : BodyPartHP)
+	{
+		// 부위가 골절되었는지 확인
+		if (statusComp->IsFractured( Part.BodyPart ) && Part.HP < MinHP)
+		{
+			MinHP = Part.HP;
+			WeakestPart = Part.BodyPart;
+		}
+	}
+	return WeakestPart;
+}
 
 
 TArray<FName> UHealthComp::GetBleedingBodyParts() const
