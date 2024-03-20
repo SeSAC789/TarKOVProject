@@ -135,7 +135,7 @@ void UPlayerAnimInstance::AnimNotify_OnGameOver()
 
 	}
 	*/
-	
+
 }
 
 void UPlayerAnimInstance::AnimNotify_OnThrowGrenade()

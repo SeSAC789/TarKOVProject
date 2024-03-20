@@ -7,7 +7,7 @@
 #include "Bandage.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class TARKOVPROJECT_API ABandage : public AHealItemBase
@@ -17,7 +17,7 @@ class TARKOVPROJECT_API ABandage : public AHealItemBase
 public:
 	ABandage();
 
-	UPROPERTY( EditAnywhere , BlueprintReadWrite)
+	UPROPERTY( EditAnywhere , BlueprintReadWrite )
 	class UBoxComponent* BoxComp;
 
 	UPROPERTY( EditAnywhere , BlueprintReadWrite )

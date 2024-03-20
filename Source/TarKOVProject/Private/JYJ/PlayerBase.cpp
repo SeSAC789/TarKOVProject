@@ -125,12 +125,12 @@ void APlayerBase::BeginPlay()
 	LeftLegLowerHitbox->OnComponentBeginOverlap.AddDynamic( this , &APlayerBase::OnHitboxOverlap );
 
 	
-	if (!hpUI)
+	if (!PlayerMainUI)
 	{
 		// MainUI를 생성해서 기억하고싶다.
-		hpUI = CreateWidget<UHPWidget>( GetWorld() , hpUIFactory );
+		PlayerMainUI = CreateWidget<UHPWidget>( GetWorld() , PlayerMainUIFactory );
 		// AddtoViewport하고싶다.
-		hpUI->AddToViewport();
+		PlayerMainUI->AddToViewport();
 	}
 
 	//네트워크 업데이트 빈도

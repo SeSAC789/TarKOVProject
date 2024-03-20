@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "JYJ/UI/GameClearWidget.h"
 #include "TarKOVPlayerController.generated.h"
 
 /**
@@ -43,6 +44,13 @@ public:
 
 	UPROPERTY()
 	class UGameOverWidget* GameOverUI;
+
+	// Game Clear UI -> Trigger에서 5초 지나면 실행
+	UPROPERTY( EditDefaultsOnly )
+	TSubclassOf<class UGameClearWidget> GameClearUIFactory;
+
+	UPROPERTY()
+	class UGameClearWidget* GameClearUI;
 
 	UFUNCTION( Server , Reliable )
 	void ServerRetry();
