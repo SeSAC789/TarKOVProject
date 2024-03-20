@@ -156,7 +156,7 @@ public:
 	UPROPERTY( EditDefaultsOnly , meta = (BindWidgetAnim),Transient )
 	class UWidgetAnimation* HitAnimation;
 
-	void PlayAnim();
+	void PlayHitAnim();
 	void UpdateStaminaBar();
 
 
