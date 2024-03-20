@@ -7,6 +7,30 @@
 #include "Engine/GameInstance.h"
 #include "TarKOVGameInstance.generated.h"
 
+USTRUCT( BlueprintType )
+struct FRoomInfo
+{
+	GENERATED_BODY()
+
+	UPROPERTY( EditDefaultsOnly )
+	int32 index;
+	UPROPERTY( EditDefaultsOnly )
+	FString roomName;
+	UPROPERTY( EditDefaultsOnly )
+	FString hostName;
+	UPROPERTY( EditDefaultsOnly )
+	FString playerCount;
+	UPROPERTY( EditDefaultsOnly )
+	FString pingMS;
+
+	FORCEINLINE void printLog() const	//const -> 값 변경 불가
+	{
+		UE_LOG( LogTemp , Warning , TEXT( "Roomname : %s, Hostaname : %s, playerCnt : %s, pintInfo : %s" ) , *roomName , *hostName , *playerCount , *pingMS );
+	}
+};
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam( FFindingRoomsDelegate , bool , bActive );
+
 /**
  * 
  */
@@ -19,6 +43,22 @@ public:
 	virtual void Init() override;
 	IOnlineSessionPtr sessionInterface;
 
-	void Createroom();
+	FString myNickName;
+
+	FString myRoomName;
+
+	// 방 생성
+	void CreateRoom(FString roomName);
+	void OnCreateRoomComplete(FName sessionName, bool bWasSuccessful);
+
+
+	// 방 찾기
+	TSharedPtr<FOnlineSessionSearch> roomSearch;
+
+	//방검색의 타이밍에 대한 Delegate
+	FFindingRoomsDelegate onFindingRoomsDelegate;
+
+	void FindOtherRooms();
+	void OnFindOtherRoomsComplete( bool bWasSuccessful );
 	
 };

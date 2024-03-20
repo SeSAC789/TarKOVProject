@@ -17,15 +17,28 @@ class TARKOVPROJECT_API ULobbyWidget : public UUserWidget
 public:
 	virtual void NativeConstruct() override;
 
+	UPROPERTY()
+	class UTarKOVGameInstance* gi;
+
 	// *------------------------메인UI------------------------* //
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
+	class UWidgetSwitcher* switcher_lobby;
+
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	class UEditableText* edit_username;
 
-	UPROPERTY( EditDefaultsOnly )
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget))
 	class UButton* btn_lobby;
+
+	void SwitchPanel( int32 index );
 
 	UFUNCTION()
 	void OnClickGoLobby();
 
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
+	class UButton* btn_createroom;
+
+	UFUNCTION()
+	void OnCreateRoom();
 	
 };
