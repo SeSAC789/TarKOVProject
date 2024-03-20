@@ -17,7 +17,6 @@ class TARKOVPROJECT_API UTarKOVGameInstance : public UGameInstance
 
 public:
 	virtual void Init() override;
-
 	IOnlineSessionPtr sessionInterface;
 
 	void Createroom();

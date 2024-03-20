@@ -18,3 +18,7 @@ void UTarKOVGameInstance::Init()
 		
 	}
 }
+
+void UTarKOVGameInstance::Createroom()
+{
+}
