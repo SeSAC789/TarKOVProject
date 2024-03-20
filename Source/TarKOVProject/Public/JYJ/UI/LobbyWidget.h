@@ -16,5 +16,16 @@ class TARKOVPROJECT_API ULobbyWidget : public UUserWidget
 
 public:
 	virtual void NativeConstruct() override;
+
+	// *------------------------메인UI------------------------* //
+	UPROPERTY(EditDefaultsOnly)
+	class UEditableText* edit_username;
+
+	UPROPERTY( EditDefaultsOnly )
+	class UButton* btn_lobby;
+
+	UFUNCTION()
+	void OnClickGoLobby();
+
 	
 };

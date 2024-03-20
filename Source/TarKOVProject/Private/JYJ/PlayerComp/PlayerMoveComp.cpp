@@ -112,6 +112,9 @@ void UPlayerMoveComp::StopRunning(const FInputActionValue& Value)
 void UPlayerMoveComp::Crouch(const FInputActionValue& Value)
 {
 	Server_Crouch();
+
+	//강제로 서버한테 
+	//OnRep_Crouch();
 }
 
 void UPlayerMoveComp::Prone(const FInputActionValue& Value)
@@ -145,32 +148,17 @@ void UPlayerMoveComp::OnRep_Crouch()
 		//isCrouched = true;
 	}
 
-	isCrouched = !isCrouched;
 }
 
 void UPlayerMoveComp::Server_Crouch_Implementation()
 {
-	Multicast_Crouch();
-}
-
-void UPlayerMoveComp::Multicast_Crouch_Implementation()
-{
+	isCrouched = !isCrouched;
 	OnRep_Crouch();
-}
-
-void UPlayerMoveComp::OnReq_Prone()
-{
-	isProned = !isProned;
 }
 
 void UPlayerMoveComp::Server_Prone_Implementation()
 {
-	Multicast_Prone();
-}
-
-void UPlayerMoveComp::Multicast_Prone_Implementation()
-{
-	OnReq_Prone();
+	isProned = !isProned;
 }
 
 void UPlayerMoveComp::OnReq_Running()
