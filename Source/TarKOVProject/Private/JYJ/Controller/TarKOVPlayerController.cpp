@@ -39,7 +39,7 @@ void ATarKOVPlayerController::ServerRetry_Implementation()
 	//이곳은 서버에서 호출되는 함수이다.
 	// 재시작 요청이 오면
 	// 현재 캐릭터를 기억하고
-	auto character = this->GetCharacter();
+	auto character = this->GetPawn();
 	// 현재 플레이어를 UnPossess 하고
 	UnPossess();
 	// 기억한 캐릭터를 파괴하고,

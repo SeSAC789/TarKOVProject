@@ -128,10 +128,16 @@ public:
 	void SetPartitionDamageCollision();
 
 	UPROPERTY( BlueprintReadOnly )
-	class UHPWidget* hpUI;
+	class UHPWidget* PlayerMainUI;
+
+	UPROPERTY()
+	class UGameOverWidget* GameOverUI;
+
+	UPROPERTY()
+	class UGameClearWidget* GameClearUI;
 
 	UPROPERTY( EditDefaultsOnly )
-	TSubclassOf<class UUserWidget> hpUIFactory;
+	TSubclassOf<class UUserWidget> PlayerMainUIFactory;
 
 
 	UFUNCTION( BlueprintImplementableEvent )

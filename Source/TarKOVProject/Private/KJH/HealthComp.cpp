@@ -106,9 +106,9 @@ void UHealthComp::TakeDamage( const FName& BodyPart , float DamageAmount , const
 		//CheckAndApplyBleeding( BodyPart );
 		CheckAndApplyFracture( BodyPart );
 		// 데미지 받으면 위젯 애님 재생
-		if (me && me->hpUI)
+		if (me && me->PlayerMainUI)
 		{
-			me->hpUI->PlayAnim();
+			me->PlayerMainUI->PlayAnim();
 		}
 	}
 	else
