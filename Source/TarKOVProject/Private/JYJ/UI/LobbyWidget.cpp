@@ -52,6 +52,8 @@ void ULobbyWidget::OnCreateRoom()
 
 	}
 
+	FString _roomname = edit_roomname->GetText().ToString();
+
 	UE_LOG(LogTemp, Warning, TEXT("ULobbyWidget::OnCreateRoom - test1"));
-	gi->CreateRoom(TEXT("TEST"));
+	gi->CreateRoom( _roomname );
 }

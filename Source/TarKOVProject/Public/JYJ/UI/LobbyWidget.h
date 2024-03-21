@@ -27,6 +27,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	class UEditableText* edit_username;
 
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
+	class UEditableText* edit_roomname;
+
 	UPROPERTY( EditDefaultsOnly , meta = (BindWidget))
 	class UButton* btn_lobby;
 
