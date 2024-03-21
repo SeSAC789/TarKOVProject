@@ -23,6 +23,6 @@ public:
 
 	UPROPERTY( Replicated )
 	int32 currentAmmo;
-	
+
 	
 };

@@ -30,6 +30,7 @@ struct FRoomInfo
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam( FFindingRoomsDelegate , bool , bActive );
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam( FAddRoomInfoDelegate , const FRoomInfo& , roomInfo );
 
 /**
  * 
@@ -58,7 +59,19 @@ public:
 	//방검색의 타이밍에 대한 Delegate
 	FFindingRoomsDelegate onFindingRoomsDelegate;
 
+	//방검색 후 방생성에 관련된 Delegate
+	FAddRoomInfoDelegate onAddRoomInfoDelegate;
+
 	void FindOtherRooms();
 	void OnFindOtherRoomsComplete( bool bWasSuccessful );
+
+	//방 입장 요청
+	void JoinRoom( int32 index );
+
+	//방 입장 응답
+	void OnJoinRoomComplete( FName sessionName , EOnJoinSessionCompleteResult::Type result );
+
+
+
 	
 };

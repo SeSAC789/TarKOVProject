@@ -43,6 +43,7 @@ void UPlayerFireComp::TickComponent( float DeltaTime , ELevelTick TickType , FAc
 	//Zoom();
 
 	PrintNetLog();
+	UE_LOG(LogTemp, Warning, TEXT("Rifle Ammo %d"), rifle->currentAmmo);
 
 	/*
 	if(me->HasAuthority())
@@ -305,15 +306,15 @@ void UPlayerFireComp::SetAiming( FHitResult OutHit , FVector Start , FVector End
 
 void UPlayerFireComp::Reload()
 {
-	if(!rifle || !pistol) return;
+	if(!this->rifle || !pistol) return;
 
 	switch (aim)
 	{
 		case EWeaponAim::RIFLE:
-			rifle->currentAmmo = rifle->gunMaxAmmo;
+			this->rifle->currentAmmo = this->rifle->gunMaxAmmo;
 			break;
 		case EWeaponAim::PISTOL:
-			pistol->currentAmmo = pistol->gunMaxAmmo;
+			this->pistol->currentAmmo = this->pistol->gunMaxAmmo;
 			break;
 		case EWeaponAim::MACHINEGUN:
 			break;

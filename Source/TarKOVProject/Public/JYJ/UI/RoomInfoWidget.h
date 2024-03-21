@@ -36,4 +36,6 @@ public:
 	void OnClickEnter();
 
 	void SetInfo(const struct FRoomInfo& info);
+
+	int32 roomIndex;
 };

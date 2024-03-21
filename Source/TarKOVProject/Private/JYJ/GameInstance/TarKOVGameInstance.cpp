@@ -16,7 +16,8 @@ void UTarKOVGameInstance::Init()
 
 		//Delegate관련 코드
 		sessionInterface->OnCreateSessionCompleteDelegates.AddUObject( this , &UTarKOVGameInstance::OnCreateRoomComplete );
-		//sessionInterface->OnFindSessionsCompleteDelegates.AddUObject( this , &UTarKOVGameInstance::OnMyFindOtherRoomsComplete );
+		sessionInterface->OnFindSessionsCompleteDelegates.AddUObject( this , &UTarKOVGameInstance::OnFindOtherRoomsComplete );
+		sessionInterface->OnJoinSessionCompleteDelegates.AddUObject( this , &UTarKOVGameInstance::OnJoinRoomComplete );
 		
 	}
 }
@@ -78,6 +79,7 @@ void UTarKOVGameInstance::OnCreateRoomComplete(FName sessionName, bool bWasSucce
 
 void UTarKOVGameInstance::FindOtherRooms()
 {
+	UE_LOG( LogTemp , Warning , TEXT( "UTarKOVGameInstance::FindOtherRooms" ) );
 	//1. FOnlineSessionSearch객체를 생성
 	roomSearch = MakeShareable( new FOnlineSessionSearch );
 
@@ -106,7 +108,93 @@ void UTarKOVGameInstance::FindOtherRooms()
 
 void UTarKOVGameInstance::OnFindOtherRoomsComplete(bool bWasSuccessful)
 {
-	
+	// 검색할 때 onFindingRoomsDelegate => false
+	// 성공 실패와 무관하게
+	if (onFindingRoomsDelegate.IsBound())
+	{
+		onFindingRoomsDelegate.Broadcast( false );
+
+	}
+
+	UE_LOG( LogTemp , Warning , TEXT( "OnMyFindOtherRoomsComplete - Sucess" ) );
+
+	//for(auto r : roomSearch->SearchResults)
+	for (int32 i = 0; i < roomSearch->SearchResults.Num(); i++)
+	{
+		UE_LOG( LogTemp , Warning , TEXT( "OnMyFindOtherRoomsComplete - Loop" ) );
+		auto r = roomSearch->SearchResults[i];
+
+		if (false == r.IsValid())
+			continue;		//그 다음으로 넘김
+
+		FRoomInfo info;
+
+		info.index = i;
+
+		//넘겨 받은 session settings = SessionSettings (위에 선언한거)
+		r.Session.SessionSettings.Get( TEXT( "ROOM_NAME" ) , info.roomName );
+
+		r.Session.SessionSettings.Get( TEXT( "HOST_NAME" ) , info.hostName );
+
+		//FString userName;
+		//userName = r.Session.OwningUserName;
+
+		//공개방 , Session Settings 에 있는 것은 방장이 설정한 값
+		int32 max = r.Session.SessionSettings.NumPublicConnections;
+		//현재 방이 몇명 들어와 있는지 (들어올 수 있는 명 수 - 현재 오픈된 connection 갯수(입장 가능 수))
+		int32 current = max - r.Session.NumOpenPublicConnections;
+
+		info.playerCount = FString::Printf( TEXT( "%d / %d" ) , current , max );
+
+		//ping 정보
+		info.pingMS = FString::Printf( TEXT( "%d ms" ) , r.PingInMs );
+
+		info.printLog();
+
+		// 만약 바인된 함수가 있다면 info를 넘겨줌
+		if (onAddRoomInfoDelegate.IsBound())
+		{
+			onAddRoomInfoDelegate.Broadcast( info );
+		}
+
+	}
+}
+
+void UTarKOVGameInstance::JoinRoom(int32 index)
+{
+	auto r = roomSearch->SearchResults[index];
+
+	//Session name = Room Name
+	FString sessionName;
+	r.Session.SessionSettings.Get( TEXT( "ROOM_NAME" ) , sessionName );
+
+	sessionInterface->JoinSession( 0 , FName( *sessionName ) , r );
+}
+
+void UTarKOVGameInstance::OnJoinRoomComplete(FName sessionName, EOnJoinSessionCompleteResult::Type result)
+{
+	//성공했다면?
+	if (EOnJoinSessionCompleteResult::Success == result)
+	{
+		//입장한 방의 이름을 기억하고 싶다.
+		myRoomName = sessionName.ToString();
+
+		//서버의 주소를 받아와서
+		//접속하는 문자열?? 서버에 접속하는 문자열,.,. 서버의 주소로 간주
+		FString url;
+		sessionInterface->GetResolvedConnectString( sessionName , url );
+		//여행을 떠나고 싶다.
+		auto pc = GetWorld()->GetFirstPlayerController();
+
+		//TRAVEL_Absolute 값을 아무것도 안 가지고 서버로 떠남!
+		pc->ClientTravel( url , TRAVEL_Absolute );
+
+	}
+	//그렇지 않다면
+	else
+	{
+		UE_LOG( LogTemp , Warning , TEXT( "Join Session Failed... : %d" ) , result );
+	}
 }
 
 

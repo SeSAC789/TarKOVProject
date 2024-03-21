@@ -33,6 +33,13 @@ public:
 	UPROPERTY( EditDefaultsOnly , meta = (BindWidget))
 	class UButton* btn_lobby;
 
+	UPROPERTY( EditDefaultsOnly, meta=(BindWidget))
+	class UScrollBox* scroll_roomlists;
+
+	UPROPERTY( EditDefaultsOnly )
+	TSubclassOf<class URoomInfoWidget> roomInfoFactory;
+
+
 	void SwitchPanel( int32 index );
 
 	UFUNCTION()
@@ -43,5 +50,12 @@ public:
 
 	UFUNCTION()
 	void OnCreateRoom();
+
+	UFUNCTION()
+	void OnFindRoomList();
+
+	UFUNCTION()
+	void AddRoomInfoWidget( const struct FRoomInfo& info );
+
 	
 };
