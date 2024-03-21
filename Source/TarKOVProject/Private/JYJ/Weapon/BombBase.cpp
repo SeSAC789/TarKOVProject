@@ -4,6 +4,7 @@
 #include "JYJ/PlayerBase.h"
 #include "EngineUtils.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "JYJ/Controller/TarKOVPlayerController.h"
 #include "Kismet/GameplayStatics.h"
 #include "KJH/HealthComp.h"
 
@@ -39,6 +40,7 @@ ABombBase::ABombBase()
 	}
 
 	GrenadeMesh->SetSimulatePhysics(true);
+	GrenadeMesh->SetIsReplicated( true );
 
 
 }
@@ -59,53 +61,68 @@ void ABombBase::Tick( float DeltaTime )
 
 }
 
-void ABombBase::explosiveBomb()
+void ABombBase::TakeDamageBomb( AActor* bomb )
 {
+	//auto pc = Cast<ATarKOVPlayerController>(GetWorld()->GetFirstPlayerController());
 
 	//레벨에 있는 ANetTPSCharacter 객체들을 다 검사해서 detectRadius안에 있고 그중에서도 가장 가까운 녀석을 내 오너로 하고 싶다.
-	if (HasAuthority())	//서버
+	//if(HasAuthority())
+	//{
+		
+	//}
+
+	//AActor* newOwner = nullptr;
+	float tmpDist = detectRadius;
+	UE_LOG( LogTemp , Warning , TEXT( "Bomb Damage Test1" ) );
+
+	APlayerBase* player = Cast<APlayerBase>( bomb->GetOwner());
+
+	float temp = player->GetDistanceTo( bomb );
+
+	if (temp < tmpDist)
 	{
-		AActor* newOwner = nullptr;
-		float tmpDist = detectRadius;
-		UE_LOG( LogTemp , Warning , TEXT( "Bomb Damage Test1" ) );
-		for (TActorIterator<APlayerBase> It( GetWorld() ); It; ++It)
+		FString HitObjectName = player->GetName();
+		player->HealthComp->TakeDamage( 30 , HitObjectName );
+		UE_LOG( LogTemp , Warning , TEXT( "Bomb Damage Test3" ) );
+
+		//newOwner = player;
+		//tempDist 값을 계속 갱신해주면서 비교
+		//tmpDist = temp;
+	}
+
+	/*
+	for (TActorIterator<APlayerBase> It( GetWorld() ); It; ++It)
+	{
+		UE_LOG( LogTemp , Warning , TEXT( "Bomb Damage Test2" ) );
+		APlayerBase* player = *It;
+
+		float temp = player->GetDistanceTo( this );
+		UE_LOG( LogTemp , Warning , TEXT( "Distance => %f, Radius -> %f" ) , temp , tmpDist );
+		if (temp < tmpDist)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Bomb Damage Test2"));
-			APlayerBase* player = *It;
+			FString HitObjectName = player->GetName();
+			player->HealthComp->TakeDamage( 30 , HitObjectName );
+			UE_LOG( LogTemp , Warning , TEXT( "Bomb Damage Test3" ) );
 
-			float temp = player->GetDistanceTo( this );
-			UE_LOG(LogTemp, Warning, TEXT("Distancce => %f, Radius -> %f"), temp, tmpDist );
-			if (temp < tmpDist)
-			{
-				FString HitObjectName = player->GetName();
-				player->HealthComp->TakeDamage( 30 , HitObjectName );
-				UE_LOG( LogTemp , Warning , TEXT( "Bomb Damage Test3" ) );
-			}
-
-			// TakeDamage 하는 동작 필요
-			//if()
-			//FName BodyPart = HitComp->ComponentTags[0];
-			//FString HitObjectName = OutHit.GetComponent()->GetName();
-
-			//player->HealthComp->TakeDamage();
-			//상대방과 나의 거리를 측정해서 tempDist보다 가깝다면 newOwner로 기억하고 싶다
-			/*
-			float temp = player->GetDistanceTo( this );
-			if (temp < tmpDist)
-			{
-				newOwner = player;
-				//tempDist 값을 계속 갱신해주면서 비교
-				tmpDist = temp;
-			}
-			*/
-
+			newOwner = player;
+			//tempDist 값을 계속 갱신해주면서 비교
+			tmpDist = temp;
 		}
 
 	}
+	*/
 
-	UGameplayStatics::SpawnEmitterAtLocation( GetWorld() , ExplosionVFXFactory , this->GetActorLocation() );
-	this->Destroy( true );
+	
+
+	//UGameplayStatics::SpawnEmitterAtLocation( GetWorld() , ExplosionVFXFactory , bomb->GetActorLocation() );
+	//bomb->Destroy( true );
 
 
+}
+
+void ABombBase::ExplosiveBomb( AActor* bomb )
+{
+	UGameplayStatics::SpawnEmitterAtLocation( GetWorld() , ExplosionVFXFactory , bomb->GetActorLocation() );
+	//bomb->Destroy( true );
 }
 
