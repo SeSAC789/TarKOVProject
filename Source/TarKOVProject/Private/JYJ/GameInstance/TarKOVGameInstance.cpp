@@ -15,7 +15,7 @@ void UTarKOVGameInstance::Init()
 		sessionInterface = subsystem->GetSessionInterface();
 
 		//Delegate관련 코드
-		//sessionInterface->OnCreateSessionCompleteDelegates.AddUObject( this , &UTarKOVGameInstance::OnMyCreateRoomComplete );
+		sessionInterface->OnCreateSessionCompleteDelegates.AddUObject( this , &UTarKOVGameInstance::OnCreateRoomComplete );
 		//sessionInterface->OnFindSessionsCompleteDelegates.AddUObject( this , &UTarKOVGameInstance::OnMyFindOtherRoomsComplete );
 		
 	}
@@ -68,7 +68,7 @@ void UTarKOVGameInstance::OnCreateRoomComplete(FName sessionName, bool bWasSucce
 		myRoomName = sessionName.ToString();
 
 		//서버는 세계 여행을 떠나고 싶다. 어디로?
-		FString url = TEXT( "/Game/TarKOV/Maps/BetaMap.BetaMap?listen" );
+		FString url = TEXT( "/Game/TarKOV/Maps/BetaMap?listen" );
 		GetWorld()->ServerTravel( url );
 
 		//서버면서 client 인 상태
@@ -106,6 +106,7 @@ void UTarKOVGameInstance::FindOtherRooms()
 
 void UTarKOVGameInstance::OnFindOtherRoomsComplete(bool bWasSuccessful)
 {
+	
 }
 
 

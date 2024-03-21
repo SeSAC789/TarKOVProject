@@ -22,6 +22,7 @@ void ULobbyWidget::NativeConstruct()
 
 	// 버튼 Bind
 	btn_lobby->OnClicked.AddDynamic(this, &ULobbyWidget::OnClickGoLobby );
+	btn_createroom->OnClicked.AddDynamic(this, &ULobbyWidget::OnCreateRoom);
 	
 }
 
@@ -33,6 +34,7 @@ void ULobbyWidget::SwitchPanel(int32 index)
 void ULobbyWidget::OnClickGoLobby()
 {
 	SwitchPanel(SWITCH_INDEX_FINDROOM);
+	UE_LOG( LogTemp , Warning , TEXT( "ULobbyWidget::OnClickGoLobby - test1" ) );
 }
 
 void ULobbyWidget::OnCreateRoom()
@@ -49,4 +51,7 @@ void ULobbyWidget::OnCreateRoom()
 		//SwitchPanel(SWITCH_INDEX_CREATEROOM);
 
 	}
+
+	UE_LOG(LogTemp, Warning, TEXT("ULobbyWidget::OnCreateRoom - test1"));
+	gi->CreateRoom(TEXT("TEST"));
 }
