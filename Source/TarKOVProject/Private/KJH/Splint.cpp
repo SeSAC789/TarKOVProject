@@ -76,6 +76,8 @@ void ASplint::NotifyActorBeginOverlap( AActor* OtherActor )
 
 void ASplint::RemoveFractureStatus( AActor* OverlappedActor , FName OverlappedBodyPart )
 {
+	UE_LOG( LogTemp , Warning , TEXT( "부목사용" ) );
+
 	if (!OverlappedActor)
 	{
 		return;

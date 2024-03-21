@@ -45,6 +45,8 @@ void ABandage::NotifyActorBeginOverlap(AActor* OtherActor)
 
 void ABandage::RemoveBleedingStatus( AActor* OverlappedActor , FName OverlappedBodyPart )
 {
+    UE_LOG( LogTemp , Warning , TEXT( "Bandage Use" ) );
+
     if (!OverlappedActor)
     {
         return;
