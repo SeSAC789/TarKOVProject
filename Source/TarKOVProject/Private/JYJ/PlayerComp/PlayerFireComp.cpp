@@ -43,7 +43,7 @@ void UPlayerFireComp::TickComponent( float DeltaTime , ELevelTick TickType , FAc
 	//Zoom();
 
 	PrintNetLog();
-	UE_LOG(LogTemp, Warning, TEXT("Rifle Ammo %d"), rifle->currentAmmo);
+	//UE_LOG(LogTemp, Warning, TEXT("Rifle Ammo %d"), me->fireComp->rifle->currentAmmo);
 
 	/*
 	if(me->HasAuthority())
@@ -308,17 +308,22 @@ void UPlayerFireComp::Reload()
 {
 	if(!this->rifle || !pistol) return;
 
+	
 	switch (aim)
 	{
-		case EWeaponAim::RIFLE:
-			this->rifle->currentAmmo = this->rifle->gunMaxAmmo;
-			break;
-		case EWeaponAim::PISTOL:
-			this->pistol->currentAmmo = this->pistol->gunMaxAmmo;
-			break;
-		case EWeaponAim::MACHINEGUN:
-			break;
+	case EWeaponAim::RIFLE:
+		PlayerAnim->playReloadRifleAnimation();
+		//rifle->currentAmmo = rifle->gunMaxAmmo;
+		break;
+	case EWeaponAim::PISTOL:
+		PlayerAnim->playReloadPistolAnimation();
+		//pistol->currentAmmo = pistol->gunMaxAmmo;
+		break;
+	case EWeaponAim::MACHINEGUN:
+		break;
+
 	}
+	
 
 	ServerRPCReload();
 
@@ -437,11 +442,27 @@ void UPlayerFireComp::MultiRPCFireRifle_Implementation( FHitResult OutHits )
 
 void UPlayerFireComp::ServerRPCReload_Implementation()
 {
-	MultiRPCReload();
+	switch (aim)
+	{
+	case EWeaponAim::RIFLE:
+		PlayerAnim->playReloadRifleAnimation();
+		rifle->currentAmmo = rifle->gunMaxAmmo;
+		break;
+	case EWeaponAim::PISTOL:
+		PlayerAnim->playReloadPistolAnimation();
+		pistol->currentAmmo = pistol->gunMaxAmmo;
+		break;
+	case EWeaponAim::MACHINEGUN:
+		break;
+
+	}
+
+	//MultiRPCReload();
 }
 
 void UPlayerFireComp::MultiRPCReload_Implementation()
 {
+	/*
 	switch (aim)
 	{
 	case EWeaponAim::RIFLE:
@@ -456,6 +477,7 @@ void UPlayerFireComp::MultiRPCReload_Implementation()
 		break;
 
 	}
+	*/
 }
 
 
@@ -481,26 +503,21 @@ void UPlayerFireComp::MultiRPCSelectedRifle_Implementation( ARifleGun* selectedR
 
 void UPlayerFireComp::OnRep_Rifle()
 {
+	// Visible setting
 	rifle->GunMeshComp->SetVisibility( bValidRifle );
 
 	if (bValidRifle)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("UPlayerFireComp::OnRep_Rifle - bValidRifle = true"))
-		if (GEngine)
-		{
-			FString Message = FString::Printf( TEXT( "%s - bValidRifle" ) , *GetOwner()->GetName() );
-			GEngine->AddOnScreenDebugMessage( -1 , 10 , FColor::Red , Message );
-		}
 	}
 	else
 	{
 		UE_LOG( LogTemp , Warning , TEXT( "UPlayerFireComp::OnRep_Rifle - bValidRifle = false" ) )
-		if (GEngine)
-		{
-			FString Message = FString::Printf( TEXT( "%s - !bValidRifle" ) , *GetOwner()->GetName() );
-			GEngine->AddOnScreenDebugMessage( -1 , 10 , FColor::Red , Message );
-		}
 	}
+
+	// Ammo setting
+	
+
 }
 
 void UPlayerFireComp::OnRep_Pistol()

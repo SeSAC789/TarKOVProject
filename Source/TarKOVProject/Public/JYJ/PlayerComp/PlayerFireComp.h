@@ -127,6 +127,7 @@ private:
 
 	bool bEnableRepeating;
 	bool bRepeated;
+	bool bReload;
 
 	//-----------------NetWork-----------------//
 private:
