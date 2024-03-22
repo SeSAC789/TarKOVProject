@@ -14,14 +14,29 @@ UPlayerMoveComp::UPlayerMoveComp()
 	SetIsReplicatedByDefault( true );
 }
 
-void UPlayerMoveComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UPlayerMoveComp::TickComponent( float DeltaTime , ELevelTick TickType , FActorComponentTickFunction* ThisTickFunction )
 {
-	Super::TickComponent(DeltaTime , TickType , ThisTickFunction);
+	Super::TickComponent( DeltaTime , TickType , ThisTickFunction );
+
+	UStaminaComp* staminaComp = me->FindComponentByClass<UStaminaComp>();
+	if (staminaComp)
+	{
+		// 달리기 상태이고, 스태미나가 남아있다면 스태미나 감소
+		if (bIsRunning && staminaComp->Stamina > 0)
+		{
+			RunningStaminaDrain( DeltaTime );
+		}
+		// 달리기를 하지 않고 스태미나가 최대아니라면 스태미나 회복
+		else if (!bIsRunning && staminaComp->Stamina < staminaComp->MaxStamina)
+		{
+			staminaComp->RecoverStamina( DeltaTime );
+		}
+	}
 }
 
-void UPlayerMoveComp::SetupInput(UEnhancedInputComponent* input)
+void UPlayerMoveComp::SetupInput( UEnhancedInputComponent* input )
 {
-	Super::SetupInput(input);
+	Super::SetupInput( input );
 
 	if (nullptr == input) return;
 
@@ -46,7 +61,7 @@ void UPlayerMoveComp::SetupInput(UEnhancedInputComponent* input)
 	input->BindAction( ProneAction , ETriggerEvent::Started , this , &UPlayerMoveComp::Prone );
 }
 
-void UPlayerMoveComp::Move(const FInputActionValue& Value)
+void UPlayerMoveComp::Move( const FInputActionValue& Value )
 {
 	// input is a Vector2D
 	FVector2D MovementVector = Value.Get<FVector2D>();
@@ -69,7 +84,7 @@ void UPlayerMoveComp::Move(const FInputActionValue& Value)
 	}
 }
 
-void UPlayerMoveComp::Look(const FInputActionValue& Value)
+void UPlayerMoveComp::Look( const FInputActionValue& Value )
 {
 	// input is a Vector2D
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
@@ -82,11 +97,11 @@ void UPlayerMoveComp::Look(const FInputActionValue& Value)
 	}
 }
 
-void UPlayerMoveComp::Jump(const FInputActionValue& Value)
+void UPlayerMoveComp::Jump( const FInputActionValue& Value )
 {
 	me->Jump();
-	UE_LOG(LogTemp, Warning, TEXT("TEST1"));
-	
+	UE_LOG( LogTemp , Warning , TEXT( "TEST1" ) );
+
 	UStaminaComp* StaminaComp = me->FindComponentByClass<UStaminaComp>();
 	if (StaminaComp)
 	{
@@ -95,35 +110,30 @@ void UPlayerMoveComp::Jump(const FInputActionValue& Value)
 	}
 }
 
-void UPlayerMoveComp::Running(const FInputActionValue& Value)
+void UPlayerMoveComp::Running( const FInputActionValue& Value )
 {
 	Server_Running();
 }
 
-void UPlayerMoveComp::StopRunning(const FInputActionValue& Value)
+void UPlayerMoveComp::StopRunning( const FInputActionValue& Value )
 {
-	if (bIsRunning)
-	{
-		bIsRunning = false;
-		me->GetCharacterMovement()->MaxWalkSpeed /= runningSpeed;
-	}
+	Server_StopRunning();
 }
 
-void UPlayerMoveComp::Crouch(const FInputActionValue& Value)
+void UPlayerMoveComp::Crouch( const FInputActionValue& Value )
 {
 	Server_Crouch();
 }
 
-void UPlayerMoveComp::Prone(const FInputActionValue& Value)
+void UPlayerMoveComp::Prone( const FInputActionValue& Value )
 {
 	Server_Prone();
 }
 
-
-void UPlayerMoveComp::SetRunning(bool IsRunning)
+void UPlayerMoveComp::SetRunning( bool IsRunning )
 {
 	bIsRunning = IsRunning;
-	
+
 	me->GetCharacterMovement()->MaxWalkSpeed = bIsRunning ? (me->GetCharacterMovement()->MaxWalkSpeed * runningSpeed) : (me->GetCharacterMovement()->MaxWalkSpeed / runningSpeed);
 }
 
@@ -179,13 +189,17 @@ void UPlayerMoveComp::OnReq_Running()
 	{
 		bIsRunning = true;
 		me->GetCharacterMovement()->MaxWalkSpeed *= runningSpeed;
-		UStaminaComp* staminaComp = me->FindComponentByClass<UStaminaComp>();
-		if (staminaComp)
-		{
-			// 달리기 시작할 때 스태미나 소모
-			staminaComp->ConsumeStamina( staminaComp->StaminaConsumptionRate );
-		}
 	}
+	else
+	{
+		bIsRunning = false;
+		me->GetCharacterMovement()->MaxWalkSpeed /= runningSpeed;
+	}
+}
+
+void UPlayerMoveComp::Server_StopRunning_Implementation()
+{
+	OnReq_Running();
 }
 
 void UPlayerMoveComp::Server_Running_Implementation()
@@ -198,6 +212,22 @@ void UPlayerMoveComp::Multicast_Running_Implementation()
 	OnReq_Running();
 }
 
+void UPlayerMoveComp::RunningStaminaDrain( float DeltaTime )
+{
+	static float RunningTime = 0.0f; // 달리기 시간 누적
+	RunningTime += DeltaTime;
+
+	// 매 1초마다 스태미나 감소
+	if (RunningTime >= 1.0f)
+	{
+		UStaminaComp* staminaComp = me->FindComponentByClass<UStaminaComp>();
+		if (staminaComp)
+		{
+			staminaComp->ConsumeStamina( 3.0f ); // 1초에 스태미나 1 소모
+			RunningTime = 0.0f;
+		}
+	}
+}
 
 void UPlayerMoveComp::GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const
 {

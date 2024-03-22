@@ -34,11 +34,11 @@ public:
 
 	// 스태미나 회복률
 	UPROPERTY( EditDefaultsOnly , BlueprintReadOnly , Category = "Stamina" )
-	float StaminaRecoveryRate = 1.0f;
+	float StaminaRecoveryRate = 3.0f;
 
 	// 스태미나 소모률
 	UPROPERTY( EditDefaultsOnly , BlueprintReadOnly , Category = "Stamina" )
-	float StaminaConsumptionRate = 1.0f;
+	float StaminaConsumptionRate = 3.0f;
 
 	void ConsumeStamina( float Amount );
 

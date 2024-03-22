@@ -74,6 +74,18 @@ void UStatusEffectComp::ClearStatusEffect( EStatusEffectType EffectType , FName 
 		{
 			Effect.bIsActive = false;
 			UE_LOG( LogTemp , Warning , TEXT( "StatusEffectComp::ClearStatusEffect - %s 상태이상의 %s 부위가 해제됨." ) , *GETENUMSTRING( "EStatusEffectType" , EffectType ) , *BodyPart.ToString() );
+
+			// 골절 상태이상이 해제되면 속도와 점프 높이 복구
+			if (EffectType == EStatusEffectType::Fracture)
+			{
+				if (me && me->GetCharacterMovement())
+				{
+					// 골절 상태 적용 시 설정했던 감소 비율의 역수를 곱하여 원래 속도와 점프 높이를 복구
+					float speedModifierInverse = 1 / 0.55f;
+					me->GetCharacterMovement()->MaxWalkSpeed *= speedModifierInverse;
+					me->GetCharacterMovement()->JumpZVelocity *= speedModifierInverse;
+				}
+			}
 			break; // 일치하는 첫 상태이상만 비활성화 후 반복 종료
 		}
 	}
