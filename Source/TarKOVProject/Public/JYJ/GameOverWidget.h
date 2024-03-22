@@ -24,13 +24,18 @@ public:
 	class UTextBlock* text_timer;
 
 	UPROPERTY( EditDefaultsOnly , BlueprintReadOnly , meta = (BindWidget) )
+	class UTextBlock* text_KillCount;
+	
+	UPROPERTY( EditDefaultsOnly , BlueprintReadOnly , meta = (BindWidget) )
 	class UButton* btn_quit;
 
 	UPROPERTY( EditDefaultsOnly , BlueprintReadOnly , meta = (BindWidget) )
 	class UButton* btn_restart;
 
 private:
+	UFUNCTION()
 	void OnClickbtnQuit();
+	UFUNCTION()
 	void OnClickbtnRestart();
 
 };

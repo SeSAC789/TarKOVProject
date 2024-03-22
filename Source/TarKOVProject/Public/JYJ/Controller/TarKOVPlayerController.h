@@ -30,7 +30,6 @@ public:
 	void UpdatekillCnt(int32 killOtherPlayer);
 
 
-
 	// Player MainUI
 	UPROPERTY( EditDefaultsOnly )
 	TSubclassOf<class UHPWidget> PlayerMainUIFactory;

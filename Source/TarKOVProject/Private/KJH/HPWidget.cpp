@@ -247,6 +247,7 @@ void UHPWidget::UpdateBodyPartImageColor( UImage* BodyPartImage , float HPPercen
 
 	if (BodyPartImage)
 	{
+		Color = Color.CopyWithNewOpacity( 0.5 );
 		BodyPartImage->SetColorAndOpacity( Color );
 	}
 }

@@ -159,7 +159,9 @@ public:
 	void PlayHitAnim();
 	void UpdateStaminaBar();
 
-
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
+	class UImage* Hit_Img;
+	
 	/*UPROPERTY()
 	class UHealthComp* healthComp;*/
 };

@@ -4,6 +4,8 @@
 #include "JYJ/GameOverWidget.h"
 #include "Components/Button.h"
 #include "JYJ/Controller/TarKOVPlayerController.h"
+#include "JYJ/GameInstance/TarKOVGameInstance.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 void UGameOverWidget::NativeConstruct()
 {
@@ -15,24 +17,14 @@ void UGameOverWidget::NativeConstruct()
 
 void UGameOverWidget::OnClickbtnQuit()
 {
-	auto pc = Cast<ATarKOVPlayerController>( GetWorld()->GetFirstPlayerController() );
-	pc->Pause();
+	auto pc = GetWorld()->GetFirstPlayerController();
+	UKismetSystemLibrary::QuitGame( GetWorld() , pc , EQuitPreference::Quit , false );
+
 }
 
 void UGameOverWidget::OnClickbtnRestart()
 {
-	//플레이어 컨트롤러를 가져오고 싶다.
-	auto pc = Cast<ATarKOVPlayerController>( GetWorld()->GetFirstPlayerController() );
-
-	if (pc)
-	{
-		//마우스 커서를 안보이게 하고 싶다.
-		pc->SetShowMouseCursor( false );
-		//SetShowGameOverUI( false );
-
-		//server retry를 호출하고 싶다.
-		pc->ServerRetry();
-
-		
-	}
+	auto gi = GetGameInstance<UTarKOVGameInstance>();
+	gi->ExitRoom();
+	btn_quit->SetIsEnabled( false );
 }

@@ -55,4 +55,5 @@ void ATriggerEscapeLocation::DisplayGameClearUI( AActor* InOverlapActor )
 
     pc->GameClearUI->AddToViewport();
     pc->SetShowMouseCursor( true );
+
 }

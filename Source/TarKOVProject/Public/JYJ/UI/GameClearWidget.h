@@ -33,6 +33,8 @@ public:
 	class UWidgetAnimation* GameClearAnimation;
 
 private:
+	UFUNCTION()
 	void OnClickbtnQuit();
+	UFUNCTION()
 	void OnClickbtnRestart();
 };

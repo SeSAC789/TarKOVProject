@@ -5,6 +5,8 @@
 #include "KJH/HPWidget.h"
 #include "Blueprint/UserWidget.h"
 #include <Subsystems/PanelExtensionSubsystem.h>
+
+#include "Components/Image.h"
 #include "JYJ/GameOverWidget.h"
 #include "JYJ/PlayerBase.h"
 #include "Net/UnrealNetwork.h"
@@ -56,6 +58,13 @@ void UHealthComp::TickComponent( float DeltaTime , ELevelTick TickType , FActorC
 
 void UHealthComp::TakeDamage( const FName& BodyPart , float DamageAmount , const FString& HitObjectName )
 {
+	if (me->PlayerMainUI)
+	{
+		UE_LOG( LogTemp , Warning , TEXT( "UHealthComp::TakeDamage play anim" ) )
+			me->PlayerMainUI->Hit_Img->SetVisibility( ESlateVisibility::Visible );
+		me->PlayerMainUI->PlayHitAnim();
+
+	}
 
 	bool bFoundBodyPart = false;
 
@@ -105,7 +114,7 @@ void UHealthComp::TakeDamage( const FName& BodyPart , float DamageAmount , const
 		// 해당 부위에 출혈 및 골절 상태를 적용.
 		//CheckAndApplyBleeding( BodyPart );
 		CheckAndApplyFracture( BodyPart );
-		
+
 	}
 	else
 	{
@@ -219,16 +228,13 @@ void UHealthComp::SetBodyPartHP( FName BodyPart , float NewHP )
 			break;
 		}
 	}
-	if (me->PlayerMainUI)
-	{
-		me->PlayerMainUI->PlayHitAnim();
-	}
+
 	OnRep_BodyPartHP();
 }
 
 void UHealthComp::OnRep_BodyPartHP()
 {
-	
+
 }
 
 void UHealthComp::CheckAndApplyBleeding( const FName& BodyPart )
@@ -326,7 +332,7 @@ FName UHealthComp::FindWeakestBodyPart()
 FName UHealthComp::FindWeakestFracturedBodyPart() const
 {
 	FName WeakestPart = NAME_None;
-	float MinHP = 100; 
+	float MinHP = 100;
 
 	for (const FBodyPartHealthData& Part : BodyPartHP)
 	{

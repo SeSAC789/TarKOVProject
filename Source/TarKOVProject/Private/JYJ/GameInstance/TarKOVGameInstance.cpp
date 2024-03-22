@@ -208,7 +208,7 @@ void UTarKOVGameInstance::OnExitRoomComplete(FName sessionName, bool bWasSuccess
 {
 	auto pc = GetWorld()->GetFirstPlayerController();
 
-	FString url = TEXT( "/Game/TarKOV/Maps/LoadingMap" );
+	FString url = TEXT( "/Game/TarKOV/Maps/LobbyMap" );
 	pc->ClientTravel( url , TRAVEL_Absolute );
 }
 
