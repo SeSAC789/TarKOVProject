@@ -71,7 +71,17 @@ public:
 	//방 입장 응답
 	void OnJoinRoomComplete( FName sessionName , EOnJoinSessionCompleteResult::Type result );
 
+	//방 퇴장 요청
+	void ExitRoom();
 
+	//방 퇴장 응답
+	UFUNCTION()
+	void OnExitRoomComplete( FName sessionName , bool bWasSuccessful );
 
+	UFUNCTION( Server , Reliable )
+	void ServerExitRoom();
+
+	UFUNCTION( NetMulticast , Reliable )
+	void MultiExitRoom();
 	
 };

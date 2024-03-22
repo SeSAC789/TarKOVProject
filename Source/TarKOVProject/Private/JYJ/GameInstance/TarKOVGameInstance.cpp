@@ -18,6 +18,8 @@ void UTarKOVGameInstance::Init()
 		sessionInterface->OnCreateSessionCompleteDelegates.AddUObject( this , &UTarKOVGameInstance::OnCreateRoomComplete );
 		sessionInterface->OnFindSessionsCompleteDelegates.AddUObject( this , &UTarKOVGameInstance::OnFindOtherRoomsComplete );
 		sessionInterface->OnJoinSessionCompleteDelegates.AddUObject( this , &UTarKOVGameInstance::OnJoinRoomComplete );
+		sessionInterface->OnDestroySessionCompleteDelegates.AddUObject( this , &UTarKOVGameInstance::OnExitRoomComplete );
+
 		
 	}
 }
@@ -197,4 +199,25 @@ void UTarKOVGameInstance::OnJoinRoomComplete(FName sessionName, EOnJoinSessionCo
 	}
 }
 
+void UTarKOVGameInstance::ExitRoom()
+{
+	ServerExitRoom();
+}
 
+void UTarKOVGameInstance::OnExitRoomComplete(FName sessionName, bool bWasSuccessful)
+{
+	auto pc = GetWorld()->GetFirstPlayerController();
+
+	FString url = TEXT( "/Game/TarKOV/Maps/LoadingMap" );
+	pc->ClientTravel( url , TRAVEL_Absolute );
+}
+
+void UTarKOVGameInstance::ServerExitRoom_Implementation()
+{
+	MultiExitRoom();
+}
+
+void UTarKOVGameInstance::MultiExitRoom_Implementation()
+{
+	sessionInterface->DestroySession( FName( *myRoomName ) );
+}

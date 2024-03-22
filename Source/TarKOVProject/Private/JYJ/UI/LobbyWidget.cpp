@@ -65,6 +65,7 @@ void ULobbyWidget::OnCreateRoom()
 void ULobbyWidget::OnFindRoomList()
 {
 	UE_LOG(LogTemp, Warning, TEXT("ULobbyWidget::OnFindRoomList - TEST1"));
+	scroll_roomlists->ClearChildren();
 	//게임 인스턴스가 있다면
 	if (gi)
 	{
@@ -83,6 +84,7 @@ void ULobbyWidget::OnFindRoomList()
 
 		gi->FindOtherRooms();
 		gi->onAddRoomInfoDelegate.AddDynamic( this , &ULobbyWidget::AddRoomInfoWidget );
+		//gi->onFindingRoomsDelegate.AddDynamic( this , &ULobbyWidget::SetFindActive );
 
 
 
