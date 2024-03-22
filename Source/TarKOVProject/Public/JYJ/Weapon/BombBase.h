@@ -23,7 +23,9 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaTime ) override;
 
-	void explosiveBomb();
+	void TakeDamageBomb( AActor* bomb );
+
+	void ExplosiveBomb( AActor* bomb );
 
 private:
 	UPROPERTY( EditAnywhere )

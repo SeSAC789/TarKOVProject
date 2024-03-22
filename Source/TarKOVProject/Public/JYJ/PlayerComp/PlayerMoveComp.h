@@ -63,7 +63,7 @@ public:
 	UPROPERTY( ReplicatedUsing = OnRep_Crouch, EditAnywhere , BlueprintReadWrite )
 	bool isCrouched;
 
-	UPROPERTY( ReplicatedUsing= OnReq_Prone , EditAnywhere , BlueprintReadWrite)
+	UPROPERTY( Replicated , EditAnywhere , BlueprintReadWrite)
 	bool isProned;
 
 public:
@@ -82,18 +82,8 @@ public:
 	UFUNCTION( Server , UnReliable )
 	void Server_Crouch();
 
-	UFUNCTION( NetMulticast , UnReliable )
-	void Multicast_Crouch();
-
-	// Prone
-	UFUNCTION()
-	void OnReq_Prone();
-
 	UFUNCTION( Server , UnReliable )
 	void Server_Prone();
-
-	UFUNCTION( NetMulticast , UnReliable )
-	void Multicast_Prone();
 
 	//Running
 	UFUNCTION()

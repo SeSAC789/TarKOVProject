@@ -127,6 +127,7 @@ private:
 
 	bool bEnableRepeating;
 	bool bRepeated;
+	bool bReload;
 
 	//-----------------NetWork-----------------//
 private:
@@ -177,7 +178,6 @@ private:
 	// server to multi.
 	UFUNCTION( NetMulticast , Reliable )
 	void MultiRPCReload( );		
-
 
 
 };

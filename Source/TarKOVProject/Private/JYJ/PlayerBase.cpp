@@ -184,7 +184,7 @@ void APlayerBase::PossessedBy(AController* NewController)
 
 	if (APlayerBase* NewCharacter = Cast<APlayerBase>( NewController->GetCharacter() ))
 	{
-		if (!NewCharacter->fireComp)
+		if (!NewCharacter->fireComp && !NewCharacter->throwComp)
 		{
 			UE_LOG( LogTemp , Warning , TEXT( "APlayerGameMode::OnPostLogin - No FireComp" ) )
 				return;
@@ -193,8 +193,7 @@ void APlayerBase::PossessedBy(AController* NewController)
 		NewCharacter->fireComp->SpawnRifle( NewCharacter->fireComp->RifleGun );
 		NewCharacter->fireComp->SpawnPistol( NewCharacter->fireComp->PistolGun );
 
-		//NewCharacter->fireComp->ServerRPCSpawnRifle( NewCharacter->fireComp->RifleGun );
-		//NewCharacter->fireComp->ServerRPCSpawnPistol( NewCharacter->fireComp->PistolGun );
+		//NewCharacter->throwComp->SpawnGrenade( NewCharacter->throwComp->BombBase );
 	}
 	else
 	{
