@@ -142,5 +142,9 @@ public:
 
 	UFUNCTION( BlueprintImplementableEvent )
 	void invenDie();
+
+	void InitUI();
+
+	void DamageProcess();
 };
 

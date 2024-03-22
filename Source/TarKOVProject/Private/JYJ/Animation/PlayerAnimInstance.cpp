@@ -124,33 +124,18 @@ void UPlayerAnimInstance::playGrenadeAnimation()
 void UPlayerAnimInstance::AnimNotify_OnGameOver()
 {
 	// 플레이어의 DamageProcess를 호출
-	if (!JHplayer)
+	if (!player)
 	{
 		return;
 	}
 	UE_LOG( LogTemp , Warning , TEXT( " UPlayerAnimInstance::AnimNotify_OnGameOver" ) );
 	
-	if (!JHplayer->IsLocallyControlled())
+	if (!player->IsLocallyControlled())
 	{
 		return;
 	}
 
-	JHplayer->DamageProcess();
-
-	/*
-	GameOverUI = CreateWidget<UGameOverWidget>( GetWorld() , GameOverUIFactory );
-	GameOverUI->AddToViewport();
-
-	UE_LOG( LogTemp , Warning , TEXT( "After Create Widget" ) )
-
-	auto pc = GetWorld()->GetFirstPlayerController();
-	pc->SetShowMouseCursor( true );
-
-	if(GameOverUI)
-	{
-
-	}
-	*/
+	player->DamageProcess();
 
 }
 

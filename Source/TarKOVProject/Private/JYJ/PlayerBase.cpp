@@ -16,6 +16,7 @@
 #include "KJH/HPWidget.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/PostProcessComponent.h"
+#include "JYJ/Controller/TarKOVPlayerController.h"
 #include "JYJ/PlayerComp/PlayerThrowComp.h"
 #include "JYJ/Trigger/TriggerEscapeLocation.h"
 #include "JYJ/Weapon/BombBase.h"
@@ -23,6 +24,7 @@
 #include "KJH/Medikit.h"
 #include "KJH/Splint.h"
 #include "KJH/StaminaComp.h"
+#include "JYJ/GameOverWidget.h"
 
 //DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -124,14 +126,7 @@ void APlayerBase::BeginPlay()
 	LeftLegUpperHitbox->OnComponentBeginOverlap.AddDynamic( this , &APlayerBase::OnHitboxOverlap );
 	LeftLegLowerHitbox->OnComponentBeginOverlap.AddDynamic( this , &APlayerBase::OnHitboxOverlap );
 
-	
-	//if (!PlayerMainUI)
-	//{
-	//	// MainUI를 생성해서 기억하고싶다.
-	//	PlayerMainUI = CreateWidget<UHPWidget>( GetWorld() , PlayerMainUIFactory );
-	//	// AddtoViewport하고싶다.
-	//	PlayerMainUI->AddToViewport();
-	//}
+	InitUI();
 
 	//네트워크 업데이트 빈도
 	NetUpdateFrequency = 100;
@@ -182,6 +177,11 @@ void APlayerBase::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy( NewController );
 
+
+	// player main UI 호출
+	InitUI();
+
+	// player gun spawn
 	if (APlayerBase* NewCharacter = Cast<APlayerBase>( NewController->GetCharacter() ))
 	{
 		if (!NewCharacter->fireComp && !NewCharacter->throwComp)
@@ -291,4 +291,57 @@ void APlayerBase::SetPartitionDamageCollision()
 	// (X=-0.343941,Y=-20.073776,Z=-0.984876) (Pitch=-2.179116,Yaw=-0.535826,Roll=89.314173)
 	// "LeftLeg" 태그 추가
 	LeftLegLowerHitbox->ComponentTags.Add( FName( "LeftLeg" ) );
+}
+
+void APlayerBase::InitUI()
+{
+	// 컨트롤러가 PlayerController가 아니라면 함수를 바로 종료
+	// 즉, mainUI를 생성하지 않겠다.
+	auto pc = Cast<ATarKOVPlayerController>( Controller );
+	if (nullptr == pc)
+	{
+		UE_LOG( LogTemp , Warning , TEXT( "%s : nullptr == pc" ) , __FUNCTION__ );
+		return;
+	}
+	if (false == IsLocallyControlled())
+	{
+		UE_LOG( LogTemp , Warning , TEXT( "%s : false == IsLocallyControlled()" ) , __FUNCTION__ );
+		return;
+	}
+
+	UE_LOG( LogTemp , Warning , TEXT( "AJHPlayerTest::InitUI" ) );
+
+
+	if (nullptr == pc->PlayerMainUI)
+	{
+		// MainUI를 생성해서 기억하고싶다.
+		pc->PlayerMainUI = CreateWidget<UHPWidget>( GetWorld() , pc->PlayerMainUIFactory );
+		// AddToViewport하고싶다.
+		pc->PlayerMainUI->AddToViewport();
+	}
+
+	// 만들어진 mainUI를 기억하고싶다.
+	PlayerMainUI = pc->PlayerMainUI;
+	// 만들어진 GameOVerUI를 기억하고싶다.
+	GameOverUI = pc->GameOverUI;
+
+	PlayerMainUI = pc->PlayerMainUI;
+}
+
+void APlayerBase::DamageProcess()
+{
+	// 죽음 애니메이션이 끝나면
+// 마우스 커서를 보이게하고싶다.
+	auto pc = Cast<ATarKOVPlayerController>( Controller );
+	pc->SetShowMouseCursor( true );
+	// 화면을 회색으로 보이게 하고싶다.
+	FollowCamera->PostProcessSettings.ColorSaturation = FVector4( 0 , 0 , 0 , 1 );
+	// 게임오버UI를 보이게하고싶다.
+	if (nullptr == pc->GameOverUI)
+	{
+		// GameOverUI를 생성해서 기억하고싶다.
+		pc->GameOverUI = CreateWidget<UGameOverWidget>( GetWorld() , pc->GameOverUIFactory );
+		// AddToViewport하고싶다.
+		pc->GameOverUI->AddToViewport();
+	}
 }
