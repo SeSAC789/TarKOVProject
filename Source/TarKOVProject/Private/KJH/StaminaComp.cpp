@@ -29,7 +29,7 @@ void UStaminaComp::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	RecoverStamina( DeltaTime );
+	//RecoverStamina( DeltaTime );
 }
 
 void UStaminaComp::ConsumeStamina(float Amount)

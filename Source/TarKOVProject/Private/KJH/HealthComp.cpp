@@ -105,11 +105,7 @@ void UHealthComp::TakeDamage( const FName& BodyPart , float DamageAmount , const
 		// 해당 부위에 출혈 및 골절 상태를 적용.
 		//CheckAndApplyBleeding( BodyPart );
 		CheckAndApplyFracture( BodyPart );
-		// 데미지 받으면 위젯 애님 재생
-		if (me && me->PlayerMainUI)
-		{
-			me->PlayerMainUI->PlayAnim();
-		}
+		
 	}
 	else
 	{
@@ -223,13 +219,16 @@ void UHealthComp::SetBodyPartHP( FName BodyPart , float NewHP )
 			break;
 		}
 	}
-
+	if (me->PlayerMainUI)
+	{
+		me->PlayerMainUI->PlayHitAnim();
+	}
 	OnRep_BodyPartHP();
 }
 
 void UHealthComp::OnRep_BodyPartHP()
 {
-
+	
 }
 
 void UHealthComp::CheckAndApplyBleeding( const FName& BodyPart )

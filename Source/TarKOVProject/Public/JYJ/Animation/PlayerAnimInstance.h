@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
+#include "KJH/JHPlayerTest.h"
 #include "PlayerAnimInstance.generated.h"
 
 /**
@@ -20,6 +21,10 @@ public:
 
 	UPROPERTY()
 	class APlayerBase* player;
+	
+	////테스트 위해 jhplayer 추가
+	///UPROPERTY()
+	class AJHPlayerTest* JHplayer;
 
 	UPROPERTY( EditAnywhere , BlueprintReadWrite )
 	float speed;

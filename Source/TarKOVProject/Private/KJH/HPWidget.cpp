@@ -287,7 +287,7 @@ void UHPWidget::UpdateStatusText()
 	}
 }
 
-void UHPWidget::PlayAnim()
+void UHPWidget::PlayHitAnim()
 {
 	PlayAnimation( HitAnimation );
 }

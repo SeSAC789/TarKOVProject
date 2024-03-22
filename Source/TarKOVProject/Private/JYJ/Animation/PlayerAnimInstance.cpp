@@ -11,6 +11,7 @@
 #include "JYJ/PlayerComp/PlayerThrowComp.h"
 #include "JYJ/TestPlayer/YJTestPlayer.h"
 #include "KJH/HealthComp.h"
+#include "KJH/JHPlayerTest.h"
 
 UPlayerAnimInstance::UPlayerAnimInstance()
 {
@@ -43,6 +44,8 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	//1. owner pawn 을 가져와서 atpsplayer 로 cast 하고 싶다.
 	player = Cast<APlayerBase>( TryGetPawnOwner() );
+
+	JHplayer = Cast<AJHPlayerTest>( TryGetPawnOwner() );
 
 	if (nullptr == player )
 		return;
@@ -120,6 +123,19 @@ void UPlayerAnimInstance::playGrenadeAnimation()
 
 void UPlayerAnimInstance::AnimNotify_OnGameOver()
 {
+	// 플레이어의 DamageProcess를 호출
+	if (!JHplayer)
+	{
+		return;
+	}
+	UE_LOG( LogTemp , Warning , TEXT( " UPlayerAnimInstance::AnimNotify_OnGameOver" ) );
+	
+	if (!JHplayer->IsLocallyControlled())
+	{
+		return;
+	}
+
+	JHplayer->DamageProcess();
 
 	/*
 	GameOverUI = CreateWidget<UGameOverWidget>( GetWorld() , GameOverUIFactory );

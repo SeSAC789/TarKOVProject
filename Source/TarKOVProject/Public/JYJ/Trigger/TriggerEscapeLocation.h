@@ -26,10 +26,12 @@ private:
 	UPROPERTY( EditDefaultsOnly )
 	TSubclassOf<class UUserWidget> GameOverUIFactory;
 
-	UPROPERTY()
+	/*UPROPERTY()
 	class UGameClearWidget* GameClearUI;
 
 	UPROPERTY( EditDefaultsOnly )
-	TSubclassOf<class UUserWidget> GameClearUIFactory;
+	TSubclassOf<class UUserWidget> GameClearUIFactory;*/
+
+	void DisplayGameClearUI( AActor* InOverlapActor );
 	
 };

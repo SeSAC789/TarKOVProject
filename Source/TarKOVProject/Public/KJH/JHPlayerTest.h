@@ -19,9 +19,14 @@ class TARKOVPROJECT_API AJHPlayerTest : public APlayerBase
 
 public:
 	virtual void BeginPlay() override;
+
+	virtual void PossessedBy( AController* NewController ) override;
+	
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	virtual void OnHitboxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 
 	void InitUI();
+
+	void DamageProcess();
 	
 };

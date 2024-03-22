@@ -14,6 +14,7 @@ ATriggerEscapeLocation::ATriggerEscapeLocation()
 	// Collision Setting
 	TriggerBox->OnComponentBeginOverlap.AddDynamic( this , &ATriggerEscapeLocation::OnTriggerBoxOverlap );
 
+    bReplicates = true;
 }
 
 void ATriggerEscapeLocation::OnTriggerBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -22,23 +23,36 @@ void ATriggerEscapeLocation::OnTriggerBoxOverlap(UPrimitiveComponent* Overlapped
 	Super::OnTriggerBoxOverlap(OverlappedComponent , OtherActor , OtherComp , OtherBodyIndex , bFromSweep ,
 	                           SweepResult);
 
-	// Test Mission Sucess UI
-	if(OtherActor == Cast<APlayerBase>(OtherActor))
-	{
-		FTimerHandle handler;
-		GetWorld()->GetTimerManager().SetTimer( handler , [&]()
-		{
-				GameClearUI = CreateWidget<UGameClearWidget>(GetWorld(), GameClearUIFactory);
-				GameClearUI->AddToViewport();
+    // 오버랩 이벤트가 서버에서 발생했는지 확인
+    DisplayGameClearUI(OtherActor);
+}
 
-				auto pc = GetWorld()->GetFirstPlayerController();
-				pc->SetShowMouseCursor( true );
+void ATriggerEscapeLocation::DisplayGameClearUI( AActor* InOverlapActor )
+{
+    APlayerBase* Player = Cast<APlayerBase>( InOverlapActor );
+    if (!Player)
+    {
+        return;
+    }
 
-				//10초 뒤, 탈출 Log 출력
-				UE_LOG( LogTemp , Warning , TEXT( "ATriggerEscapeLocation::OnTriggerBoxOverlap" ) )
+    if (!Player->IsLocallyControlled())
+    {
+        return;
+    }
+    // 클라이언트에 UI 표시 요청
+    //ClientDisplayGameClearUI();
+    auto pc = Cast<ATarKOVPlayerController>( GetWorld()->GetFirstPlayerController() );
+    if (!pc)
+    {
+        return;
+    }
 
-		} , 5, false );
+    pc->GameClearUI = CreateWidget<UGameClearWidget>( GetWorld() , pc->GameClearUIFactory );
+    if (!pc->GameClearUI)
+    {
+        return;
+    }
 
-	}
-
+    pc->GameClearUI->AddToViewport();
+    pc->SetShowMouseCursor( true );
 }

@@ -19,6 +19,7 @@ public:
 	UPlayerMoveComp();
 	virtual void TickComponent( float DeltaTime , ELevelTick TickType , FActorComponentTickFunction* ThisTickFunction ) override;
 	virtual void SetupInput( UEnhancedInputComponent* input ) override;
+	void RunningStaminaDrain(float DeltaTime);
 	virtual void GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
 
 	/** Jump Input Action */
@@ -95,6 +96,7 @@ public:
 	UFUNCTION( NetMulticast , UnReliable )
 	void Multicast_Running();
 
-
+	UFUNCTION( Server , UnReliable )
+	void Server_StopRunning();
 
 };
