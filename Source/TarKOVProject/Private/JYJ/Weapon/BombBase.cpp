@@ -7,6 +7,7 @@
 #include "JYJ/Controller/TarKOVPlayerController.h"
 #include "Kismet/GameplayStatics.h"
 #include "KJH/HealthComp.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 ABombBase::ABombBase()
@@ -50,79 +51,69 @@ void ABombBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	FTimerHandle handler;
+	GetWorld()->GetTimerManager().SetTimer( handler , [&]()
+	{
+		// 가까운 플레이어를 검색
+		StartTrace = this->GetActorLocation();
+		EndTrace = StartTrace + (FVector::UpVector * detectRadius); // 검색 반경 설정
+
+		FCollisionShape CollisionShape;
+		CollisionShape.ShapeType = ECollisionShape::Sphere;
+		CollisionShape.SetSphere( detectRadius );
+
+		FCollisionQueryParams QueryParams;
+		QueryParams.bTraceComplex = true;
+		QueryParams.AddIgnoredActor( this ); // 폭탄 자신을 무시
+
+		bool bHits = GetWorld()->SweepMultiByChannel( HitResults , StartTrace , EndTrace , FQuat::Identity , ECC_Pawn , CollisionShape , QueryParams );
+
+		if (bHits)
+		{
+			TSet<AActor*> DamagedPlayers;
+
+			for (auto& HitResult : HitResults)
+			{
+				AActor* HitActor = HitResult.GetActor();
+				if (HitActor && HitActor->IsA<APlayerBase>())
+				{
+					APlayerBase* Player = Cast<APlayerBase>( HitActor );
+					if (Player && !DamagedPlayers.Contains( Player ))
+					{
+						if (Player)
+						{
+							FString HitObjectName = Player->GetName();
+							Player->HealthComp->TakeDamage( 30 , HitObjectName );
+							UE_LOG( LogTemp , Warning , TEXT( "Bomb Damage Test3" ) );
+
+							DamagedPlayers.Add( Player );
+						}
+					}
+				}
+			}
+
+			UGameplayStatics::SpawnEmitterAtLocation( GetWorld() , ExplosionVFXFactory , this->GetActorLocation() );
+			this->Destroy();
+		}
+
+	} , 5 , false );
 }
 
 // Called every frame
 void ABombBase::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
-
 	DrawDebugSphere( GetWorld() , GetActorLocation() , detectRadius , 32 , FColor::Cyan , false , 0 );
-
 }
 
-void ABombBase::TakeDamageBomb( AActor* bomb )
+
+void ABombBase::GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const
 {
-	//auto pc = Cast<ATarKOVPlayerController>(GetWorld()->GetFirstPlayerController());
+	Super::GetLifetimeReplicatedProps( OutLifetimeProps );
 
-	//레벨에 있는 ANetTPSCharacter 객체들을 다 검사해서 detectRadius안에 있고 그중에서도 가장 가까운 녀석을 내 오너로 하고 싶다.
-	//if(HasAuthority())
-	//{
-		
-	//}
-
-	//AActor* newOwner = nullptr;
-	float tmpDist = detectRadius;
-	UE_LOG( LogTemp , Warning , TEXT( "Bomb Damage Test1" ) );
-
-	APlayerBase* player = Cast<APlayerBase>( bomb->GetOwner());
-
-	float temp = player->GetDistanceTo( bomb );
-
-	if (temp < tmpDist)
-	{
-		FString HitObjectName = player->GetName();
-		player->HealthComp->TakeDamage( 30 , HitObjectName );
-		UE_LOG( LogTemp , Warning , TEXT( "Bomb Damage Test3" ) );
-
-		//newOwner = player;
-		//tempDist 값을 계속 갱신해주면서 비교
-		//tmpDist = temp;
-	}
-
-	/*
-	for (TActorIterator<APlayerBase> It( GetWorld() ); It; ++It)
-	{
-		UE_LOG( LogTemp , Warning , TEXT( "Bomb Damage Test2" ) );
-		APlayerBase* player = *It;
-
-		float temp = player->GetDistanceTo( this );
-		UE_LOG( LogTemp , Warning , TEXT( "Distance => %f, Radius -> %f" ) , temp , tmpDist );
-		if (temp < tmpDist)
-		{
-			FString HitObjectName = player->GetName();
-			player->HealthComp->TakeDamage( 30 , HitObjectName );
-			UE_LOG( LogTemp , Warning , TEXT( "Bomb Damage Test3" ) );
-
-			newOwner = player;
-			//tempDist 값을 계속 갱신해주면서 비교
-			tmpDist = temp;
-		}
-
-	}
-	*/
-
-	
-
-	//UGameplayStatics::SpawnEmitterAtLocation( GetWorld() , ExplosionVFXFactory , bomb->GetActorLocation() );
-	//bomb->Destroy( true );
-
+	DOREPLIFETIME( ABombBase , playerTarget );
+	DOREPLIFETIME( ABombBase , HitResults );
+	DOREPLIFETIME( ABombBase , StartTrace );
+	DOREPLIFETIME( ABombBase , EndTrace );
 
 }
-
-void ABombBase::ExplosiveBomb( AActor* bomb )
-{
-	UGameplayStatics::SpawnEmitterAtLocation( GetWorld() , ExplosionVFXFactory , bomb->GetActorLocation() );
-	//bomb->Destroy( true );
-}
-

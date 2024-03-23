@@ -6,6 +6,7 @@
 
 #include "JYJ/Animation/PlayerAnimInstance.h"
 #include "JYJ/PlayerBase.h"
+#include "KJH/HealthComp.h"
 #include "JYJ/Weapon/BombBase.h"
 #include "EnhancedInputComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -44,54 +45,63 @@ void UPlayerThrowComp::throwBomb()
 {
 	
 	SpawnGrenade( BombBase );
-	
-	FTimerHandle handler;
-	GetWorld()->GetTimerManager().SetTimer( handler , [&]()
-	{
-		grenade->TakeDamageBomb(grenade);
-		//ServerRPCThrowBomb(grenade);
 
-	} , 5 , false );
-	
 	//ServerRPCThrowBomb();
 	
 }
 
-
-void UPlayerThrowComp::SpawnGrenade( TSubclassOf<ABombBase> BombFactory )
+void UPlayerThrowComp::ServerRPCTSpawnBomb_Implementation( TSubclassOf<ABombBase> BombFactory )
 {
 	if (!me) { return; }
 
 	if (BombFactory)
 	{
-		grenade = GetWorld()->SpawnActor<ABombBase>( BombFactory , me->GetActorLocation() , me->GetActorRotation() );
-		//grenade = GetWorld()->SpawnActor<ABombBase>( BombFactory , FVector::ZeroVector , FRotator::ZeroRotator );
+		MultiRPCSpawnBomb( BombFactory );
+	}
+}
 
-		if (grenade)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("UPlayerThrowComp::SpawnGrenade - Success"))
+void UPlayerThrowComp::MultiRPCSpawnBomb_Implementation( TSubclassOf<ABombBase> BombFactory )
+{
+	grenade = GetWorld()->SpawnActor<ABombBase>( BombFactory , me->GetActorLocation() , me->GetActorRotation() );
+	if (grenade)
+	{
+		UE_LOG( LogTemp , Warning , TEXT( "UPlayerThrowComp::SpawnGrenade - Success" ) )
 			grenade->AttachToComponent( me->pistolComp , FAttachmentTransformRules::SnapToTargetNotIncludingScale );
-			grenade->SetOwner( me );
-			//OnRep_Bomb();
-		}
-		//ServerRPCSpawnPistol(GunFactory);
+		grenade->SetOwner( me );
+
+
+		/*
+		FTimerHandle handler;
+		GetWorld()->GetTimerManager().SetTimer( handler , [&]()
+		{
+			grenade->TakeDamageBomb();
+
+		} , 5 , false );
+		*/
+
 
 	}
+	//ServerRPCSpawnPistol(GunFactory)
+}
+
+
+void UPlayerThrowComp::SpawnGrenade( TSubclassOf<ABombBase> BombFactory )
+{
+	ServerRPCTSpawnBomb( BombFactory );
 }
 
 void UPlayerThrowComp::ServerRPCThrowBomb_Implementation( )
 {
-	PlayerAnim->playGrenadeAnimation();
+	//PlayerAnim->playGrenadeAnimation();
 	//selectedBomb->ExplosiveBomb(selectedBomb);
-	//MultiRPCThrowBomb( selectedBomb );
-	
-	
+	MultiRPCThrowBomb();
 }
 
-void UPlayerThrowComp::MultiRPCThrowBomb_Implementation( ABombBase* selectedBomb )
+void UPlayerThrowComp::MultiRPCThrowBomb_Implementation()
 {
-	//UGameplayStatics::SpawnEmitterAtLocation( GetWorld() , ExplosionVFXFactory , selectedBomb->GetActorLocation() );
+	PlayerAnim->playGrenadeAnimation();
 }
+
 
 void UPlayerThrowComp::GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const
 {
