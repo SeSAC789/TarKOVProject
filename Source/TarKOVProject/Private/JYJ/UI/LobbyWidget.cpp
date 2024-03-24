@@ -8,6 +8,7 @@
 #include "JYJ/GameInstance/TarKOVGameInstance.h"
 #include "Components/WidgetSwitcher.h"
 #include "JYJ/UI/RoomInfoWidget.h"
+#include "Kismet/GameplayStatics.h"
 
 const int SWITCH_INDEX_MENU = 0;
 const int SWITCH_INDEX_FINDROOM = 1;
@@ -35,6 +36,8 @@ void ULobbyWidget::SwitchPanel(int32 index)
 
 void ULobbyWidget::OnClickGoLobby()
 {
+	UGameplayStatics::PlaySound2D( GetWorld() , clickSFX );
+
 	SwitchPanel(SWITCH_INDEX_FINDROOM);
 	UE_LOG( LogTemp , Warning , TEXT( "ULobbyWidget::OnClickGoLobby - test1" ) );
 
@@ -43,6 +46,7 @@ void ULobbyWidget::OnClickGoLobby()
 
 void ULobbyWidget::OnCreateRoom()
 {
+	UGameplayStatics::PlaySound2D( GetWorld() , clickSFX );
 	if(gi)
 	{
 		if(false == edit_username->GetText().IsEmpty())

@@ -68,20 +68,7 @@ void UPlayerThrowComp::MultiRPCSpawnBomb_Implementation( TSubclassOf<ABombBase> 
 		UE_LOG( LogTemp , Warning , TEXT( "UPlayerThrowComp::SpawnGrenade - Success" ) )
 			grenade->AttachToComponent( me->pistolComp , FAttachmentTransformRules::SnapToTargetNotIncludingScale );
 		grenade->SetOwner( me );
-
-
-		/*
-		FTimerHandle handler;
-		GetWorld()->GetTimerManager().SetTimer( handler , [&]()
-		{
-			grenade->TakeDamageBomb();
-
-		} , 5 , false );
-		*/
-
-
 	}
-	//ServerRPCSpawnPistol(GunFactory)
 }
 
 
@@ -92,8 +79,6 @@ void UPlayerThrowComp::SpawnGrenade( TSubclassOf<ABombBase> BombFactory )
 
 void UPlayerThrowComp::ServerRPCThrowBomb_Implementation( )
 {
-	//PlayerAnim->playGrenadeAnimation();
-	//selectedBomb->ExplosiveBomb(selectedBomb);
 	MultiRPCThrowBomb();
 }
 

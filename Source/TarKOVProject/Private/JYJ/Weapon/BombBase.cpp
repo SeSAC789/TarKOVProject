@@ -51,6 +51,8 @@ void ABombBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if(!bombSFX && !bombVFX)	return;
+
 	FTimerHandle handler;
 	GetWorld()->GetTimerManager().SetTimer( handler , [&]()
 	{
@@ -92,7 +94,8 @@ void ABombBase::BeginPlay()
 				}
 			}
 
-			UGameplayStatics::SpawnEmitterAtLocation( GetWorld() , ExplosionVFXFactory , this->GetActorLocation() );
+			UGameplayStatics::SpawnEmitterAtLocation( GetWorld() , bombVFX , this->GetActorLocation() );
+			UGameplayStatics::PlaySound2D( GetWorld() , bombSFX );
 			this->Destroy();
 		}
 
@@ -103,7 +106,7 @@ void ABombBase::BeginPlay()
 void ABombBase::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
-	DrawDebugSphere( GetWorld() , GetActorLocation() , detectRadius , 32 , FColor::Cyan , false , 0 );
+	//DrawDebugSphere( GetWorld() , GetActorLocation() , detectRadius , 32 , FColor::Cyan , false , 0 );
 }
 
 

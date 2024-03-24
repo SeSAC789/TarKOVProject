@@ -2,16 +2,21 @@
 
 
 #include "JYJ/PlayerComp/PlayerMoveComp.h"
+
+#include "AudioDevice.h"
 #include "JYJ/PlayerBase.h"
 #include "EnhancedInputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "KJH/StaminaComp.h"
 #include "Net/UnrealNetwork.h"
+#include "Sound/SoundCue.h"
 
 
 UPlayerMoveComp::UPlayerMoveComp()
 {
 	SetIsReplicatedByDefault( true );
+	
 }
 
 void UPlayerMoveComp::TickComponent( float DeltaTime , ELevelTick TickType , FActorComponentTickFunction* ThisTickFunction )

@@ -18,7 +18,7 @@ ARifleGun::ARifleGun()
 		//GunMeshComp->SetRelativeRotation( FRotator( 40 , -100 , 80 ) );
 	}
 
-	AimCamSocket->SetRelativeLocation( FVector( 0 , 25 , 17 ) );
+	AimCamSocket->SetRelativeLocation( FVector( 0 , 45 , 15 ) );
 	AimCamSocket->SetRelativeRotation( FRotator( 0 , 90 , 0 ) );
 
 	GunMeshComp->SetIsReplicated(true);

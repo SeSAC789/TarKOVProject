@@ -10,6 +10,8 @@
 #include "JYJ/PlayerComp/PlayerFireComp.h"
 #include "JYJ/PlayerComp/PlayerThrowComp.h"
 #include "JYJ/TestPlayer/YJTestPlayer.h"
+#include "Kismet/GameplayStatics.h"
+#include "Components/AudioComponent.h"
 #include "KJH/HealthComp.h"
 #include "KJH/JHPlayerTest.h"
 
@@ -144,4 +146,12 @@ void UPlayerAnimInstance::AnimNotify_OnThrowGrenade()
 	if(!player->IsLocallyControlled()) return;
 
 	player->throwComp->throwBomb();
+}
+
+void UPlayerAnimInstance::AnimNotify_OnWalking()
+{
+	if (footstepSFX)
+	{
+		UGameplayStatics::PlaySound2D( GetWorld() , footstepSFX );
+	}
 }

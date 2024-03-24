@@ -77,6 +77,10 @@ public:
 	UPROPERTY( EditDefaultsOnly )
 	TSubclassOf<class UUserWidget> GameOverUIFactory;
 
+	UPROPERTY( EditDefaultsOnly )
+	class USoundBase* footstepSFX;
+
+
 	void playFireRifleAnimation();
 	void playFirePistolAnimation();
 
@@ -90,5 +94,8 @@ public:
 
 	UFUNCTION()
 	void AnimNotify_OnThrowGrenade();
+
+	UFUNCTION()
+	void AnimNotify_OnWalking();
 	
 };

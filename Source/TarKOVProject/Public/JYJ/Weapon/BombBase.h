@@ -35,7 +35,10 @@ private:
 	class UProjectileMovementComponent* throwDir;
 
 	UPROPERTY( EditDefaultsOnly )
-	class UParticleSystem* ExplosionVFXFactory;
+	class UParticleSystem* bombVFX;
+
+	UPROPERTY( EditDefaultsOnly )
+	class USoundBase* bombSFX;
 
 	UPROPERTY()
 	class APlayerBase* damagePlayer;

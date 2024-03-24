@@ -261,7 +261,6 @@ void UPlayerFireComp::PrintNetLog()
 	DrawDebugString( GetWorld() , loc , *str , nullptr , FColor::Yellow , 0 , true , 1.2f );
 }
 
-
 void UPlayerFireComp::SetAiming( FHitResult OutHit , FVector Start , FVector EndPoint )
 {
 	// Param Settings
@@ -291,6 +290,7 @@ void UPlayerFireComp::SetAiming( FHitResult OutHit , FVector Start , FVector End
 	UCapsuleComponent* HitComp = Cast<UCapsuleComponent>( OutHit.GetComponent() );
 	if (HitComp == nullptr)return;
 
+	ServerFireVFX( OutHit );
 	if (HitComp->ComponentHasTag( "Head" ) || HitComp->ComponentHasTag( "Thorax" ) || HitComp->ComponentHasTag( "Stomach" ) || HitComp->ComponentHasTag( "RightArm" ) || HitComp->ComponentHasTag( "LeftArm" ) || HitComp->ComponentHasTag( "RightLeg" ) || HitComp->ComponentHasTag( "LeftLeg" ))
 	{
 		auto otherplayer = Cast<APlayerBase>( OutHit.GetActor() );
@@ -379,6 +379,9 @@ void UPlayerFireComp::MultiRPCFirePistol_Implementation( FHitResult OutHits )
 	// Montage Play
 	PlayerAnim->playFirePistolAnimation();
 
+	if (pistolSFX)
+		UGameplayStatics::PlaySound2D( GetWorld() , pistolSFX );
+
 	// Param Settings
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor( me );
@@ -391,8 +394,9 @@ void UPlayerFireComp::MultiRPCFirePistol_Implementation( FHitResult OutHits )
 	FVector _End = pistol->AimCamSocket->GetForwardVector() * 100000;
 	bool bHits = GetWorld()->LineTraceSingleByChannel( OutHits , _Start , _End , ECollisionChannel::ECC_Visibility , Params );
 
+	UGameplayStatics::SpawnEmitterAtLocation( GetWorld() , muzzleVFX , _Start, FRotator( 90 , 0 , 0 ) );
 	DrawDebugLine( GetWorld() , t.GetLocation() , _End , FColor::Silver , false , 0.2f );
-	UGameplayStatics::SpawnEmitterAtLocation( GetWorld() , ExplosionVFXFactory, OutHits.ImpactPoint);
+	//UGameplayStatics::SpawnEmitterAtLocation( GetWorld() , ExplosionVFXFactory, OutHits.ImpactPoint);
 }
 
 void UPlayerFireComp::ServerRPCFireRifle_Implementation()
@@ -423,6 +427,9 @@ void UPlayerFireComp::MultiRPCFireRifle_Implementation( FHitResult OutHits )
 {
 	PlayerAnim->playFireRifleAnimation();
 
+	if (rifleSFX)
+		UGameplayStatics::PlaySound2D( GetWorld() , rifleSFX );
+
 	// Param Settings
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor( me );
@@ -436,7 +443,7 @@ void UPlayerFireComp::MultiRPCFireRifle_Implementation( FHitResult OutHits )
 	bool bHits = GetWorld()->LineTraceSingleByChannel( OutHits , _Start , _End , ECollisionChannel::ECC_Visibility , Params );
 
 	DrawDebugLine( GetWorld() , t.GetLocation() , _End , FColor::Silver , false , 0.2f );
-	UGameplayStatics::SpawnEmitterAtLocation( GetWorld() , ExplosionVFXFactory , OutHits.ImpactPoint );
+	UGameplayStatics::SpawnEmitterAtLocation( GetWorld() , muzzleVFX , _Start, FRotator( 90 , 0 , 0 ) );
 
 }
 
@@ -459,27 +466,6 @@ void UPlayerFireComp::ServerRPCReload_Implementation()
 
 	//MultiRPCReload();
 }
-
-void UPlayerFireComp::MultiRPCReload_Implementation()
-{
-	/*
-	switch (aim)
-	{
-	case EWeaponAim::RIFLE:
-		PlayerAnim->playReloadRifleAnimation();
-		//rifle->currentAmmo = rifle->gunMaxAmmo;
-		break;
-	case EWeaponAim::PISTOL:
-		PlayerAnim->playReloadPistolAnimation();
-		//pistol->currentAmmo = pistol->gunMaxAmmo;
-		break;
-	case EWeaponAim::MACHINEGUN:
-		break;
-
-	}
-	*/
-}
-
 
 void UPlayerFireComp::ServerRPCSelectedRifle_Implementation( ARifleGun* selectedRifle )
 {
@@ -525,6 +511,29 @@ void UPlayerFireComp::OnRep_Pistol()
 	pistol->pistolMesh->SetVisibility( bValidPistol );
 	//pistol->SetOwner(me);
 	
+}
+
+void UPlayerFireComp::ServerFireVFX_Implementation( FHitResult OutHit )
+{
+	MultiFireVFX( OutHit );
+}
+
+void UPlayerFireComp::MultiFireVFX_Implementation( FHitResult OutHit )
+{
+	UCapsuleComponent* HitComp = Cast<UCapsuleComponent>( OutHit.GetComponent() );
+	if (HitComp == nullptr)return;
+
+	if (HitComp->ComponentHasTag( "Head" ) || HitComp->ComponentHasTag( "Thorax" ) || HitComp->ComponentHasTag( "Stomach" ) || HitComp->ComponentHasTag( "RightArm" ) || HitComp->ComponentHasTag( "LeftArm" ) || HitComp->ComponentHasTag( "RightLeg" ) || HitComp->ComponentHasTag( "LeftLeg" ))
+	{
+		auto otherplayer = Cast<APlayerBase>( OutHit.GetActor() );
+		if (otherplayer)
+		{
+			UGameplayStatics::SpawnEmitterAtLocation( GetWorld() , damageVFX , OutHit.ImpactPoint, me->GetActorRotation() );
+		} else
+		{
+			
+		}
+	}
 }
 
 void UPlayerFireComp::GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const

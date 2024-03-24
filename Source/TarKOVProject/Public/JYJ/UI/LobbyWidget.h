@@ -57,5 +57,7 @@ public:
 	UFUNCTION()
 	void AddRoomInfoWidget( const struct FRoomInfo& info );
 
+	UPROPERTY(EditDefaultsOnly)
+	class USoundBase* clickSFX;
 	
 };

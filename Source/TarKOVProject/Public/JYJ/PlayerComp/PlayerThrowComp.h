@@ -15,47 +15,35 @@ class TARKOVPROJECT_API UPlayerThrowComp : public UPlayerBaseComp
 {
 	GENERATED_BODY()
 
-private:
+public:
 	UPlayerThrowComp();
 	virtual void BeginPlay() override;
 	virtual void SetupInput( UEnhancedInputComponent* input ) override;
 	virtual void GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
 
-	void InputThrow();
+	//-----------------Input-----------------//
+	UPROPERTY( EditAnywhere , BlueprintReadOnly , Category = Input , meta = (AllowPrivateAccess = "true") )
+	class UInputAction* BombThrowAction;
 
-	
-
+	//-----------------Function--------------//
 public:
+	void InputThrow();
 	void SpawnGrenade( TSubclassOf<ABombBase> BombFactory );
-	//void SpawnGrenade( ABombBase grenade );
 	void throwBomb();
 
-
-
+	//-----------------Member variable-----------------//
+public:
 	UPROPERTY( Replicated, EditDefaultsOnly )
 	class ABombBase* grenade;
 
 	UPROPERTY( EditDefaultsOnly )
 	TSubclassOf<class ABombBase> BombBase;
 
-
-private:
 	UPROPERTY( EditAnywhere )
 	class UPlayerAnimInstance* PlayerAnim;
 
-	UPROPERTY( EditAnywhere , BlueprintReadOnly , Category = Input , meta = (AllowPrivateAccess = "true") )
-	class UInputAction* BombThrowAction;
-
-	UPROPERTY( EditDefaultsOnly )
-	class UParticleSystem* ExplosionVFXFactory;
-
-	//UPROPERTY( EditDefaultsOnly )
-	//class ABombBase* grenade;
-
-	//UPROPERTY( EditAnywhere )
-	//TSubclassOf<class ABombBase> GrenadeBomb;
-
-	//Reload
+	//-----------------NetWork---------------//
+public:
 	// client to server.
 	UFUNCTION( Server , Reliable )
 	void ServerRPCThrowBomb( );
@@ -63,7 +51,6 @@ private:
 	// server to multi.
 	UFUNCTION( NetMulticast , Reliable )
 	void MultiRPCThrowBomb();
-
 
 	UFUNCTION( Server , Reliable )
 	void ServerRPCTSpawnBomb( TSubclassOf<ABombBase> BombFactory );

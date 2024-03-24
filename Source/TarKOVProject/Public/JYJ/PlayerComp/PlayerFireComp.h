@@ -98,11 +98,20 @@ public:
 	EWeaponAim aim;
 
 private:
+	UPROPERTY( EditDefaultsOnly )
+	class USoundBase* rifleSFX;
+
+	UPROPERTY( EditDefaultsOnly )
+	class USoundBase* pistolSFX;
+
 	UPROPERTY( EditAnywhere )
 	class UPlayerAnimInstance* PlayerAnim;
 
 	UPROPERTY( EditDefaultsOnly )
-	class UParticleSystem* ExplosionVFXFactory;
+	class UParticleSystem* muzzleVFX;
+
+	UPROPERTY( EditDefaultsOnly )
+	class UParticleSystem* damageVFX;
 
 	void ChoosePistol();
 	void ChooseRifle();
@@ -134,50 +143,43 @@ private:
 	void PrintNetLog();
 
 	// Selected Pistol
-	// client to server.
 	UFUNCTION( Server , Reliable )
-	void ServerRPCSelectedPistol( APistolGun* selectedPistol );				
+	void ServerRPCSelectedPistol( APistolGun* selectedPistol );
 
-	// server to multi.
 	UFUNCTION( NetMulticast , Reliable )
 	void MultiRPCSelectedPistol( APistolGun* selectedPistol );				
 
 	//Selected Rifle
-	// client to server.
 	UFUNCTION( Server , Reliable )
 	void ServerRPCSelectedRifle( ARifleGun* selectedRifle );				
 
-	// server to multi.
 	UFUNCTION( NetMulticast , Reliable )
 	void MultiRPCSelectedRifle( ARifleGun* selectedRifle );
 
 	//Fire
-	// client to server.
 	UFUNCTION( Server , Reliable )
 	void ServerRPCFirePistol( );											
 
-	// server to multi.
 	UFUNCTION( NetMulticast , Reliable )
 	void MultiRPCFirePistol( FHitResult OutHits );
 
 
-	// client to server.
 	UFUNCTION( Server , Reliable )
 	void ServerRPCFireRifle();
 
-	// server to multi.
 	UFUNCTION( NetMulticast , Reliable )
 	void MultiRPCFireRifle( FHitResult OutHits );
 
-
 	//Reload
-	// client to server.
 	UFUNCTION( Server , Reliable )
 	void ServerRPCReload();											
 
-	// server to multi.
+	//VFX
+	UFUNCTION( Server , Reliable )
+	void ServerFireVFX( FHitResult OutHit );
+
 	UFUNCTION( NetMulticast , Reliable )
-	void MultiRPCReload( );		
+	void MultiFireVFX( FHitResult OutHits );
 
 
 };
