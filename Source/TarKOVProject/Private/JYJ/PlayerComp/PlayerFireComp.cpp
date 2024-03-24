@@ -15,6 +15,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Components/AudioComponent.h"
 #include "Sound/SoundWave.h"
+#include "Misc/OutputDeviceNull.h"
 
 UPlayerFireComp::UPlayerFireComp()
 {
@@ -570,4 +571,9 @@ void UPlayerFireComp::PlaySoundAtLocation()
 		}
 		AudioComponent->Play( 0.f );
 	}
+
+	//FireLightON
+	FOutputDeviceNull pAR;
+	GetOwner()->CallFunctionByNameWithArguments( TEXT( "FireLightON" ) , pAR , nullptr , true );
+
 }
