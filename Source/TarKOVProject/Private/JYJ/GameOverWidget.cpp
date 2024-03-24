@@ -15,8 +15,12 @@ void UGameOverWidget::NativeConstruct()
 	ATarKOVPlayerController* pc = Cast<ATarKOVPlayerController>( GetOwningPlayer() );
 	if (pc)
 	{
+		// 플레이 시간
 		FString PlayTimeText = FString::Printf( TEXT( "레이드 시간 : %.2f " ) , pc->PlayTime );
 		text_timer->SetText( FText::FromString( PlayTimeText ) );
+
+		// 킬 카운트 
+		UpdatePlayerKillCount( pc->GetKillCount() );
 	}
 
 	btn_restart->OnClicked.AddDynamic( this , &UGameOverWidget::OnClickbtnRestart );
@@ -35,4 +39,24 @@ void UGameOverWidget::OnClickbtnRestart()
 	auto gi = GetGameInstance<UTarKOVGameInstance>();
 	gi->ExitRoom();
 	btn_quit->SetIsEnabled( false );
+}
+
+void UGameOverWidget::UpdatePlayerKillCount( int32 KillCount )
+{
+	if (text_KillCount)
+	{
+		text_KillCount->SetText( FText::AsNumber( KillCount ) );
+	}
+}
+
+FText UGameOverWidget::GetKillCountText() const
+{
+	const ATarKOVPlayerController* pc = Cast<ATarKOVPlayerController>( GetOwningPlayer() );
+	if (pc)
+	{
+		int32 KillCount = pc->GetKillCount();
+		return FText::AsNumber( KillCount );
+	}
+
+	return FText::GetEmpty();
 }

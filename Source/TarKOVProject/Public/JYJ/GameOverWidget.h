@@ -32,6 +32,11 @@ public:
 	UPROPERTY( EditDefaultsOnly , BlueprintReadOnly , meta = (BindWidget) )
 	class UButton* btn_restart;
 
+	UFUNCTION( BlueprintCallable )
+	void UpdatePlayerKillCount( int32 KillCount );
+
+	FText GetKillCountText() const;
+
 private:
 	UFUNCTION()
 	void OnClickbtnQuit();

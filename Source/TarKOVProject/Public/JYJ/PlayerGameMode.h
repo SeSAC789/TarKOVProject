@@ -14,4 +14,6 @@ class TARKOVPROJECT_API APlayerGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
+public:
+	void CheckGameOverCondition();
 };

@@ -42,6 +42,16 @@ void ATarKOVPlayerController::UpdatekillCnt(int32 killOtherPlayer)
 
 }
 
+int32 ATarKOVPlayerController::GetKillCount() const
+{
+	return killCnt;
+}
+
+UGameOverWidget* ATarKOVPlayerController::GetGameOverUI() const
+{
+	return GameOverUI;
+}
+
 void ATarKOVPlayerController::OnRep_GameStartTime()
 {
 }
@@ -84,5 +94,5 @@ void ATarKOVPlayerController::GetLifetimeReplicatedProps( TArray<FLifetimeProper
 
 	DOREPLIFETIME( ATarKOVPlayerController , GameStartTime );
 	DOREPLIFETIME( ATarKOVPlayerController , PlayTime );
-
+	DOREPLIFETIME( ATarKOVPlayerController , killCnt );
 }

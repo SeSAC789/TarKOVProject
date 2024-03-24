@@ -59,6 +59,11 @@ void UHealthComp::TickComponent( float DeltaTime , ELevelTick TickType , FActorC
 
 void UHealthComp::TakeDamage( const FName& BodyPart , float DamageAmount , const FString& HitObjectName )
 {
+	if (bIsDead)
+	{
+		return;
+	}
+
 	if (!me && !me->PlayerMainUI)
 	{
 		return;
@@ -297,6 +302,11 @@ void UHealthComp::CheckAndApplyFracture( const FName& BodyPart )
 
 void UHealthComp::DistributeDamage( float DamageAmount , FName IgnoredBodyPart )
 {
+	if (bIsDead)
+	{
+		return;
+	}
+
 	float DamageMultiplier = 1.0f; // 기본 피해량 배수
 
 	// 부위 별 피해 분산 배수 조정 
@@ -412,6 +422,11 @@ TArray<FName> UHealthComp::GetInjuredBodyParts() const
 	return InjuredParts;
 }
 
+bool UHealthComp::IsDead()
+{
+	return bIsDead;
+}
+
 void UHealthComp::GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const
 {
 	Super::GetLifetimeReplicatedProps( OutLifetimeProps );
@@ -419,9 +434,4 @@ void UHealthComp::GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLife
 	DOREPLIFETIME( UHealthComp , BodyPartHP );
 	DOREPLIFETIME( UHealthComp , bIsDead );
 }
-
-void UHealthComp::invenDie()
-{
-}
-
 

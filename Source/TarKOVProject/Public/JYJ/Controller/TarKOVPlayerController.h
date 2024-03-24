@@ -23,11 +23,14 @@ public:
 
 	virtual void BeginPlay() override;
 
-	UPROPERTY()
+	UPROPERTY( Replicated , EditAnywhere , BlueprintReadWrite )
 	int32 killCnt = 0;
 
 	// Kill Count
 	void UpdatekillCnt(int32 killOtherPlayer);
+
+	UFUNCTION()
+	int32 GetKillCount() const;
 
 
 	// Player MainUI
@@ -41,12 +44,15 @@ public:
 	UPROPERTY( EditDefaultsOnly )
 	TSubclassOf<class UGameOverWidget> GameOverUIFactory;
 
-	UPROPERTY()
+	UPROPERTY( Transient )
 	class UGameOverWidget* GameOverUI;
 
 	// Game Clear UI -> Trigger에서 5초 지나면 실행
 	UPROPERTY( EditDefaultsOnly )
 	TSubclassOf<class UGameClearWidget> GameClearUIFactory;
+
+	UFUNCTION( BlueprintCallable )
+	UGameOverWidget* GetGameOverUI() const;
 
 	UPROPERTY()
 	class UGameClearWidget* GameClearUI;
