@@ -179,5 +179,16 @@ private:
 	UFUNCTION( NetMulticast , Reliable )
 	void MultiRPCReload( );		
 
+public:
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio")
+    UAudioComponent* AudioComponent;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+    USoundWave* SoundToPlay;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+    USoundAttenuation* SoundAttenuation;
+
+	UFUNCTION()
+	void PlaySoundAtLocation();
 };

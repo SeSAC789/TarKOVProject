@@ -13,12 +13,17 @@
 #include "Kismet/GameplayStatics.h"
 #include "KJH/HealthComp.h"
 #include "Net/UnrealNetwork.h"
-
+#include "Components/AudioComponent.h"
+#include "Sound/SoundWave.h"
 
 UPlayerFireComp::UPlayerFireComp()
 {
-
+	
 	SetIsReplicatedByDefault( true );
+
+	AudioComponent = CreateDefaultSubobject<UAudioComponent>( TEXT( "AudioComponent" ) );
+	AudioComponent->bAutoActivate = false; 
+	//AudioComponent->AutoAttachParent;
 }
 
 void UPlayerFireComp::BeginPlay()
@@ -34,6 +39,7 @@ void UPlayerFireComp::BeginPlay()
 	bRepeated = false;
 	bAimRifle = false;
 	bEnableRepeating = false;
+	AudioComponent->AttachToComponent( GetOwner()->GetRootComponent() , FAttachmentTransformRules::KeepRelativeTransform );
 
 }
 
@@ -197,6 +203,7 @@ void UPlayerFireComp::Fire()
 	case EWeaponAim::MACHINEGUN:
 		break;
 	}
+
 }
 
 
@@ -347,6 +354,8 @@ void UPlayerFireComp::MultiRPCSelectedPistol_Implementation( APistolGun* selecte
 
 	OnRep_Pistol();
 	OnRep_Rifle();
+
+
 }
 
 void UPlayerFireComp::ServerRPCFirePistol_Implementation()
@@ -393,6 +402,9 @@ void UPlayerFireComp::MultiRPCFirePistol_Implementation( FHitResult OutHits )
 
 	DrawDebugLine( GetWorld() , t.GetLocation() , _End , FColor::Silver , false , 0.2f );
 	UGameplayStatics::SpawnEmitterAtLocation( GetWorld() , ExplosionVFXFactory, OutHits.ImpactPoint);
+
+	PlaySoundAtLocation();
+
 }
 
 void UPlayerFireComp::ServerRPCFireRifle_Implementation()
@@ -437,6 +449,8 @@ void UPlayerFireComp::MultiRPCFireRifle_Implementation( FHitResult OutHits )
 
 	DrawDebugLine( GetWorld() , t.GetLocation() , _End , FColor::Silver , false , 0.2f );
 	UGameplayStatics::SpawnEmitterAtLocation( GetWorld() , ExplosionVFXFactory , OutHits.ImpactPoint );
+
+	PlaySoundAtLocation();
 
 }
 
@@ -542,4 +556,18 @@ void UPlayerFireComp::GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& Out
 	//DOREPLIFETIME( UPlayerFireComp , pistol->currentAmmo );
 	//DOREPLIFETIME( UPlayerFireComp , rifle->currentAmmo );
 
+}
+ 
+void UPlayerFireComp::PlaySoundAtLocation()
+{
+	UE_LOG( LogTemp , Warning , TEXT( "bang" ) );
+	if (SoundToPlay != nullptr)
+	{
+		AudioComponent->SetSound( SoundToPlay );
+		if (SoundAttenuation != nullptr)
+		{
+			AudioComponent->AttenuationSettings = SoundAttenuation;
+		}
+		AudioComponent->Play( 0.f );
+	}
 }
