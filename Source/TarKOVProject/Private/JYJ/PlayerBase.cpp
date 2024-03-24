@@ -318,6 +318,8 @@ void APlayerBase::InitUI()
 		pc->PlayerMainUI = CreateWidget<UHPWidget>( GetWorld() , pc->PlayerMainUIFactory );
 		// AddToViewport하고싶다.
 		pc->PlayerMainUI->AddToViewport();
+		// 타이머 카운트 다운 시작하고싶다.
+		pc->PlayerMainUI->StartCountdown( 300 ); // 5분
 	}
 
 	// 만들어진 mainUI를 기억하고싶다.
@@ -331,7 +333,7 @@ void APlayerBase::InitUI()
 void APlayerBase::DamageProcess()
 {
 	// 죽음 애니메이션이 끝나면
-// 마우스 커서를 보이게하고싶다.
+    // 마우스 커서를 보이게하고싶다.
 	auto pc = Cast<ATarKOVPlayerController>( Controller );
 	pc->SetShowMouseCursor( true );
 	// 화면을 회색으로 보이게 하고싶다.

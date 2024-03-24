@@ -161,7 +161,36 @@ public:
 
 	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
 	class UImage* Hit_Img;
-	
+
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
+	class UImage* ExitClear_Img;
+
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
+	class UImage* Clear_Img;
+
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
+	class UTextBlock* ClearTimer_Text;
+
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
+	class UTextBlock* ExitClear_Text;
+
+	UFUNCTION( BlueprintCallable )
+	void StartCountdown( int32 CountdownTime );
+
+	UFUNCTION( BlueprintCallable )
+	void StopCountdown();
+
+	FTimerHandle CountdownTimerHandle;
+	int32 CurrentCountdownTime;
+
+	void UpdateCountdown();
+
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
+	class UTextBlock* Timer_Text;
+
+	void UpdateHPBarColor( UProgressBar* HPBar , float HPPercentage ) const;
+
 	/*UPROPERTY()
 	class UHealthComp* healthComp;*/
+
 };

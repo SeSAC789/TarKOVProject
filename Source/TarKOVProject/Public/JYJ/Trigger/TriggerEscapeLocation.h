@@ -20,6 +20,10 @@ private:
 	UFUNCTION()
 	virtual void OnTriggerBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 
+	UFUNCTION()
+	void OnTriggerBoxEndOverlap( UPrimitiveComponent* OverlappedComponent , AActor* OtherActor , UPrimitiveComponent* OtherComp , int32 OtherBodyIndex );
+
+
 	UPROPERTY()
 	class UGameOverWidget* GameOverUI;
 
@@ -33,5 +37,9 @@ private:
 	TSubclassOf<class UUserWidget> GameClearUIFactory;*/
 
 	void DisplayGameClearUI( AActor* InOverlapActor );
+
 	
+	FTimerHandle GameClearTimerHandle;
+
+	void GameClearTimerFinished(); 
 };

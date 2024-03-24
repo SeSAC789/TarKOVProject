@@ -54,13 +54,16 @@ public:
 	UFUNCTION( BlueprintCallable )
 	UGameOverWidget* GetGameOverUI() const;
 
-	UPROPERTY()
+	UFUNCTION( BlueprintCallable )
+	UGameClearWidget* GetGameClearUI() const;
+
+	UPROPERTY( Transient )
 	class UGameClearWidget* GameClearUI;
 
 	UFUNCTION( Server , Reliable )
 	void ServerRetry();
 
-	// 게임 시작 시간을 기록
+	// gameover 게임 시작 시간을 기록
 	UPROPERTY( ReplicatedUsing = OnRep_GameStartTime )
 	float GameStartTime;
 
@@ -72,6 +75,17 @@ public:
 	void OnRep_GameStartTime();
 
 	void CalculatePlayTime();
+
+	// 클리어시 ui에 timer보이게
+	UFUNCTION( BlueprintCallable )
+	void ShowEscapeUI( bool bShow );
+
+	// gameclear 플레이 타임을 저장
+	UPROPERTY( EditAnywhere , BlueprintReadOnly , Replicated )
+	float PlayerPlayTime;
+
+	// 게임 클리어 시 호출
+	void CalculateAndSavePlayTime();
 
 	void GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
 };

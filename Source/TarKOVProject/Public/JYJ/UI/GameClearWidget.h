@@ -29,8 +29,20 @@ public:
 	UPROPERTY( EditDefaultsOnly , BlueprintReadOnly , meta = (BindWidget) )
 	class UButton* btn_restart;
 
+	UPROPERTY( EditDefaultsOnly , BlueprintReadOnly , meta = (BindWidget) )
+	class UTextBlock* text_KillCount;
+	
+
 	UPROPERTY( EditDefaultsOnly , BlueprintReadOnly , meta = (BindWidgetAnim), Transient )
 	class UWidgetAnimation* GameClearAnimation;
+
+	UFUNCTION( BlueprintCallable )
+	void SetPlayTime( float PlayTime );
+
+	UFUNCTION( BlueprintCallable )
+	void UpdatePlayerKillCount( int32 KillCount );
+
+	FText GetKillCountText() const;
 
 private:
 	UFUNCTION()

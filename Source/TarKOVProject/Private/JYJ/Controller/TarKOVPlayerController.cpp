@@ -5,6 +5,10 @@
 #include "GameFramework/Character.h"
 #include "JYJ/PlayerGameMode.h"
 #include "Net/UnrealNetwork.h"
+#include "KJH/HPWidget.h"
+#include "Components/TextBlock.h"
+#include "Components/Image.h"
+
 
 ATarKOVPlayerController::ATarKOVPlayerController()
 {
@@ -52,6 +56,11 @@ UGameOverWidget* ATarKOVPlayerController::GetGameOverUI() const
 	return GameOverUI;
 }
 
+UGameClearWidget* ATarKOVPlayerController::GetGameClearUI() const
+{
+	return GameClearUI;
+}
+
 void ATarKOVPlayerController::OnRep_GameStartTime()
 {
 }
@@ -61,6 +70,26 @@ void ATarKOVPlayerController::CalculatePlayTime()
 	if (GetWorld())
 	{
 		PlayTime = GetWorld()->GetTimeSeconds() - GameStartTime;
+	}
+}
+
+void ATarKOVPlayerController::ShowEscapeUI(bool bShow)
+{
+	if (PlayerMainUI)
+	{
+		PlayerMainUI->ExitClear_Img->SetVisibility( bShow ? ESlateVisibility::Visible : ESlateVisibility::Hidden );
+		PlayerMainUI->Clear_Img->SetVisibility( bShow ? ESlateVisibility::Visible : ESlateVisibility::Hidden );
+		PlayerMainUI->ExitClear_Text->SetVisibility( bShow ? ESlateVisibility::Visible : ESlateVisibility::Hidden );
+		PlayerMainUI->ClearTimer_Text->SetVisibility( bShow ? ESlateVisibility::Visible : ESlateVisibility::Hidden );
+
+		if (bShow)
+		{
+			PlayerMainUI->StartCountdown( 7 ); // 7초 카운트 다운 시작
+		}
+		else
+		{
+			PlayerMainUI->StopCountdown(); // 카운트 다운 중지
+		}
 	}
 }
 
@@ -88,6 +117,11 @@ void ATarKOVPlayerController::ServerRetry_Implementation()
 	}
 }
 
+void ATarKOVPlayerController::CalculateAndSavePlayTime()
+{
+	PlayerPlayTime = GetWorld()->GetTimeSeconds() - GameStartTime;
+}
+
 void ATarKOVPlayerController::GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const
 {
 	Super::GetLifetimeReplicatedProps( OutLifetimeProps );
@@ -95,4 +129,5 @@ void ATarKOVPlayerController::GetLifetimeReplicatedProps( TArray<FLifetimeProper
 	DOREPLIFETIME( ATarKOVPlayerController , GameStartTime );
 	DOREPLIFETIME( ATarKOVPlayerController , PlayTime );
 	DOREPLIFETIME( ATarKOVPlayerController , killCnt );
+	DOREPLIFETIME( ATarKOVPlayerController , PlayerPlayTime );
 }
