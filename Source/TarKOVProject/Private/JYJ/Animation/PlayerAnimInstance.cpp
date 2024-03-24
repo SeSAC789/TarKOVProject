@@ -141,5 +141,7 @@ void UPlayerAnimInstance::AnimNotify_OnGameOver()
 
 void UPlayerAnimInstance::AnimNotify_OnThrowGrenade()
 {
+	if(!player->IsLocallyControlled()) return;
+
 	player->throwComp->throwBomb();
 }

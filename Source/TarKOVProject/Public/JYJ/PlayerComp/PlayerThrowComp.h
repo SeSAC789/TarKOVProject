@@ -30,6 +30,8 @@ public:
 	//void SpawnGrenade( ABombBase grenade );
 	void throwBomb();
 
+
+
 	UPROPERTY( Replicated, EditDefaultsOnly )
 	class ABombBase* grenade;
 
@@ -60,6 +62,14 @@ private:
 
 	// server to multi.
 	UFUNCTION( NetMulticast , Reliable )
-	void MultiRPCThrowBomb( ABombBase* selectedBomb );
+	void MultiRPCThrowBomb();
+
+
+	UFUNCTION( Server , Reliable )
+	void ServerRPCTSpawnBomb( TSubclassOf<ABombBase> BombFactory );
+
+	// server to multi.
+	UFUNCTION( NetMulticast , Reliable )
+	void MultiRPCSpawnBomb( TSubclassOf<ABombBase> BombFactory );
 
 };

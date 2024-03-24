@@ -22,10 +22,7 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick( float DeltaTime ) override;
-
-	void TakeDamageBomb( AActor* bomb );
-
-	void ExplosiveBomb( AActor* bomb );
+	virtual void GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
 
 private:
 	UPROPERTY( EditAnywhere )
@@ -39,5 +36,20 @@ private:
 
 	UPROPERTY( EditDefaultsOnly )
 	class UParticleSystem* ExplosionVFXFactory;
+
+	UPROPERTY()
+	class APlayerBase* damagePlayer;
+
+	UPROPERTY( Replicated , EditAnywhere )
+	class APlayerBase* playerTarget;
+
+	UPROPERTY( Replicated , EditAnywhere )
+	TArray<FHitResult> HitResults;
+
+	UPROPERTY( Replicated , EditAnywhere )
+	FVector StartTrace;
+
+	UPROPERTY( Replicated , EditAnywhere )
+	FVector EndTrace;
 
 };
