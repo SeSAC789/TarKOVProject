@@ -9,6 +9,7 @@
 #include "Components/Image.h"
 #include "JYJ/GameOverWidget.h"
 #include "JYJ/PlayerBase.h"
+#include "JYJ/Controller/TarKOVPlayerController.h"
 #include "Net/UnrealNetwork.h"
 
 
@@ -58,6 +59,11 @@ void UHealthComp::TickComponent( float DeltaTime , ELevelTick TickType , FActorC
 
 void UHealthComp::TakeDamage( const FName& BodyPart , float DamageAmount , const FString& HitObjectName )
 {
+	if (!me && !me->PlayerMainUI)
+	{
+		return;
+	}
+
 	if (me->PlayerMainUI)
 	{
 		UE_LOG( LogTemp , Warning , TEXT( "UHealthComp::TakeDamage play anim" ) )
@@ -91,7 +97,15 @@ void UHealthComp::TakeDamage( const FName& BodyPart , float DamageAmount , const
 			if ((BodyPart == FName( "Head" ) || BodyPart == FName( "Thorax" )) && BodyPartData.HP <= 0.0f && !isBleedingDamage)
 			{
 				bIsDead = true;
-				me->invenDie();
+				ATarKOVPlayerController* pc = Cast<ATarKOVPlayerController>( me->GetController() );
+				if (pc && me)
+				{
+					pc->CalculatePlayTime();
+					pc->DisableInput( pc ); // 죽으면 인풋 안받게
+					me->OnDeath(); // 죽으면 충돌체 비활성화
+				}
+
+				//me->invenDie();
 				UE_LOG( LogTemp , Warning , TEXT( "%s 부위가 %s 로 인해 데미지 받아 즉시 사망." ) , *BodyPart.ToString() , *HitObjectName );
 				return;
 			}
@@ -148,9 +162,15 @@ void UHealthComp::CheckAndHandleTotalDepletion()
 
 	if (bIsDead)
 	{
+		ATarKOVPlayerController* pc = Cast<ATarKOVPlayerController>( me->GetController() );
+		if (pc && me)
+		{
+			pc->CalculatePlayTime();
+			pc->DisableInput( pc );
+			me->OnDeath();
+		}
 		UE_LOG( LogTemp , Warning , TEXT( "모든 부위 hp가 다 0이 되어 죽음." ) );
-		me->invenDie();
-
+		//me->invenDie();
 	}
 }
 

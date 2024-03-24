@@ -4,6 +4,7 @@
 #include "JYJ/Controller/TarKOVPlayerController.h"
 #include "GameFramework/Character.h"
 #include "JYJ/PlayerGameMode.h"
+#include "Net/UnrealNetwork.h"
 
 ATarKOVPlayerController::ATarKOVPlayerController()
 {
@@ -19,6 +20,13 @@ void ATarKOVPlayerController::BeginPlay()
 	{
 		gm = Cast<APlayerGameMode>( GetWorld()->GetAuthGameMode() );
 	}
+
+	if (HasAuthority())
+	{
+		gm = Cast<APlayerGameMode>( GetWorld()->GetAuthGameMode() );
+		GameStartTime = GetWorld()->GetTimeSeconds(); // 게임 시작 시간 기록
+		OnRep_GameStartTime();
+	}
 }
 
 void ATarKOVPlayerController::UpdatekillCnt(int32 killOtherPlayer)
@@ -33,6 +41,19 @@ void ATarKOVPlayerController::UpdatekillCnt(int32 killOtherPlayer)
 	// 위젯 변수를 여기서 추가하든, 위젯에서 controller 정의하고 controller의 killCnt 값 가져와서 셋팅하던 
 
 }
+
+void ATarKOVPlayerController::OnRep_GameStartTime()
+{
+}
+
+void ATarKOVPlayerController::CalculatePlayTime()
+{
+	if (GetWorld())
+	{
+		PlayTime = GetWorld()->GetTimeSeconds() - GameStartTime;
+	}
+}
+
 
 void ATarKOVPlayerController::ServerRetry_Implementation()
 {
@@ -55,4 +76,13 @@ void ATarKOVPlayerController::ServerRetry_Implementation()
 	{
 		gm->RestartPlayer( this );
 	}
+}
+
+void ATarKOVPlayerController::GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const
+{
+	Super::GetLifetimeReplicatedProps( OutLifetimeProps );
+
+	DOREPLIFETIME( ATarKOVPlayerController , GameStartTime );
+	DOREPLIFETIME( ATarKOVPlayerController , PlayTime );
+
 }

@@ -53,5 +53,19 @@ public:
 
 	UFUNCTION( Server , Reliable )
 	void ServerRetry();
-	
+
+	// 게임 시작 시간을 기록
+	UPROPERTY( ReplicatedUsing = OnRep_GameStartTime )
+	float GameStartTime;
+
+	// 플레이 시간을 저장
+	UPROPERTY( Replicated, EditAnywhere )
+	float PlayTime;
+
+	UFUNCTION()
+	void OnRep_GameStartTime();
+
+	void CalculatePlayTime();
+
+	void GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
 };
