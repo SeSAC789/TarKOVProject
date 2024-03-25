@@ -43,7 +43,7 @@ void UPlayerFireComp::TickComponent( float DeltaTime , ELevelTick TickType , FAc
 	Super::TickComponent( DeltaTime , TickType , ThisTickFunction );
 	//Zoom();
 
-	PrintNetLog();
+	//PrintNetLog();
 	//UE_LOG(LogTemp, Warning, TEXT("Rifle Ammo %d"), me->fireComp->rifle->currentAmmo);
 
 	/*
