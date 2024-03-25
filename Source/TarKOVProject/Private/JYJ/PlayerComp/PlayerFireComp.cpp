@@ -380,6 +380,10 @@ void UPlayerFireComp::ServerRPCFirePistol_Implementation()
 	// Aim, Fire Network Connection
 	FHitResult OutHit;
 	bool bHits = GetWorld()->LineTraceSingleByChannel( OutHit , AimStartPoint , AimEndPoint , ECollisionChannel::ECC_Visibility , Params );
+
+	if (pistolSFX)
+		UGameplayStatics::PlaySound2D( GetWorld() , pistolSFX );
+
 	MultiRPCFirePistol( OutHit );
 	SetAiming( OutHit , AimStartPoint , AimEndPoint );
 
@@ -430,6 +434,10 @@ void UPlayerFireComp::ServerRPCFireRifle_Implementation()
 	// Aim, Fire Network Connection
 	FHitResult OutHit;
 	bool bHits = GetWorld()->LineTraceSingleByChannel( OutHit , AimStartPoint , AimEndPoint , ECollisionChannel::ECC_Visibility , Params );
+	
+	if (rifleSFX)
+		UGameplayStatics::PlaySound2D( GetWorld() , rifleSFX );
+
 	MultiRPCFireRifle( OutHit );
 	SetAiming( OutHit , AimStartPoint , AimEndPoint );
 }
