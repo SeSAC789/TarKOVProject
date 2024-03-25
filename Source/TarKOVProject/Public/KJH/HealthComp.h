@@ -110,7 +110,7 @@ public:
 	virtual  void GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
 
 	UFUNCTION(BlueprintCallable)
-	void invenDie();
+	bool IsDead();
 
 	UPROPERTY()
 	class UGameOverWidget* GameOverUI;

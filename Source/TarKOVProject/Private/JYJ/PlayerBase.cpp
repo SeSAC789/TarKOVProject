@@ -318,6 +318,10 @@ void APlayerBase::InitUI()
 		pc->PlayerMainUI = CreateWidget<UHPWidget>( GetWorld() , pc->PlayerMainUIFactory );
 		// AddToViewport하고싶다.
 		pc->PlayerMainUI->AddToViewport();
+		// 타이머 카운트 다운 시작하고싶다.
+		pc->PlayerMainUI->GameStartCountdown( 300 );
+
+		pc->PlayerMainUI->PlayEscapeAnim();
 	}
 
 	// 만들어진 mainUI를 기억하고싶다.
@@ -331,7 +335,7 @@ void APlayerBase::InitUI()
 void APlayerBase::DamageProcess()
 {
 	// 죽음 애니메이션이 끝나면
-// 마우스 커서를 보이게하고싶다.
+    // 마우스 커서를 보이게하고싶다.
 	auto pc = Cast<ATarKOVPlayerController>( Controller );
 	pc->SetShowMouseCursor( true );
 	// 화면을 회색으로 보이게 하고싶다.
@@ -343,5 +347,26 @@ void APlayerBase::DamageProcess()
 		pc->GameOverUI = CreateWidget<UGameOverWidget>( GetWorld() , pc->GameOverUIFactory );
 		// AddToViewport하고싶다.
 		pc->GameOverUI->AddToViewport();
+	}
+}
+
+void APlayerBase::OnDeath()
+{
+	GetCapsuleComponent()->SetCollisionEnabled( ECollisionEnabled::NoCollision );
+
+	// 캐릭터 움직임을 멈추고 싶다.
+	if (GetCharacterMovement())
+	{
+		GetCharacterMovement()->StopMovementImmediately();
+		GetCharacterMovement()->DisableMovement();
+		GetCharacterMovement()->SetComponentTickEnabled( false );
+	}
+
+	// 마우스 및 카메라 회전 비활성화
+	APlayerController* pc = Cast<APlayerController>( GetController() );
+	if (pc)
+	{
+		pc->SetIgnoreLookInput( true ); // 카메라(시선) 움직임을 무시하도록 설정
+		pc->SetIgnoreMoveInput( true ); // 이동 입력을 무시하도록 설정
 	}
 }

@@ -23,12 +23,14 @@ public:
 
 	virtual void BeginPlay() override;
 
-	UPROPERTY()
+	UPROPERTY( Replicated , EditAnywhere , BlueprintReadWrite )
 	int32 killCnt = 0;
 
 	// Kill Count
 	void UpdatekillCnt(int32 killOtherPlayer);
 
+	UFUNCTION()
+	int32 GetKillCount() const;
 
 
 	// Player MainUI
@@ -42,17 +44,48 @@ public:
 	UPROPERTY( EditDefaultsOnly )
 	TSubclassOf<class UGameOverWidget> GameOverUIFactory;
 
-	UPROPERTY()
+	UPROPERTY( Transient )
 	class UGameOverWidget* GameOverUI;
 
 	// Game Clear UI -> Trigger에서 5초 지나면 실행
 	UPROPERTY( EditDefaultsOnly )
 	TSubclassOf<class UGameClearWidget> GameClearUIFactory;
 
-	UPROPERTY()
+	UFUNCTION( BlueprintCallable )
+	UGameOverWidget* GetGameOverUI() const;
+
+	UFUNCTION( BlueprintCallable )
+	UGameClearWidget* GetGameClearUI() const;
+
+	UPROPERTY( Transient )
 	class UGameClearWidget* GameClearUI;
 
 	UFUNCTION( Server , Reliable )
 	void ServerRetry();
-	
+
+	// gameover 게임 시작 시간을 기록
+	UPROPERTY( ReplicatedUsing = OnRep_GameStartTime )
+	int32 GameStartTime;
+
+	// 플레이 시간을 저장
+	UPROPERTY( Replicated, EditAnywhere )
+	int32 PlayTime;
+
+	UFUNCTION()
+	void OnRep_GameStartTime();
+
+	void CalculatePlayTime();
+
+	// 클리어시 ui에 timer보이게
+	UFUNCTION( BlueprintCallable )
+	void ShowEscapeUI( bool bShow );
+
+	// gameclear 플레이 타임을 저장
+	UPROPERTY( EditAnywhere , BlueprintReadOnly , Replicated )
+	int32 PlayerPlayTime;
+
+	// 게임 클리어 시 호출
+	void CalculateAndSavePlayTime();
+
+	void GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
 };

@@ -157,9 +157,54 @@ public:
 	class UWidgetAnimation* HitAnimation;
 
 	void PlayHitAnim();
+
 	void UpdateStaminaBar();
 
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
+	class UImage* Hit_Img;
 
-	/*UPROPERTY()
-	class UHealthComp* healthComp;*/
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
+	class UImage* ExitClear_Img;
+
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
+	class UImage* Clear_Img;
+
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
+	class UTextBlock* ClearTimer_Text;
+
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
+	class UTextBlock* ExitClear_Text;
+
+	UFUNCTION( BlueprintCallable )
+	void StartCountdown( int32 CountdownTime );
+
+	UFUNCTION( BlueprintCallable )
+	void StopCountdown();
+
+	FTimerHandle CountdownTimerHandle;
+	int32 CurrentCountdownTime;
+
+	void UpdateCountdown();
+
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
+	class UTextBlock* Timer_Text;
+
+	UFUNCTION( BlueprintCallable )
+	void GameStartCountdown( int32 GameCountdownTime );
+
+	UFUNCTION( BlueprintCallable )
+	void GameStopCountdown();
+
+	FTimerHandle GameCountdownTimerHandle;
+	int32 GameCurrentCountdownTime;
+
+	void UpdateGameCountdown();
+
+	void UpdateHPBarColor( UProgressBar* HPBar , float HPPercentage ) const;
+
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidgetAnim) , Transient )
+	class UWidgetAnimation* EscapeAnimation;
+
+	void PlayEscapeAnim();
+
 };

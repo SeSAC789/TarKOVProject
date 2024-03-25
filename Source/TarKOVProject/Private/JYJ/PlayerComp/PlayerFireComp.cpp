@@ -8,6 +8,7 @@
 #include "Engine/SkeletalMeshSocket.h"
 #include "JYJ/PlayerBase.h"
 #include "JYJ/Animation/PlayerAnimInstance.h"
+#include "JYJ/Controller/TarKOVPlayerController.h"
 #include "JYJ/Weapon/PistolGun.h"
 #include "JYJ/Weapon/RifleGun.h"
 #include "Kismet/GameplayStatics.h"
@@ -301,7 +302,17 @@ void UPlayerFireComp::SetAiming( FHitResult OutHit , FVector Start , FVector End
 			otherplayer->HealthComp->TakeDamage( BodyPart , attackDamage , HitObjectName );
 		}
 	}
-	
+
+	// 총으로 적 죽이면 kill count +1
+	auto otherplayer = Cast<APlayerBase>( OutHit.GetActor() );
+	if (otherplayer && otherplayer->HealthComp->bIsDead)
+	{
+		ATarKOVPlayerController* pc = Cast<ATarKOVPlayerController>( me->GetController() );
+		if (pc)
+		{
+			pc->UpdatekillCnt( 1 );
+		}
+	}
 }
 
 void UPlayerFireComp::Reload()

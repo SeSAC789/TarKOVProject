@@ -8,6 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "KJH/HealthComp.h"
 #include "Components/TextBlock.h"
+#include "JYJ/Controller/TarKOVPlayerController.h"
 #include "KJH/StaminaComp.h"
 
 
@@ -53,7 +54,19 @@ void UHPWidget::NativeTick( const FGeometry& MyGeometry , float InDeltaTime )
 	UpdateBodyPartImageColor( RightLeg_Img , LeftLegHP() );
 
 	UpdateStatusText();
-	UpdateStaminaBar();
+	if (Stamina_Bar)
+	{
+		UpdateStaminaBar();
+	}
+
+
+	UpdateHPBarColor( HeadHp_Bar , HeadHP() );
+	UpdateHPBarColor( ThoraxHp_Bar , ThoraxHP() );
+	UpdateHPBarColor( StomachHp_Bar , StomachHP() );
+	UpdateHPBarColor( RightArmHp_Bar , RightArmHP() );
+	UpdateHPBarColor( LeftArmHp_Bar , LeftArmHP() );
+	UpdateHPBarColor( RightLegHp_Bar , RightLegHP() );
+	UpdateHPBarColor( LeftLegHp_Bar , LeftLegHP() );
 }
 
 float UHPWidget::HeadHP() const
@@ -247,6 +260,7 @@ void UHPWidget::UpdateBodyPartImageColor( UImage* BodyPartImage , float HPPercen
 
 	if (BodyPartImage)
 	{
+		Color = Color.CopyWithNewOpacity( 0.5 );
 		BodyPartImage->SetColorAndOpacity( Color );
 	}
 }
@@ -254,37 +268,39 @@ void UHPWidget::UpdateBodyPartImageColor( UImage* BodyPartImage , float HPPercen
 void UHPWidget::UpdateStatusText()
 {
 	APlayerBase* me = Cast<APlayerBase>( GetOwningPlayerPawn() );
-	if (me)
+	if (!me)
 	{
-		UStatusEffectComp* StatusEffectComp = me->FindComponentByClass<UStatusEffectComp>();
-		if (StatusEffectComp)
+		return;
+	}
+	UStatusEffectComp* StatusEffectComp = me->FindComponentByClass<UStatusEffectComp>();
+	if (StatusEffectComp)
+	{
+		int32 BleedingCount = StatusEffectComp->GetBleedingCount();
+		int32 FractureCount = StatusEffectComp->GetFractureCount();
+
+		// 출혈 상태이상 부위가 있다면 텍스트를 업데이트합니다.
+		if (BleedingCount > 0)
 		{
-			int32 BleedingCount = StatusEffectComp->GetBleedingCount();
-			int32 FractureCount = StatusEffectComp->GetFractureCount();
+			Bleeding_Text->SetText( FText::FromString( FString::Printf( TEXT( "%d" ) , BleedingCount ) ) );
+			Bleeding_Text->SetVisibility( ESlateVisibility::Visible );
+		}
+		else
+		{
+			Bleeding_Text->SetVisibility( ESlateVisibility::Collapsed );
+		}
 
-			// 출혈 상태이상 부위가 있다면 텍스트를 업데이트합니다.
-			if (BleedingCount > 0)
-			{
-				Bleeding_Text->SetText( FText::FromString( FString::Printf( TEXT( "%d" ) , BleedingCount ) ) );
-				Bleeding_Text->SetVisibility( ESlateVisibility::Visible );
-			}
-			else
-			{
-				Bleeding_Text->SetVisibility( ESlateVisibility::Collapsed );
-			}
-
-			// 골절 상태이상 부위가 있다면 텍스트를 업데이트합니다.
-			if (FractureCount > 0)
-			{
-				Fracture_Text->SetText( FText::FromString( FString::Printf( TEXT( "%d" ) , FractureCount ) ) );
-				Fracture_Text->SetVisibility( ESlateVisibility::Visible );
-			}
-			else
-			{
-				Fracture_Text->SetVisibility( ESlateVisibility::Collapsed );
-			}
+		// 골절 상태이상 부위가 있다면 텍스트를 업데이트합니다.
+		if (FractureCount > 0)
+		{
+			Fracture_Text->SetText( FText::FromString( FString::Printf( TEXT( "%d" ) , FractureCount ) ) );
+			Fracture_Text->SetVisibility( ESlateVisibility::Visible );
+		}
+		else
+		{
+			Fracture_Text->SetVisibility( ESlateVisibility::Collapsed );
 		}
 	}
+
 }
 
 void UHPWidget::PlayHitAnim()
@@ -304,4 +320,113 @@ void UHPWidget::UpdateStaminaBar()
 			Stamina_Bar->SetPercent( StaminaPercent );
 		}
 	}
+}
+
+void UHPWidget::StartCountdown( int32 CountdownTime )
+{
+	CurrentCountdownTime = CountdownTime;
+	UpdateCountdown();
+
+	// 타이머 시작, 1초마다 UpdateCountdown 호출
+	GetWorld()->GetTimerManager().SetTimer( CountdownTimerHandle , this , &UHPWidget::UpdateCountdown , 1.0f , true );
+}
+
+void UHPWidget::StopCountdown()
+{
+	GetWorld()->GetTimerManager().ClearTimer( CountdownTimerHandle );
+}
+
+void UHPWidget::UpdateCountdown()
+{
+	if (CurrentCountdownTime >= 0)
+	{
+		if (ClearTimer_Text)
+		{
+			ClearTimer_Text->SetText( FText::AsNumber( CurrentCountdownTime ) );
+		}
+	
+		if (CurrentCountdownTime == 0)
+		{
+			// 카운트다운이 끝나면 타이머 중지
+			StopCountdown();
+		}
+		--CurrentCountdownTime;
+	}
+	
+}
+
+void UHPWidget::GameStartCountdown(int32 GameCountdownTime)
+{
+	GameCurrentCountdownTime = GameCountdownTime;
+	UpdateGameCountdown();
+
+	// 타이머 시작, 1초마다 UpdateCountdown 호출
+	GetWorld()->GetTimerManager().SetTimer( GameCountdownTimerHandle , this , &UHPWidget::UpdateGameCountdown , 1.0f , true );
+}
+
+void UHPWidget::GameStopCountdown()
+{
+	GetWorld()->GetTimerManager().ClearTimer( GameCountdownTimerHandle );
+}
+
+void UHPWidget::UpdateGameCountdown()
+{
+	if (GameCurrentCountdownTime >= 0)
+	{
+		if (Timer_Text)
+		{
+			int32 Minutes = GameCurrentCountdownTime / 60;
+			int32 Seconds = GameCurrentCountdownTime % 60;
+			FString TimeText = FString::Printf( TEXT( "%02d:%02d" ) , Minutes , Seconds );
+			Timer_Text->SetText( FText::FromString( TimeText ) );
+		}
+		if (GameCurrentCountdownTime == 0)
+		{
+			// 카운트다운이 끝나면 타이머 중지
+			GameStopCountdown();
+
+			APlayerBase* me = Cast<APlayerBase>( GetOwningPlayerPawn() );
+			if (me && me->HealthComp)
+			{
+				me->HealthComp->bIsDead = true; // 플레이어 사망 처리 함수 호출
+
+				ATarKOVPlayerController* pc = Cast<ATarKOVPlayerController>( me->GetController() );
+				if (pc)
+				{
+					pc->CalculatePlayTime();
+					pc->DisableInput( pc );
+					me->OnDeath();
+				}
+			}
+		}
+		--GameCurrentCountdownTime;
+	}
+
+}
+
+void UHPWidget::UpdateHPBarColor( UProgressBar* HPBar , float HPPercentage ) const
+{
+	FLinearColor Color;
+	if (HPPercentage > 0.5f) // HP가 50% 이상일 때
+	{
+		Color = FLinearColor::Green;
+	}
+	else if (HPPercentage > 0.3f) // HP가 30%에서 50% 사이일 때
+	{
+		Color = FLinearColor::Yellow;
+	}
+	else // HP가 30% 이하일 때
+	{
+		Color = FLinearColor::Red;
+	}
+
+	if (HPBar)
+	{
+		HPBar->SetFillColorAndOpacity( Color );
+	}
+}
+
+void UHPWidget::PlayEscapeAnim()
+{
+	PlayAnimation( EscapeAnimation );
 }

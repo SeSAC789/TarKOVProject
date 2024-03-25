@@ -146,5 +146,7 @@ public:
 	void InitUI();
 
 	void DamageProcess();
+
+	void OnDeath();
 };
 

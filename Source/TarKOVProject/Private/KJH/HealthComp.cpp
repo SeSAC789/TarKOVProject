@@ -5,8 +5,11 @@
 #include "KJH/HPWidget.h"
 #include "Blueprint/UserWidget.h"
 #include <Subsystems/PanelExtensionSubsystem.h>
+
+#include "Components/Image.h"
 #include "JYJ/GameOverWidget.h"
 #include "JYJ/PlayerBase.h"
+#include "JYJ/Controller/TarKOVPlayerController.h"
 #include "Net/UnrealNetwork.h"
 
 
@@ -56,6 +59,23 @@ void UHealthComp::TickComponent( float DeltaTime , ELevelTick TickType , FActorC
 
 void UHealthComp::TakeDamage( const FName& BodyPart , float DamageAmount , const FString& HitObjectName )
 {
+	if (bIsDead)
+	{
+		return;
+	}
+
+	if (!me && !me->PlayerMainUI)
+	{
+		return;
+	}
+
+	if (me->PlayerMainUI)
+	{
+		UE_LOG( LogTemp , Warning , TEXT( "UHealthComp::TakeDamage play anim" ) )
+			me->PlayerMainUI->Hit_Img->SetVisibility( ESlateVisibility::Visible );
+		me->PlayerMainUI->PlayHitAnim();
+
+	}
 
 	bool bFoundBodyPart = false;
 
@@ -82,7 +102,15 @@ void UHealthComp::TakeDamage( const FName& BodyPart , float DamageAmount , const
 			if ((BodyPart == FName( "Head" ) || BodyPart == FName( "Thorax" )) && BodyPartData.HP <= 0.0f && !isBleedingDamage)
 			{
 				bIsDead = true;
-				me->invenDie();
+				ATarKOVPlayerController* pc = Cast<ATarKOVPlayerController>( me->GetController() );
+				if (pc && me)
+				{
+					pc->CalculatePlayTime();
+					pc->DisableInput( pc ); // 죽으면 인풋 안받게
+					me->OnDeath(); // 죽으면 충돌체 비활성화
+				}
+
+				//me->invenDie();
 				UE_LOG( LogTemp , Warning , TEXT( "%s 부위가 %s 로 인해 데미지 받아 즉시 사망." ) , *BodyPart.ToString() , *HitObjectName );
 				return;
 			}
@@ -105,7 +133,7 @@ void UHealthComp::TakeDamage( const FName& BodyPart , float DamageAmount , const
 		// 해당 부위에 출혈 및 골절 상태를 적용.
 		//CheckAndApplyBleeding( BodyPart );
 		CheckAndApplyFracture( BodyPart );
-		
+
 	}
 	else
 	{
@@ -139,9 +167,15 @@ void UHealthComp::CheckAndHandleTotalDepletion()
 
 	if (bIsDead)
 	{
+		ATarKOVPlayerController* pc = Cast<ATarKOVPlayerController>( me->GetController() );
+		if (pc && me)
+		{
+			pc->CalculatePlayTime();
+			pc->DisableInput( pc );
+			me->OnDeath();
+		}
 		UE_LOG( LogTemp , Warning , TEXT( "모든 부위 hp가 다 0이 되어 죽음." ) );
-		me->invenDie();
-
+		//me->invenDie();
 	}
 }
 
@@ -219,16 +253,13 @@ void UHealthComp::SetBodyPartHP( FName BodyPart , float NewHP )
 			break;
 		}
 	}
-	if (me->PlayerMainUI)
-	{
-		me->PlayerMainUI->PlayHitAnim();
-	}
+
 	OnRep_BodyPartHP();
 }
 
 void UHealthComp::OnRep_BodyPartHP()
 {
-	
+
 }
 
 void UHealthComp::CheckAndApplyBleeding( const FName& BodyPart )
@@ -271,6 +302,11 @@ void UHealthComp::CheckAndApplyFracture( const FName& BodyPart )
 
 void UHealthComp::DistributeDamage( float DamageAmount , FName IgnoredBodyPart )
 {
+	if (bIsDead)
+	{
+		return;
+	}
+
 	float DamageMultiplier = 1.0f; // 기본 피해량 배수
 
 	// 부위 별 피해 분산 배수 조정 
@@ -326,7 +362,7 @@ FName UHealthComp::FindWeakestBodyPart()
 FName UHealthComp::FindWeakestFracturedBodyPart() const
 {
 	FName WeakestPart = NAME_None;
-	float MinHP = 100; 
+	float MinHP = 100;
 
 	for (const FBodyPartHealthData& Part : BodyPartHP)
 	{
@@ -386,6 +422,11 @@ TArray<FName> UHealthComp::GetInjuredBodyParts() const
 	return InjuredParts;
 }
 
+bool UHealthComp::IsDead()
+{
+	return bIsDead;
+}
+
 void UHealthComp::GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const
 {
 	Super::GetLifetimeReplicatedProps( OutLifetimeProps );
@@ -393,9 +434,4 @@ void UHealthComp::GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLife
 	DOREPLIFETIME( UHealthComp , BodyPartHP );
 	DOREPLIFETIME( UHealthComp , bIsDead );
 }
-
-void UHealthComp::invenDie()
-{
-}
-
 

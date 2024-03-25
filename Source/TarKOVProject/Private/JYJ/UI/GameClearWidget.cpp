@@ -4,6 +4,10 @@
 #include "JYJ/UI/GameClearWidget.h"
 #include "Components/Button.h"
 #include "JYJ/Controller/TarKOVPlayerController.h"
+#include "JYJ/GameInstance/TarKOVGameInstance.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "Components/TextBlock.h"
+#include "Components/Image.h"
 
 void UGameClearWidget::NativeConstruct()
 {
@@ -11,30 +15,56 @@ void UGameClearWidget::NativeConstruct()
 
 	PlayAnimation(GameClearAnimation, 0, 0);
 
+	ATarKOVPlayerController* pc = Cast<ATarKOVPlayerController>( GetOwningPlayer() );
+	if (pc)
+	{
+		// 킬 카운트 
+		UpdatePlayerKillCount( pc->GetKillCount() );
+	}
+
 	btn_restart->OnClicked.AddDynamic( this , &UGameClearWidget::OnClickbtnRestart ); 
 	btn_quit->OnClicked.AddDynamic( this , &UGameClearWidget::OnClickbtnQuit );
 }
 
+void UGameClearWidget::SetPlayTime(int32 PlayTime)
+{
+	int32 Minutes = PlayTime / 60;
+	int32 Seconds = PlayTime % 60;
+	FString TimeText = FString::Printf( TEXT( "레이드 시간 :  %02d:%02d" ) , Minutes , Seconds );
+	text_timer->SetText( FText::FromString( TimeText ) );
+
+	//text_timer->SetText( FText::FromString( FString::Printf( TEXT( "레이드 시간: %0.2f " ) , PlayTime ) ) );
+}
+
 void UGameClearWidget::OnClickbtnQuit()
 {
-	auto pc = Cast<ATarKOVPlayerController>( GetWorld()->GetFirstPlayerController() );
-	pc->Pause();
+	auto pc = GetWorld()->GetFirstPlayerController();
+	UKismetSystemLibrary::QuitGame( GetWorld() , pc , EQuitPreference::Quit , false );
 }
 
 void UGameClearWidget::OnClickbtnRestart()
 {
-	//플레이어 컨트롤러를 가져오고 싶다.
-	auto pc = Cast<ATarKOVPlayerController>( GetWorld()->GetFirstPlayerController() );
+	auto gi = GetGameInstance<UTarKOVGameInstance>();
+	gi->ExitRoom();
+	btn_quit->SetIsEnabled( false );
+}
 
+void UGameClearWidget::UpdatePlayerKillCount( int32 KillCount )
+{
+	if (text_KillCount)
+	{
+		text_KillCount->SetText( FText::AsNumber( KillCount ) );
+	}
+}
+
+FText UGameClearWidget::GetKillCountText() const
+{
+	const ATarKOVPlayerController* pc = Cast<ATarKOVPlayerController>( GetOwningPlayer() );
 	if (pc)
 	{
-		//마우스 커서를 안보이게 하고 싶다.
-		pc->SetShowMouseCursor( false );
-		//SetShowGameOverUI( false );
-
-		//server retry를 호출하고 싶다.
-		pc->ServerRetry();
-
-
+		int32 KillCount = pc->GetKillCount();
+		return FText::AsNumber( KillCount );
 	}
+
+	return FText::GetEmpty();
 }

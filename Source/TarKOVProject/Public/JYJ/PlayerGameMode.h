@@ -14,4 +14,13 @@ class TARKOVPROJECT_API APlayerGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
+public:
+
+	virtual void BeginPlay() override;
+
+	void CheckGameOverCondition();
+
+	void CheckGameClearCondition();
+
+
 };
