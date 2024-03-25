@@ -36,7 +36,7 @@ void ULobbyWidget::SwitchPanel(int32 index)
 
 void ULobbyWidget::OnClickGoLobby()
 {
-	UGameplayStatics::PlaySound2D( GetWorld() , clickSFX );
+	//UGameplayStatics::PlaySound2D( GetWorld() , clickSFX );
 
 	SwitchPanel(SWITCH_INDEX_FINDROOM);
 	UE_LOG( LogTemp , Warning , TEXT( "ULobbyWidget::OnClickGoLobby - test1" ) );
@@ -46,7 +46,7 @@ void ULobbyWidget::OnClickGoLobby()
 
 void ULobbyWidget::OnCreateRoom()
 {
-	UGameplayStatics::PlaySound2D( GetWorld() , clickSFX );
+	//UGameplayStatics::PlaySound2D( GetWorld() , clickSFX );
 	if(gi)
 	{
 		if(false == edit_username->GetText().IsEmpty())
