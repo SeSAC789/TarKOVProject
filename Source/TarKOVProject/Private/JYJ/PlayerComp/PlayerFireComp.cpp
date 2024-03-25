@@ -288,7 +288,7 @@ void UPlayerFireComp::SetAiming( FHitResult OutHit , FVector Start , FVector End
 
 	if(&OutHit == nullptr) return;
 
-	UE_LOG( LogTemp , Warning , TEXT( "%s" ) , *OutHit.Component->GetName() );
+	//UE_LOG( LogTemp , Warning , TEXT( "%s" ) , *OutHit.Component->GetName() );
 	// Call a Take Damage function
 	UCapsuleComponent* HitComp = Cast<UCapsuleComponent>( OutHit.GetComponent() );
 	if (HitComp == nullptr)return;

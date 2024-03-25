@@ -83,5 +83,8 @@ public:
 
 	UFUNCTION( NetMulticast , Reliable )
 	void MultiExitRoom();
+
+	FString StringBase64Encode( const FString& str );
+	FString StringBase64Decode( const FString& str );
 	
 };

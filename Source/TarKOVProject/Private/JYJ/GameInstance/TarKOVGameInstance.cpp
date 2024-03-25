@@ -26,8 +26,6 @@ void UTarKOVGameInstance::Init()
 
 void UTarKOVGameInstance::CreateRoom(FString roomName)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("Create Room [%s]!!!!!!!!!!!!1"), *roomName);
-
 	FOnlineSessionSettings setting;
 
 	//데디케이트 서버인가
@@ -50,8 +48,8 @@ void UTarKOVGameInstance::CreateRoom(FString roomName)
 	setting.NumPublicConnections = 5;
 
 	//커스텀 정보 설정
-	setting.Set( TEXT( "HOST_NAME" ) , myNickName , EOnlineDataAdvertisementType::ViaOnlineServiceAndPing );
-	setting.Set( TEXT( "ROOM_NAME" ) , roomName ,	EOnlineDataAdvertisementType::ViaOnlineServiceAndPing );
+	setting.Set( TEXT( "HOST_NAME" ) , StringBase64Encode(myNickName) , EOnlineDataAdvertisementType::ViaOnlineServiceAndPing );
+	setting.Set( TEXT( "ROOM_NAME" ) , StringBase64Encode(roomName) ,	EOnlineDataAdvertisementType::ViaOnlineServiceAndPing );
 
 	//netID 설정
 	FUniqueNetIdPtr _netID = GetWorld()->GetFirstLocalPlayerFromController()->GetUniqueNetIdForPlatformUser().GetUniqueNetId();
@@ -133,10 +131,17 @@ void UTarKOVGameInstance::OnFindOtherRoomsComplete(bool bWasSuccessful)
 
 		info.index = i;
 
-		//넘겨 받은 session settings = SessionSettings (위에 선언한거)
-		r.Session.SessionSettings.Get( TEXT( "ROOM_NAME" ) , info.roomName );
+		FString roomName_enc;
+		FString hostName_enc;
 
-		r.Session.SessionSettings.Get( TEXT( "HOST_NAME" ) , info.hostName );
+
+		//넘겨 받은 session settings = SessionSettings (위에 선언한거)
+		r.Session.SessionSettings.Get( TEXT( "ROOM_NAME" ) , roomName_enc );
+
+		r.Session.SessionSettings.Get( TEXT( "HOST_NAME" ) , hostName_enc );
+
+		info.roomName = StringBase64Decode( roomName_enc );
+		info.hostName = StringBase64Decode( hostName_enc );
 
 		//FString userName;
 		//userName = r.Session.OwningUserName;
@@ -169,6 +174,8 @@ void UTarKOVGameInstance::JoinRoom(int32 index)
 	//Session name = Room Name
 	FString sessionName;
 	r.Session.SessionSettings.Get( TEXT( "ROOM_NAME" ) , sessionName );
+
+	sessionName = StringBase64Decode( sessionName );
 
 	sessionInterface->JoinSession( 0 , FName( *sessionName ) , r );
 }
@@ -220,4 +227,21 @@ void UTarKOVGameInstance::ServerExitRoom_Implementation()
 void UTarKOVGameInstance::MultiExitRoom_Implementation()
 {
 	sessionInterface->DestroySession( FName( *myRoomName ) );
+}
+
+FString UTarKOVGameInstance::StringBase64Encode( const FString& str )
+{
+	// Set 할 때 : FString -> UTF8 (std::string) -> TArray<uint8> -> base64 로 Encode
+	std::string utf8String = TCHAR_TO_UTF8( *str );
+	TArray<uint8> arrayData = TArray<uint8>( (uint8*)(utf8String.c_str()) , utf8String.length() );
+	return FBase64::Encode( arrayData );
+}
+
+FString UTarKOVGameInstance::StringBase64Decode( const FString& str )
+{
+	// Get 할 때 : base64 로 Decode -> TArray<uint8> -> TCHAR
+	TArray<uint8> arrayData;
+	FBase64::Decode( str , arrayData );
+	std::string ut8String( (char*)(arrayData.GetData()) , arrayData.Num() );
+	return UTF8_TO_TCHAR( ut8String.c_str() );
 }
