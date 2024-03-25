@@ -181,5 +181,6 @@ private:
 	UFUNCTION( NetMulticast , Reliable )
 	void MultiFireVFX( FHitResult OutHits );
 
-
+	UPROPERTY(EditDefaultsOnly)
+	class APlayerBase* tempPlayer;
 };

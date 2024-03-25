@@ -305,12 +305,14 @@ void UPlayerFireComp::SetAiming( FHitResult OutHit , FVector Start , FVector End
 
 	// 총으로 적 죽이면 kill count +1
 	auto otherplayer = Cast<APlayerBase>( OutHit.GetActor() );
-	if (otherplayer && otherplayer->HealthComp->bIsDead)
+	if (otherplayer && otherplayer->HealthComp->bIsDead && otherplayer!=tempPlayer)
 	{
+		
 		ATarKOVPlayerController* pc = Cast<ATarKOVPlayerController>( me->GetController() );
 		if (pc)
 		{
 			pc->UpdatekillCnt( 1 );
+			tempPlayer = otherplayer;
 		}
 	}
 }
