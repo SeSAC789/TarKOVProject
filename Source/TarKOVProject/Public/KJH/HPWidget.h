@@ -157,6 +157,7 @@ public:
 	class UWidgetAnimation* HitAnimation;
 
 	void PlayHitAnim();
+
 	void UpdateStaminaBar();
 
 	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
@@ -188,9 +189,22 @@ public:
 	UPROPERTY( EditDefaultsOnly , meta = (BindWidget) )
 	class UTextBlock* Timer_Text;
 
+	UFUNCTION( BlueprintCallable )
+	void GameStartCountdown( int32 GameCountdownTime );
+
+	UFUNCTION( BlueprintCallable )
+	void GameStopCountdown();
+
+	FTimerHandle GameCountdownTimerHandle;
+	int32 GameCurrentCountdownTime;
+
+	void UpdateGameCountdown();
+
 	void UpdateHPBarColor( UProgressBar* HPBar , float HPPercentage ) const;
 
-	/*UPROPERTY()
-	class UHealthComp* healthComp;*/
+	UPROPERTY( EditDefaultsOnly , meta = (BindWidgetAnim) , Transient )
+	class UWidgetAnimation* EscapeAnimation;
+
+	void PlayEscapeAnim();
 
 };

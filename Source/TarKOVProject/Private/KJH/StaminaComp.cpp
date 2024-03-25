@@ -3,6 +3,8 @@
 
 #include "KJH/StaminaComp.h"
 
+#include "Net/UnrealNetwork.h"
+
 // Sets default values for this component's properties
 UStaminaComp::UStaminaComp()
 {
@@ -43,6 +45,13 @@ void UStaminaComp::RecoverStamina(float DeltaTime)
 	{
 		Stamina = FMath::Clamp( Stamina + StaminaRecoveryRate * DeltaTime , 0.0f , MaxStamina );
 	}
+}
+
+void UStaminaComp::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME( UStaminaComp , Stamina );
 }
 
 

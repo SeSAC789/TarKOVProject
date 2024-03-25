@@ -29,7 +29,7 @@ public:
 	UPROPERTY( EditDefaultsOnly , BlueprintReadOnly , Category = "Stamina" )
 	float MaxStamina = 100.0f;
 
-	UPROPERTY( VisibleAnywhere , BlueprintReadOnly , Category = "Stamina" )
+	UPROPERTY( EditDefaultsOnly , BlueprintReadOnly , Category = "Stamina", Replicated )
 	float Stamina = MaxStamina;
 
 	// 스태미나 회복률
@@ -43,4 +43,6 @@ public:
 	void ConsumeStamina( float Amount );
 
 	void RecoverStamina( float DeltaTime );
+
+	virtual void GetLifetimeReplicatedProps( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
 };

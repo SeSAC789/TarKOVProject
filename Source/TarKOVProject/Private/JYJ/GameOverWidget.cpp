@@ -15,9 +15,12 @@ void UGameOverWidget::NativeConstruct()
 	ATarKOVPlayerController* pc = Cast<ATarKOVPlayerController>( GetOwningPlayer() );
 	if (pc)
 	{
-		// 플레이 시간
-		FString PlayTimeText = FString::Printf( TEXT( "레이드 시간 : %.2f " ) , pc->PlayTime );
+		int32 Minutes = pc->PlayTime / 60;
+		int32 Seconds = pc->PlayTime % 60;
+		FString PlayTimeText = FString::Printf( TEXT( "레이드 시간 :  %02d:%02d" ) , Minutes , Seconds );
 		text_timer->SetText( FText::FromString( PlayTimeText ) );
+		/*FString PlayTimeText = FString::Printf( TEXT( "레이드 시간 : %.2f " ) , pc->PlayTime );
+		text_timer->SetText( FText::FromString( PlayTimeText ) );*/
 
 		// 킬 카운트 
 		UpdatePlayerKillCount( pc->GetKillCount() );

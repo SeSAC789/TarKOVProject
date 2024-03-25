@@ -26,9 +26,14 @@ void UGameClearWidget::NativeConstruct()
 	btn_quit->OnClicked.AddDynamic( this , &UGameClearWidget::OnClickbtnQuit );
 }
 
-void UGameClearWidget::SetPlayTime(float PlayTime)
+void UGameClearWidget::SetPlayTime(int32 PlayTime)
 {
-	text_timer->SetText( FText::FromString( FString::Printf( TEXT( "레이드 시간: %0.2f " ) , PlayTime ) ) );
+	int32 Minutes = PlayTime / 60;
+	int32 Seconds = PlayTime % 60;
+	FString TimeText = FString::Printf( TEXT( "레이드 시간 :  %02d:%02d" ) , Minutes , Seconds );
+	text_timer->SetText( FText::FromString( TimeText ) );
+
+	//text_timer->SetText( FText::FromString( FString::Printf( TEXT( "레이드 시간: %0.2f " ) , PlayTime ) ) );
 }
 
 void UGameClearWidget::OnClickbtnQuit()

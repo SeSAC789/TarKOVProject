@@ -37,7 +37,7 @@ public:
 	class UWidgetAnimation* GameClearAnimation;
 
 	UFUNCTION( BlueprintCallable )
-	void SetPlayTime( float PlayTime );
+	void SetPlayTime( int32 PlayTime );
 
 	UFUNCTION( BlueprintCallable )
 	void UpdatePlayerKillCount( int32 KillCount );

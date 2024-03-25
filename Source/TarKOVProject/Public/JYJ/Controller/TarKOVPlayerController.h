@@ -65,11 +65,11 @@ public:
 
 	// gameover 게임 시작 시간을 기록
 	UPROPERTY( ReplicatedUsing = OnRep_GameStartTime )
-	float GameStartTime;
+	int32 GameStartTime;
 
 	// 플레이 시간을 저장
 	UPROPERTY( Replicated, EditAnywhere )
-	float PlayTime;
+	int32 PlayTime;
 
 	UFUNCTION()
 	void OnRep_GameStartTime();
@@ -82,7 +82,7 @@ public:
 
 	// gameclear 플레이 타임을 저장
 	UPROPERTY( EditAnywhere , BlueprintReadOnly , Replicated )
-	float PlayerPlayTime;
+	int32 PlayerPlayTime;
 
 	// 게임 클리어 시 호출
 	void CalculateAndSavePlayTime();

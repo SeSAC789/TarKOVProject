@@ -344,17 +344,47 @@ void UHPWidget::UpdateCountdown()
 		{
 			ClearTimer_Text->SetText( FText::AsNumber( CurrentCountdownTime ) );
 		}
-		if (Timer_Text)
-		{
-			int32 Minutes = CurrentCountdownTime / 60;
-			int32 Seconds = CurrentCountdownTime % 60;
-			FString TimeText = FString::Printf( TEXT( "%02d:%02d" ) , Minutes , Seconds );
-			Timer_Text->SetText( FText::FromString( TimeText ) );
-		}
+	
 		if (CurrentCountdownTime == 0)
 		{
 			// 카운트다운이 끝나면 타이머 중지
 			StopCountdown();
+		}
+		--CurrentCountdownTime;
+	}
+	
+}
+
+void UHPWidget::GameStartCountdown(int32 GameCountdownTime)
+{
+	GameCurrentCountdownTime = GameCountdownTime;
+	UpdateGameCountdown();
+
+	// 타이머 시작, 1초마다 UpdateCountdown 호출
+	GetWorld()->GetTimerManager().SetTimer( GameCountdownTimerHandle , this , &UHPWidget::UpdateGameCountdown , 1.0f , true );
+}
+
+void UHPWidget::GameStopCountdown()
+{
+	GetWorld()->GetTimerManager().ClearTimer( GameCountdownTimerHandle );
+}
+
+void UHPWidget::UpdateGameCountdown()
+{
+	if (GameCurrentCountdownTime >= 0)
+	{
+		if (Timer_Text)
+		{
+			int32 Minutes = GameCurrentCountdownTime / 60;
+			int32 Seconds = GameCurrentCountdownTime % 60;
+			FString TimeText = FString::Printf( TEXT( "%02d:%02d" ) , Minutes , Seconds );
+			Timer_Text->SetText( FText::FromString( TimeText ) );
+		}
+		if (GameCurrentCountdownTime == 0)
+		{
+			// 카운트다운이 끝나면 타이머 중지
+			GameStopCountdown();
+
 			APlayerBase* me = Cast<APlayerBase>( GetOwningPlayerPawn() );
 			if (me && me->HealthComp)
 			{
@@ -369,9 +399,9 @@ void UHPWidget::UpdateCountdown()
 				}
 			}
 		}
-		--CurrentCountdownTime;
+		--GameCurrentCountdownTime;
 	}
-	
+
 }
 
 void UHPWidget::UpdateHPBarColor( UProgressBar* HPBar , float HPPercentage ) const
@@ -394,4 +424,9 @@ void UHPWidget::UpdateHPBarColor( UProgressBar* HPBar , float HPPercentage ) con
 	{
 		HPBar->SetFillColorAndOpacity( Color );
 	}
+}
+
+void UHPWidget::PlayEscapeAnim()
+{
+	PlayAnimation( EscapeAnimation );
 }

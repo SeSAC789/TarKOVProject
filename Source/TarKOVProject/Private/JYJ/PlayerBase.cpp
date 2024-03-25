@@ -319,7 +319,9 @@ void APlayerBase::InitUI()
 		// AddToViewport하고싶다.
 		pc->PlayerMainUI->AddToViewport();
 		// 타이머 카운트 다운 시작하고싶다.
-		pc->PlayerMainUI->StartCountdown( 300 ); // 5분
+		pc->PlayerMainUI->GameStartCountdown( 300 );
+
+		pc->PlayerMainUI->PlayEscapeAnim();
 	}
 
 	// 만들어진 mainUI를 기억하고싶다.
